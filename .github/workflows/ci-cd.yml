@@ -16,13 +16,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+          cache: 'pnpm'
           
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
         
       - name: Run tests
-        run: yarn workspace @send/api-gateway test
+        run: pnpm workspace @send/api-gateway test
         env:
           NODE_ENV: test
           
@@ -36,13 +36,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+          cache: 'pnpm'
           
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
         
       - name: Build
-        run: yarn workspace @send/api-gateway build
+        run: pnpm workspace @send/api-gateway build
         
       - name: Build Docker image
         run: docker build -t api-gateway:latest -f packages/api-gateway/Dockerfile .
