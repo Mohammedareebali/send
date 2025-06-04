@@ -37,27 +37,27 @@ The User Service is a microservice responsible for user management in the SEND T
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   yarn install
+   pnpm install
    ```
 3. Copy `.env.example` to `.env` and configure environment variables
 4. Start the service:
    ```bash
-   yarn start
+   pnpm start
    ```
 
 ## Development
 
 - Run in development mode:
   ```bash
-  yarn dev
+  pnpm dev
   ```
 - Run tests:
   ```bash
-  yarn test
+  pnpm test
   ```
 - Lint code:
   ```bash
-  yarn lint
+  pnpm lint
   ```
 
 ## Environment Variables
