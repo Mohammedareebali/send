@@ -1,0 +1,21 @@
+{
+  "name": "send",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "format": "lerna run format",
+    "start": "lerna run start",
+    "dev": "lerna run dev",
+    "clean": "lerna clean",
+    "bootstrap": "lerna bootstrap"
+  },
+  "devDependencies": {
+    "lerna": "^6.6.2"
+  }
+}

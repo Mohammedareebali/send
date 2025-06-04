@@ -1,0 +1,57 @@
+apiVersion: 1
+
+providers:
+  - name: 'default'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: true
+
+  - name: 'user-service'
+    orgId: 1
+    folder: 'User Service'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/user-service.json
+
+  - name: 'run-service'
+    orgId: 1
+    folder: 'Run Service'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/run-service.json
+
+  - name: 'tracking-service'
+    orgId: 1
+    folder: 'Tracking Service'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/tracking-service.json
+
+  - name: 'document-service'
+    orgId: 1
+    folder: 'Document Service'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/document-service.json
+
+  - name: 'notification-service'
+    orgId: 1
+    folder: 'Notification Service'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/notification-service.json 

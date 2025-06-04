@@ -1,0 +1,166 @@
+import { TrackingService } from './tracking.service';
+import { PrismaClient } from '@prisma/client';
+import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
+import { Logger } from 'winston';
+import { Location, TrackingEvent, Geofence } from '@shared/types/tracking';
+
+describe('TrackingService', () => {
+  let trackingService: TrackingService;
+  let mockPrisma: jest.Mocked<PrismaClient>;
+  let mockRabbitMQ: jest.Mocked<RabbitMQService>;
+  let mockLogger: jest.Mocked<Logger>;
+
+  beforeEach(() => {
+    mockPrisma = {
+      trackingEvent: {
+        create: jest.fn(),
+        findMany: jest.fn()
+      },
+      geofence: {
+        findMany: jest.fn()
+      }
+    } as any;
+
+    mockRabbitMQ = {
+      publishMessage: jest.fn()
+    } as any;
+
+    mockLogger = {
+      info: jest.fn(),
+      error: jest.fn()
+    } as any;
+
+    trackingService = new TrackingService(
+      mockPrisma,
+      mockRabbitMQ,
+      mockLogger
+    );
+  });
+
+  describe('trackLocation', () => {
+    it('should track location and create event', async () => {
+      const vehicleId = 'test-vehicle';
+      const location: Location = {
+        latitude: 40.7128,
+        longitude: -74.0060,
+        speed: 60,
+        heading: 90
+      };
+
+      const mockEvent = {
+        id: 'event-1',
+        vehicleId,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        speed: location.speed,
+        heading: location.heading,
+        timestamp: new Date()
+      };
+
+      mockPrisma.trackingEvent.create.mockResolvedValue(mockEvent);
+      mockPrisma.geofence.findMany.mockResolvedValue([]);
+
+      const result = await trackingService.trackLocation(vehicleId, location);
+
+      expect(mockPrisma.trackingEvent.create).toHaveBeenCalledWith({
+        data: {
+          vehicleId,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          speed: location.speed,
+          heading: location.heading,
+          timestamp: expect.any(Date)
+        }
+      });
+
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith(
+        'tracking.location.updated',
+        expect.objectContaining({
+          vehicleId,
+          location,
+          timestamp: expect.any(Date)
+        })
+      );
+
+      expect(result).toEqual({
+        id: mockEvent.id,
+        vehicleId: mockEvent.vehicleId,
+        location: {
+          latitude: mockEvent.latitude,
+          longitude: mockEvent.longitude,
+          speed: mockEvent.speed,
+          heading: mockEvent.heading
+        },
+        timestamp: mockEvent.timestamp
+      });
+    });
+
+    it('should handle geofence events when vehicle enters a geofence', async () => {
+      const vehicleId = 'test-vehicle';
+      const location: Location = {
+        latitude: 40.7128,
+        longitude: -74.0060,
+        speed: 60,
+        heading: 90
+      };
+
+      const mockGeofence: Geofence = {
+        id: 'geofence-1',
+        name: 'Test Geofence',
+        boundary: [
+          { latitude: 40.7128, longitude: -74.0060 },
+          { latitude: 40.7129, longitude: -74.0061 }
+        ],
+        isActive: true
+      };
+
+      const mockEvent = {
+        id: 'event-1',
+        vehicleId,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        speed: location.speed,
+        heading: location.heading,
+        timestamp: new Date()
+      };
+
+      mockPrisma.trackingEvent.create.mockResolvedValue(mockEvent);
+      mockPrisma.geofence.findMany.mockResolvedValue([mockGeofence]);
+
+      await trackingService.trackLocation(vehicleId, location);
+
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith(
+        'tracking.geofence.entered',
+        expect.objectContaining({
+          vehicleId,
+          geofenceId: mockGeofence.id,
+          location,
+          timestamp: expect.any(Date)
+        })
+      );
+    });
+
+    it('should handle errors during tracking', async () => {
+      const vehicleId = 'test-vehicle';
+      const location: Location = {
+        latitude: 40.7128,
+        longitude: -74.0060,
+        speed: 60,
+        heading: 90
+      };
+
+      const error = new Error('Database error');
+      mockPrisma.trackingEvent.create.mockRejectedValue(error);
+
+      await expect(trackingService.trackLocation(vehicleId, location)).rejects.toThrow(error);
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Failed to track location',
+        expect.objectContaining({
+          error,
+          vehicleId,
+          location
+        })
+      );
+    });
+  });
+}); 

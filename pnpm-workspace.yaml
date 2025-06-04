@@ -1,0 +1,25 @@
+packages:
+  - 'packages/*'
+
+public-hoist-pattern:
+  - '*'
+  - '!@prisma/*'
+  - '!@send/*'
+
+ignoredBuiltDependencies:
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - 'prisma'
+  - 'esbuild'
+
+node-linker: hoisted
+shamefully-hoist: true
+strict-peer-dependencies: false
+auto-install-peers: true
+
+hoist-pattern:
+  - '*'
+  - '!@prisma/*'
+  - '!@send/*'

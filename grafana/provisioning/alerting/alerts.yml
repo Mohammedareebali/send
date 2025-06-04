@@ -1,0 +1,336 @@
+apiVersion: 1
+
+groups:
+  - name: API Gateway Alerts
+    folder: API Gateway
+    interval: 1m
+    rules:
+      - name: Critical Error Rate
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(http_errors_total{status=~"5.."}[5m]) > 0.05
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Critical error rate detected
+          description: 5xx error rate is above 5% for the last 2 minutes
+        labels:
+          severity: critical
+          team: operations
+
+      - name: Warning Error Rate
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(http_errors_total{status=~"4.."}[5m]) > 0.1
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Warning error rate detected
+          description: 4xx error rate is above 10% for the last 5 minutes
+        labels:
+          severity: warning
+          team: operations
+
+      - name: Critical Latency
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(http_request_duration_seconds_sum{route!~"/health|/metrics"}[5m]) / rate(http_request_duration_seconds_count{route!~"/health|/metrics"}[5m]) > 2
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Critical latency detected
+          description: Average request duration is above 2 seconds for the last 2 minutes
+        labels:
+          severity: critical
+          team: performance
+
+      - name: Warning Latency
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(http_request_duration_seconds_sum{route!~"/health|/metrics"}[5m]) / rate(http_request_duration_seconds_count{route!~"/health|/metrics"}[5m]) > 1
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Warning latency detected
+          description: Average request duration is above 1 second for the last 5 minutes
+        labels:
+          severity: warning
+          team: performance
+
+      - name: Circuit Breaker Open
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: circuit_breaker_state == 2
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: Circuit breaker is open
+          description: Circuit breaker for {{ $labels.service }} is in OPEN state
+        labels:
+          severity: critical
+          team: reliability
+
+      - name: High Memory Usage
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: process_resident_memory_bytes / process_virtual_memory_bytes > 0.9
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Critical memory usage
+          description: Memory usage is above 90% for the last 5 minutes
+        labels:
+          severity: critical
+          team: operations
+
+      - name: Warning Memory Usage
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: process_resident_memory_bytes / process_virtual_memory_bytes > 0.8
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: Warning memory usage
+          description: Memory usage is above 80% for the last 10 minutes
+        labels:
+          severity: warning
+          team: operations
+
+      - name: Service Unavailable
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: up == 0
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: Service is down
+          description: The API Gateway service is not responding
+        labels:
+          severity: critical
+          team: operations
+
+      - name: High Rate Limit Hits
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(rate_limit_hits_total[5m]) > 20
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: High rate limit hits
+          description: Rate limit hits are above 20 per second for the last 5 minutes
+        labels:
+          severity: warning
+          team: security
+
+      - name: High CPU Usage
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(process_cpu_seconds_total[5m]) > 0.8
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: High CPU usage detected
+          description: CPU usage is above 80% for the last 5 minutes
+        labels:
+          severity: warning
+          team: operations
+
+      - name: Disk Space Warning
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.85
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: Low disk space warning
+          description: Disk usage is above 85% for the last 10 minutes
+        labels:
+          severity: warning
+          team: operations
+
+      - name: High Request Volume
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(http_requests_total{route!~"/health|/metrics"}[5m]) > 1000
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: High request volume detected
+          description: Request rate is above 1000 requests per second for the last 5 minutes
+        labels:
+          severity: warning
+          team: performance
+
+      - name: Slow Database Queries
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(db_query_duration_seconds_sum[5m]) / rate(db_query_duration_seconds_count[5m]) > 0.5
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Slow database queries detected
+          description: Average database query duration is above 500ms for the last 5 minutes
+        labels:
+          severity: warning
+          team: database
+
+      - name: High Cache Miss Rate
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: rate(cache_misses_total[5m]) / rate(cache_requests_total[5m]) > 0.2
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: High cache miss rate detected
+          description: Cache miss rate is above 20% for the last 5 minutes
+        labels:
+          severity: warning
+          team: performance
+
+      - name: High Queue Length
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: queue_length > 1000
+              instant: false
+              intervalMs: 15000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: High queue length detected
+          description: Message queue length is above 1000 for the last 5 minutes
+        labels:
+          severity: warning
+          team: operations 

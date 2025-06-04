@@ -1,0 +1,104 @@
+import express from 'express';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
+import { PrismaClient } from '@prisma/client';
+import { RabbitMQService } from './infra/messaging/rabbitmq';
+import { TrackingService } from './infra/services/tracking.service';
+import { TrackingController } from './api/controllers/tracking.controller';
+import { createTrackingRoutes } from './api/routes/tracking.routes';
+import { Geofence } from '@shared/types/tracking';
+
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
+
+const prisma = new PrismaClient();
+const rabbitMQ = new RabbitMQService();
+
+// Define geofences for pickup and dropoff locations
+const geofences: Geofence[] = [
+  {
+    id: 'pickup-zone',
+    name: 'Pickup Zone',
+    type: 'PICKUP',
+    center: {
+      latitude: 51.5074,
+      longitude: -0.1278,
+      timestamp: new Date()
+    },
+    radius: 100 // meters
+  },
+  {
+    id: 'dropoff-zone',
+    name: 'Dropoff Zone',
+    type: 'DROPOFF',
+    center: {
+      latitude: 51.5074,
+      longitude: -0.1278,
+      timestamp: new Date()
+    },
+    radius: 100 // meters
+  }
+];
+
+const trackingService = new TrackingService(prisma, rabbitMQ, geofences);
+const trackingController = new TrackingController(trackingService);
+
+// Set up routes
+app.use(express.json());
+app.use('/api', createTrackingRoutes(trackingController));
+
+// Set up WebSocket connections
+io.on('connection', (socket) => {
+  console.log('Client connected');
+
+  socket.on('join-run', (runId: string) => {
+    trackingService.addClient(runId, socket);
+    console.log(`Client joined run ${runId}`);
+  });
+
+  socket.on('disconnect', () => {
+    // Find and remove the socket from all runs
+    for (const [runId, tracking] of trackingService['activeRuns']) {
+      tracking.sockets.delete(socket);
+    }
+    console.log('Client disconnected');
+  });
+});
+
+// Connect to RabbitMQ and start listening for events
+async function start() {
+  try {
+    await rabbitMQ.connect();
+    await rabbitMQ.subscribeToTrackingEvents(async (event) => {
+      console.log('Received tracking event:', event);
+      // Handle tracking events as needed
+    });
+
+    const port = process.env.PORT || 3003;
+    httpServer.listen(port, () => {
+      console.log(`Tracking service listening on port ${port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start tracking service:', error);
+    process.exit(1);
+  }
+}
+
+start();
+
+// Handle graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received. Shutting down gracefully...');
+  await rabbitMQ.close();
+  await prisma.$disconnect();
+  httpServer.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
+  });
+}); 
