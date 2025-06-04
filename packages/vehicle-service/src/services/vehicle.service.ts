@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { Vehicle, VehicleType, VehicleStatus } from '../types/vehicle';
 import { createVehicleSchema, updateVehicleSchema, vehicleQuerySchema } from '@shared/validation/schemas/vehicle.schema';
 import { prometheus } from '@shared/prometheus';
@@ -99,16 +99,29 @@ export class VehicleService {
         ...(year && { year })
       };
 
+      const conditions = Object.entries(where).map(([key, value]) =>
+        Prisma.sql`${Prisma.raw(`"${key}"`)} = ${value}`
+      );
+
+      const whereSql =
+        conditions.length > 0
+          ? Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`
+          : Prisma.empty;
+
       const [vehicles, total] = await Promise.all([
-        this.prisma.$queryRaw<PrismaVehicle[]>`
-          SELECT * FROM "vehicle"."Vehicle"
-          WHERE ${Object.entries(where).map(([key, value]) => `${key} = ${value}`).join(' AND ')}
-          LIMIT ${limit} OFFSET ${(page - 1) * limit}
-        `,
-        this.prisma.$queryRaw<[{ count: number }]>`
-          SELECT COUNT(*) as count FROM "vehicle"."Vehicle"
-          WHERE ${Object.entries(where).map(([key, value]) => `${key} = ${value}`).join(' AND ')}
-        `
+        this.prisma.$queryRaw<PrismaVehicle[]>(
+          Prisma.sql`
+            SELECT * FROM "vehicle"."Vehicle"
+            ${whereSql}
+            LIMIT ${limit} OFFSET ${(page - 1) * limit}
+          `
+        ),
+        this.prisma.$queryRaw<{ count: number }[]>(
+          Prisma.sql`
+            SELECT COUNT(*) as count FROM "vehicle"."Vehicle"
+            ${whereSql}
+          `
+        )
       ]);
 
       return {
@@ -155,12 +168,18 @@ export class VehicleService {
     try {
       const validatedData = updateVehicleSchema.parse(vehicleData);
       
-      const result = await this.prisma.$queryRaw<PrismaVehicle[]>`
+      const updates = Object.entries(validatedData).map(([key, value]) =>
+        Prisma.sql`${Prisma.raw(`"${key}"`)} = ${value}`
+      );
+
+      const updateQuery = Prisma.sql`
         UPDATE "vehicle"."Vehicle"
-        SET ${Object.entries(validatedData).map(([key, value]) => `${key} = ${value}`).join(', ')}
+        SET ${Prisma.join(updates, ', ')}
         WHERE id = ${id}
         RETURNING *
       `;
+
+      const result = await this.prisma.$queryRaw<PrismaVehicle[]>(updateQuery);
 
       if (!result || result.length === 0) {
         return null;

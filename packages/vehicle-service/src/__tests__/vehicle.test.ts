@@ -162,6 +162,34 @@ describe('Vehicle Service', () => {
       expect(vehicles).toHaveLength(1);
       expect(vehicles[0].status).toBe(VehicleStatus.AVAILABLE);
     });
+
+    it('should filter vehicles by make and year', async () => {
+      await vehicleService.createVehicle({
+        type: VehicleType.SEDAN,
+        make: 'Toyota',
+        model: 'Camry',
+        year: 2022,
+        licensePlate: 'ABC123',
+        status: VehicleStatus.AVAILABLE,
+        capacity: 4
+      });
+
+      await vehicleService.createVehicle({
+        type: VehicleType.SUV,
+        make: 'Honda',
+        model: 'CRV',
+        year: 2021,
+        licensePlate: 'XYZ789',
+        status: VehicleStatus.AVAILABLE,
+        capacity: 5
+      });
+
+      const { vehicles } = await vehicleService.getAllVehicles({ make: 'Toyota', year: 2022 });
+
+      expect(vehicles).toHaveLength(1);
+      expect(vehicles[0].make).toBe('Toyota');
+      expect(vehicles[0].year).toBe(2022);
+    });
   });
 
   describe('deleteVehicle', () => {
