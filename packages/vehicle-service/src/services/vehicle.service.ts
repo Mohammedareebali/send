@@ -19,23 +19,125 @@ interface PrismaVehicle {
 }
 
 export class VehicleService {
-  getVehicles(vehicleId: string) {
-    throw new Error('Method not implemented.');
+  async getVehicles(vehicleId: string): Promise<Vehicle | null> {
+    return this.getVehicleById(vehicleId);
   }
-  assignVehicleToRun(id: string, runId: any) {
-    throw new Error('Method not implemented.');
+
+  async assignVehicleToRun(id: string, runId: string): Promise<Vehicle | null> {
+    try {
+      const result = await this.prisma.$queryRaw<PrismaVehicle[]>`
+        UPDATE "vehicle"."Vehicle"
+        SET status = ${VehicleStatus.IN_USE}, currentRunId = ${runId}
+        WHERE id = ${id}
+        RETURNING *
+      `;
+
+      if (!result || result.length === 0) {
+        return null;
+      }
+
+      const mappedVehicle = this.mapToVehicle(result[0]);
+      this.cache.set(id, mappedVehicle);
+      return mappedVehicle;
+    } catch (error) {
+      logger.error('Error assigning vehicle to run:', { id, runId, error });
+      prometheus.serviceRequestsTotal.inc({
+        service: 'vehicle-service',
+        status: 'error'
+      });
+      throw error;
+    }
   }
-  unassignVehicleFromRun(id: string) {
-    throw new Error('Method not implemented.');
+
+  async unassignVehicleFromRun(id: string): Promise<Vehicle | null> {
+    try {
+      const result = await this.prisma.$queryRaw<PrismaVehicle[]>`
+        UPDATE "vehicle"."Vehicle"
+        SET status = ${VehicleStatus.AVAILABLE}, currentRunId = NULL
+        WHERE id = ${id}
+        RETURNING *
+      `;
+
+      if (!result || result.length === 0) {
+        return null;
+      }
+
+      const mappedVehicle = this.mapToVehicle(result[0]);
+      this.cache.set(id, mappedVehicle);
+      return mappedVehicle;
+    } catch (error) {
+      logger.error('Error unassigning vehicle from run:', { id, error });
+      prometheus.serviceRequestsTotal.inc({
+        service: 'vehicle-service',
+        status: 'error'
+      });
+      throw error;
+    }
   }
-  getAvailableVehicles() {
-    throw new Error('Method not implemented.');
+
+  async getAvailableVehicles(): Promise<Vehicle[]> {
+    try {
+      const result = await this.prisma.$queryRaw<PrismaVehicle[]>`
+        SELECT * FROM "vehicle"."Vehicle"
+        WHERE status = ${VehicleStatus.AVAILABLE} AND currentRunId IS NULL
+      `;
+
+      return result.map(this.mapToVehicle);
+    } catch (error) {
+      logger.error('Error getting available vehicles:', { error });
+      prometheus.serviceRequestsTotal.inc({
+        service: 'vehicle-service',
+        status: 'error'
+      });
+      throw error;
+    }
   }
-  addMaintenanceRecord(id: string, body: any) {
-    throw new Error('Method not implemented.');
+
+  async addMaintenanceRecord(id: string, body: {
+    type: string;
+    description: string;
+    cost: number;
+    date?: Date;
+  }): Promise<{ id: string } & typeof body> {
+    try {
+      const recordDate = body.date || new Date();
+
+      const result = await this.prisma.$queryRaw<any[]>`
+        INSERT INTO "vehicle"."MaintenanceRecord" (
+          vehicleId, type, description, cost, date
+        ) VALUES (
+          ${id}, ${body.type}, ${body.description}, ${body.cost}, ${recordDate}
+        ) RETURNING *
+      `;
+
+      return result[0];
+    } catch (error) {
+      logger.error('Error adding maintenance record:', { id, body, error });
+      prometheus.serviceRequestsTotal.inc({
+        service: 'vehicle-service',
+        status: 'error'
+      });
+      throw error;
+    }
   }
-  getMaintenanceHistory(id: string) {
-    throw new Error('Method not implemented.');
+
+  async getMaintenanceHistory(id: string): Promise<any[]> {
+    try {
+      const result = await this.prisma.$queryRaw<any[]>`
+        SELECT * FROM "vehicle"."MaintenanceRecord"
+        WHERE vehicleId = ${id}
+        ORDER BY date DESC
+      `;
+
+      return result;
+    } catch (error) {
+      logger.error('Error getting maintenance history:', { id, error });
+      prometheus.serviceRequestsTotal.inc({
+        service: 'vehicle-service',
+        status: 'error'
+      });
+      throw error;
+    }
   }
   private prisma: PrismaClient;
   private cache: Map<string, Vehicle>;
