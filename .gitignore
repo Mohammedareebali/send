@@ -51,3 +51,9 @@ grafana/data/
 
 # Prometheus
 prometheus_data/ 
+# TypeScript build artifacts
+packages/shared/src/types/run.js
+packages/shared/src/types/user.js
+packages/shared/src/types/vehicle.js
+packages/shared/tsconfig.tsbuildinfo
+
