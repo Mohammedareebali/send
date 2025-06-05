@@ -1,10 +1,10 @@
 import { VehicleService } from '../../services/vehicle.service';
 import { PrismaClient } from '@prisma/client';
-import { RabbitMQService } from '../../infra/messaging/rabbitmq.service';
+import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { VehicleType, VehicleStatus, AlertType, AlertSeverity, AlertStatus } from '../../types/vehicle';
 
 jest.mock('@prisma/client');
-jest.mock('../../infra/messaging/rabbitmq.service');
+jest.mock('../../infra/messaging/rabbitmq');
 
 class MockRabbitMQService {
   url = 'amqp://localhost';
