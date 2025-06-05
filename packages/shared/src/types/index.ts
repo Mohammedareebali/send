@@ -14,3 +14,4 @@ export {
   TrackingEvent,
   TrackingNotification
 } from './tracking';
+export * from './invoice';
