@@ -3,11 +3,11 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../../shared/src/*"],
-      "@send/shared": ["../../shared/src"],
-      "@send/shared/*": ["../../shared/src/*"]
+      "@shared/*": ["../shared/src/*"],
+      "@send/shared": ["../shared/src"],
+      "@send/shared/*": ["../shared/src/*"]
     },
     "types": ["node", "jest", "express"]
   },
