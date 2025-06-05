@@ -5,6 +5,8 @@
     "rootDir": "../..",
     "baseUrl": ".",
     "paths": {
+      "@send/shared": ["../shared/src"],
+      "@send/shared/*": ["../shared/src/*"],
       "@services/*": ["./src/services/*"],
       "@types/*": ["./src/types/*"],
       "@shared/*": ["../shared/src/*"]

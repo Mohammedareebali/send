@@ -1,7 +1,7 @@
-import { setupTestEnvironment, cleanupTestEnvironment } from '@send/shared/src/testing/setup';
+import { setupTestEnvironment, cleanupTestEnvironment } from '@send/shared/testing/setup';
 import { VehicleService } from '../services/vehicle.service';
 import { PrismaClient } from '@prisma/client';
-import { VehicleStatus, VehicleType } from '@send/shared/src/types/vehicle';
+import { VehicleStatus, VehicleType } from '@send/shared/types/vehicle';
 
 describe('Vehicle Service', () => {
   let testSetup: any;
