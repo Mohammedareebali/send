@@ -21,3 +21,4 @@ process.on('SIGTERM', async () => {
   await prisma.$disconnect();
   process.exit(0);
 });
+export { DocumentExpiryWorker } from './workers/documentExpiry.worker';

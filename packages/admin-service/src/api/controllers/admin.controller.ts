@@ -13,4 +13,8 @@ export class AdminController {
   async reports(req: Request, res: Response): Promise<void> {
     res.json([]);
   }
+
+  async userActivity(req: Request, res: Response): Promise<void> {
+    res.json([]);
+  }
 }
