@@ -102,7 +102,7 @@ pnpm test:coverage
 
 ## Environment Variables
 
-- `PORT` - Service port (default: 3003)
+- `PORT` - Service port (default: 3007)
 - `DATABASE_URL` - PostgreSQL connection string
 - `RABBITMQ_URL` - RabbitMQ connection string
 - `JWT_SECRET` - JWT secret for authentication
