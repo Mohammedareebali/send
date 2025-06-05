@@ -19,7 +19,8 @@ export enum VehicleEventType {
   VEHICLE_STATUS_CHANGED = 'VEHICLE_STATUS_CHANGED',
   VEHICLE_ASSIGNED = 'VEHICLE_ASSIGNED',
   VEHICLE_UNASSIGNED = 'VEHICLE_UNASSIGNED',
-  MAINTENANCE_RECORD_ADDED = 'MAINTENANCE_RECORD_ADDED'
+  MAINTENANCE_RECORD_ADDED = 'MAINTENANCE_RECORD_ADDED',
+  TELEMETRY_RECORDED = 'TELEMETRY_RECORDED'
 }
 
 export enum AlertType {
@@ -68,10 +69,21 @@ export interface MaintenanceRecord {
   updatedAt: Date;
 }
 
+export interface TelemetryRecord {
+  id: string;
+  vehicleId: string;
+  speed?: number;
+  fuelLevel?: number;
+  location?: { latitude: number; longitude: number } | null;
+  recordedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface VehicleEvent {
   type: VehicleEventType;
   vehicleId: string;
-  data: Partial<Vehicle> | MaintenanceRecord;
+  data: Partial<Vehicle> | MaintenanceRecord | TelemetryRecord;
   timestamp: Date;
 }
 

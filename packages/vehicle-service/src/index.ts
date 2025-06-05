@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 const rabbitMQService = new RabbitMQService();
 
 // Create services and controllers
-const vehicleService = new VehicleService();
+const vehicleService = new VehicleService(rabbitMQService);
 const vehicleController = new VehicleController(vehicleService);
 
 // Middleware
