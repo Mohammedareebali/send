@@ -29,6 +29,7 @@ The service is built with the following components:
 - `POST /api/tracking/:runId/location` - Update location for a run
 - `POST /api/tracking/:runId/stop` - Stop tracking a run
 - `GET /api/tracking/:runId/status` - Get tracking status for a run
+- `GET /api/locations/:routeId/latest` - Get the most recent location for a run
 
 ### WebSocket Events
 

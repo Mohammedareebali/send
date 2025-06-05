@@ -13,6 +13,7 @@ traffic to the underlying services and enforces authentication using the shared
 - `DRIVER_SERVICE_URL` - URL of the driver service (default: `http://localhost:3004`)
 - `VEHICLE_SERVICE_URL` - URL of the vehicle service (default: `http://localhost:3005`)
 - `DOCUMENT_SERVICE_URL` - URL of the document service (default: `http://localhost:3006`)
+- `TRACKING_SERVICE_URL` - URL of the tracking service (default: `http://localhost:3003`)
 
 ## Development
 
