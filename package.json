@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "build": "lerna run build",
-    "generate:prisma": "npx prisma generate --schema=packages/driver-service/prisma/schema.prisma && npx prisma generate --schema=packages/run-service/prisma/schema.prisma && npx prisma generate --schema=packages/system-notification-service/prisma/schema.prisma && npx prisma generate --schema=packages/user-service/prisma/schema.prisma && npx prisma generate --schema=packages/vehicle-service/prisma/schema.prisma && npx prisma generate --schema=packages/student-service/prisma/schema.prisma && npx prisma generate --schema=packages/document-service/prisma/schema.prisma && npx prisma generate --schema=packages/tracking-service/prisma/schema.prisma",
+    "generate:prisma": "npx prisma generate --schema=packages/driver-service/prisma/schema.prisma && npx prisma generate --schema=packages/run-service/prisma/schema.prisma && npx prisma generate --schema=packages/system-notification-service/prisma/schema.prisma && npx prisma generate --schema=packages/user-service/prisma/schema.prisma && npx prisma generate --schema=packages/vehicle-service/prisma/schema.prisma && npx prisma generate --schema=packages/student-service/prisma/schema.prisma && npx prisma generate --schema=packages/document-service/prisma/schema.prisma && npx prisma generate --schema=packages/tracking-service/prisma/schema.prisma && npx prisma generate --schema=packages/incident-service/prisma/schema.prisma",
     "test": "npm run generate:prisma && lerna run test",
     "lint": "lerna run lint",
     "format": "lerna run format",
