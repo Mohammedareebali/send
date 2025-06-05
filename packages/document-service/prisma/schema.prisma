@@ -1,0 +1,96 @@
+ generator client {
+   provider = "prisma-client-js"
+ }
+
+ datasource db {
+   provider = "postgresql"
+   url      = env("DATABASE_URL")
+ }
+
+ enum DocumentStatus {
+   ACTIVE
+   ARCHIVED
+   DELETED
+ }
+
+ enum ComplianceStatus {
+   PENDING
+   COMPLIANT
+   NON_COMPLIANT
+ }
+
+ model Document {
+   id              String             @id @default(uuid())
+   userId          String
+   type            String
+   fileName        String
+   originalName    String
+   mimeType        String
+   size            Int
+   status          DocumentStatus     @default(ACTIVE)
+   complianceStatus ComplianceStatus  @default(PENDING)
+   metadata        Json
+   ocrText         String?
+   ocrConfidence   Float?
+   storagePath     String
+   createdAt       DateTime           @default(now())
+   updatedAt       DateTime           @updatedAt
+   versions        DocumentVersion[]
+   accesses        DocumentAccess[]
+   ocrResults      OCRResult[]
+
+   @@map("documents")
+ }
+
+ model DocumentVersion {
+   id          String   @id @default(uuid())
+   documentId  String
+   document    Document @relation(fields: [documentId], references: [id])
+   version     Int
+   fileName    String
+   storagePath String
+   changes     Json
+   uploadedBy  String
+   createdAt   DateTime @default(now())
+
+   @@map("document_versions")
+ }
+
+ model DocumentAccess {
+   id         String   @id @default(uuid())
+   documentId String
+   document   Document @relation(fields: [documentId], references: [id])
+   userId     String
+   permission String
+   grantedBy  String
+   grantedAt  DateTime
+   expiresAt  DateTime?
+
+   @@map("document_accesses")
+ }
+
+ model ComplianceRule {
+   id           String   @id @default(uuid())
+   documentType String
+   name         String
+   description  String
+   conditions   Json
+   actions      Json
+   createdAt    DateTime @default(now())
+   updatedAt    DateTime @updatedAt
+
+   @@map("compliance_rules")
+ }
+
+ model OCRResult {
+   id             String   @id @default(uuid())
+   documentId     String
+   document       Document @relation(fields: [documentId], references: [id])
+   rawText        String
+   structuredData Json
+   confidence     Float
+   processingTime Int
+   createdAt      DateTime @default(now())
+
+   @@map("ocr_results")
+ }
