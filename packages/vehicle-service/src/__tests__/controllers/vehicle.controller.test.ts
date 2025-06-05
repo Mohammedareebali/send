@@ -20,7 +20,6 @@ describe('VehicleController', () => {
       deleteVehicle: jest.fn(),
       getAllVehicles: jest.fn(),
       addMaintenanceRecord: jest.fn(),
-      updateVehicleStatus: jest.fn(),
       assignVehicleToRun: jest.fn(),
       unassignVehicleFromRun: jest.fn()
     } as any;
@@ -288,7 +287,7 @@ describe('VehicleController', () => {
         status: VehicleStatus.MAINTENANCE
       };
 
-      vehicleService.updateVehicleStatus.mockResolvedValue(mockVehicle);
+      vehicleService.updateVehicle.mockResolvedValue(mockVehicle);
 
       const response = await request(app)
         .put('/vehicles/1/status')
@@ -296,11 +295,11 @@ describe('VehicleController', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockVehicle);
-      expect(vehicleService.updateVehicleStatus).toHaveBeenCalledWith('1', status);
+      expect(vehicleService.updateVehicle).toHaveBeenCalledWith('1', { status });
     });
 
     it('should return 404 if vehicle not found', async () => {
-      vehicleService.updateVehicleStatus.mockResolvedValue(null);
+      vehicleService.updateVehicle.mockResolvedValue(null);
 
       const response = await request(app)
         .put('/vehicles/1/status')
@@ -311,7 +310,7 @@ describe('VehicleController', () => {
     });
 
     it('should handle errors', async () => {
-      vehicleService.updateVehicleStatus.mockRejectedValue(new Error('Test error'));
+      vehicleService.updateVehicle.mockRejectedValue(new Error('Test error'));
 
       const response = await request(app)
         .put('/vehicles/1/status')

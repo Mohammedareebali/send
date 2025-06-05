@@ -13,7 +13,7 @@ describe('Vehicle Service Performance', () => {
   beforeAll(async () => {
     testSetup = await setupTestEnvironment();
     prisma = testSetup.getPrisma();
-    vehicleService = new VehicleService(prisma);
+    vehicleService = new VehicleService();
 
     // Create test vehicles
     const vehicles = Array.from({ length: NUM_VEHICLES }, (_, i) => ({
