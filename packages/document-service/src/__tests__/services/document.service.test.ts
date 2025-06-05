@@ -65,7 +65,8 @@ jest.mock('winston', () => ({
   Logger: jest.fn().mockImplementation(() => ({
     info: jest.fn(),
     error: jest.fn(),
-    debug: jest.fn()
+    debug: jest.fn(),
+    warn: jest.fn()
   }))
 }));
 
