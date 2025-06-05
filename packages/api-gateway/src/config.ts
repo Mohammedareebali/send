@@ -1,0 +1,8 @@
+export const serviceConfig = {
+  userService: process.env.USER_SERVICE_URL || 'http://localhost:3000',
+  runService: process.env.RUN_SERVICE_URL || 'http://localhost:3002',
+  studentService: process.env.STUDENT_SERVICE_URL || 'http://localhost:3003',
+  driverService: process.env.DRIVER_SERVICE_URL || 'http://localhost:3004',
+  vehicleService: process.env.VEHICLE_SERVICE_URL || 'http://localhost:3005',
+  documentService: process.env.DOCUMENT_SERVICE_URL || 'http://localhost:3006'
+};
