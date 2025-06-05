@@ -72,10 +72,10 @@ beforeEach(() => {
 
   notificationService = new NotificationService();
 
-  pushInstance = (PushProvider as jest.Mock).mock.results[0].value;
-  inAppInstance = (InAppProvider as jest.Mock).mock.results[0].value;
-  smsInstance = (SMSProvider as jest.Mock).mock.results[0].value;
-  emailInstance = (EmailProvider as jest.Mock).mock.results[0].value;
+  pushInstance = (PushProvider as jest.Mock).mock.results[(PushProvider as jest.Mock).mock.results.length - 1].value;
+  inAppInstance = (InAppProvider as jest.Mock).mock.results[(InAppProvider as jest.Mock).mock.results.length - 1].value;
+  smsInstance = (SMSProvider as jest.Mock).mock.results[(SMSProvider as jest.Mock).mock.results.length - 1].value;
+  emailInstance = (EmailProvider as jest.Mock).mock.results[(EmailProvider as jest.Mock).mock.results.length - 1].value;
 
   // Replace prisma in service with our mock
   (notificationService as any).prisma = mockPrisma;

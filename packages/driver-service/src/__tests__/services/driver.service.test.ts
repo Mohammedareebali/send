@@ -1,7 +1,7 @@
 import { DriverService } from '../../services/driver.service';
 import { RabbitMQService } from '../../services/messaging/rabbitmq.service';
 import { PrismaClient } from '@prisma/client';
-import { Driver, DriverStatus } from '@send/shared';
+import { Driver, DriverStatus } from '@shared/types/driver';
 
 jest.mock('../../services/messaging/rabbitmq.service');
 
