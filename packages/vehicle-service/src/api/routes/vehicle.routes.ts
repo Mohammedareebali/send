@@ -11,7 +11,7 @@ export function createVehicleRoutes(controller: VehicleController): Router {
 
   // Vehicle CRUD routes
   router.post('/', validateCreateVehicle, controller.createVehicle.bind(controller));
-  router.get('/', controller.listVehicles.bind(controller));
+  router.get('/', controller.getVehicles.bind(controller));
   router.get('/:id', controller.getVehicle.bind(controller));
   router.put('/:id', validateUpdateVehicle, controller.updateVehicle.bind(controller));
   router.delete('/:id', controller.deleteVehicle.bind(controller));
@@ -21,11 +21,11 @@ export function createVehicleRoutes(controller: VehicleController): Router {
   router.put('/:id/status', controller.updateVehicleStatus.bind(controller));
 
   // Vehicle assignment routes
-  router.post('/:id/assign', controller.assignToRun.bind(controller));
-  router.post('/:id/release', controller.releaseFromRun.bind(controller));
+  router.post('/:id/assign', controller.assignVehicleToRun.bind(controller));
+  router.post('/:id/release', controller.unassignVehicleFromRun.bind(controller));
 
   // Vehicle alerts route
-  router.get('/:vehicleId/alerts', controller.getVehicleAlerts.bind(controller));
+  router.get('/:id/maintenance/history', controller.getMaintenanceHistory.bind(controller));
 
   return router;
 } 
