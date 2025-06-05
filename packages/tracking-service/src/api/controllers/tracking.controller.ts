@@ -43,8 +43,12 @@ export class TrackingController {
   async getTrackingStatus(req: Request, res: Response): Promise<void> {
     try {
       const { runId } = req.params;
-      // Implementation depends on how we store tracking status
-      res.status(200).json({ message: 'Tracking status retrieved' });
+      const status = this.trackingService.getTrackingStatus(runId);
+      if (!status) {
+        res.status(404).json({ error: 'Run not found' });
+        return;
+      }
+      res.status(200).json({ status });
     } catch (error) {
       console.error('Failed to get tracking status:', error);
       res.status(500).json({ error: 'Failed to get tracking status' });

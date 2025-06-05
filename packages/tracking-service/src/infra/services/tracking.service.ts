@@ -111,6 +111,10 @@ export class TrackingService {
     return this.activeRuns.get(runId)?.lastLocation;
   }
 
+  getTrackingStatus(runId: string): Run['status'] | undefined {
+    return this.activeRuns.get(runId)?.run.status;
+  }
+
   private async checkGeofences(location: Location): Promise<Geofence[]> {
     const point: GeolibCoordinates = {
       latitude: location.latitude,
