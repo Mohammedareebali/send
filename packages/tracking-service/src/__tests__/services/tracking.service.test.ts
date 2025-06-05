@@ -1,22 +1,22 @@
 import { TrackingService } from '../../infra/services/tracking.service';
 import { RabbitMQService } from '../../infra/messaging/rabbitmq';
-import { PrismaClient } from '@prisma/client';
+import { Logger } from 'winston';
 import { Run, RunStatus, RunType, ScheduleType } from '@shared/types/run';
-import { Location, Geofence, TrackingEvent } from '@shared/types/tracking';
+import { Location } from '@shared/types/tracking';
 
 jest.mock('../../infra/messaging/rabbitmq');
-jest.mock('@prisma/client');
 
 describe('TrackingService', () => {
   let trackingService: TrackingService;
   let mockRabbitMQ: jest.Mocked<RabbitMQService>;
-  let mockPrisma: jest.Mocked<PrismaClient>;
+  let mockPrisma: any;
+  let mockLogger: jest.Mocked<Logger>;
   let mockRun: Run;
-  let mockGeofences: Geofence[];
+  let mockGeofences: any[];
 
   beforeEach(() => {
     mockRabbitMQ = new RabbitMQService() as jest.Mocked<RabbitMQService>;
-    mockPrisma = new PrismaClient() as jest.Mocked<PrismaClient>;
+    mockLogger = { info: jest.fn(), error: jest.fn() } as any;
     mockGeofences = [
       {
         id: 'pickup-zone',
@@ -42,6 +42,16 @@ describe('TrackingService', () => {
       }
     ];
 
+    mockPrisma = {
+      geofence: {
+        findMany: jest.fn().mockResolvedValue(mockGeofences)
+      },
+      trackingEvent: {
+        create: jest.fn(),
+        findMany: jest.fn()
+      }
+    } as any;
+
     mockRun = {
       id: 'run-1',
       type: RunType.REGULAR,
@@ -63,7 +73,7 @@ describe('TrackingService', () => {
       updatedAt: new Date()
     };
 
-    trackingService = new TrackingService(mockPrisma, mockRabbitMQ, mockGeofences);
+    trackingService = new TrackingService(mockPrisma, mockRabbitMQ, mockLogger);
   });
 
   describe('startTracking', () => {
@@ -147,6 +157,7 @@ describe('TrackingService', () => {
 
     beforeEach(async () => {
       await trackingService.startTracking(mockRun);
+      mockPrisma.geofence.findMany.mockResolvedValue(mockGeofences);
     });
 
     it('should detect entering geofence', async () => {

@@ -1,12 +1,11 @@
 import { TrackingService } from './tracking.service';
-import { PrismaClient } from '@prisma/client';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
 import { Logger } from 'winston';
-import { Location, TrackingEvent, Geofence } from '@shared/types/tracking';
+import { Location } from '@shared/types/tracking';
 
 describe('TrackingService', () => {
   let trackingService: TrackingService;
-  let mockPrisma: jest.Mocked<PrismaClient>;
+  let mockPrisma: any;
   let mockRabbitMQ: jest.Mocked<RabbitMQService>;
   let mockLogger: jest.Mocked<Logger>;
 
@@ -44,7 +43,8 @@ describe('TrackingService', () => {
         latitude: 40.7128,
         longitude: -74.0060,
         speed: 60,
-        heading: 90
+        heading: 90,
+        timestamp: new Date()
       };
 
       const mockEvent = {
@@ -101,10 +101,11 @@ describe('TrackingService', () => {
         latitude: 40.7128,
         longitude: -74.0060,
         speed: 60,
-        heading: 90
+        heading: 90,
+        timestamp: new Date()
       };
 
-      const mockGeofence: Geofence = {
+      const mockGeofence = {
         id: 'geofence-1',
         name: 'Test Geofence',
         boundary: [
@@ -146,7 +147,8 @@ describe('TrackingService', () => {
         latitude: 40.7128,
         longitude: -74.0060,
         speed: 60,
-        heading: 90
+        heading: 90,
+        timestamp: new Date()
       };
 
       const error = new Error('Database error');
