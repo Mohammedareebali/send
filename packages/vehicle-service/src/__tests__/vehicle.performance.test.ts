@@ -17,6 +17,7 @@ describe('Vehicle Service Performance', () => {
 
     // Create test vehicles
     const vehicles = Array.from({ length: NUM_VEHICLES }, (_, i) => ({
+      type: 'SEDAN',
       make: 'Toyota',
       model: 'Camry',
       year: 2022,
@@ -36,8 +37,8 @@ describe('Vehicle Service Performance', () => {
 
   it('should handle concurrent requests efficiently', async () => {
     const startTime = performance.now();
-    const requests = Array.from({ length: 100 }, () => 
-      vehicleService.listVehicles()
+    const requests = Array.from({ length: 100 }, () =>
+      vehicleService.getAllVehicles()
     );
     await Promise.all(requests);
     const endTime = performance.now();
@@ -50,12 +51,12 @@ describe('Vehicle Service Performance', () => {
   it('should cache frequently accessed data', async () => {
     // First request (cache miss)
     const startTime1 = performance.now();
-    await vehicleService.listVehicles();
+    await vehicleService.getAllVehicles();
     const duration1 = performance.now() - startTime1;
 
     // Second request (cache hit)
     const startTime2 = performance.now();
-    await vehicleService.listVehicles();
+    await vehicleService.getAllVehicles();
     const duration2 = performance.now() - startTime2;
 
     console.log(`First request duration: ${duration1}ms`);
@@ -67,7 +68,7 @@ describe('Vehicle Service Performance', () => {
 
   it('should handle bulk operations efficiently', async () => {
     const startTime = performance.now();
-    const vehicles = await vehicleService.listVehicles();
+    const { vehicles } = await vehicleService.getAllVehicles();
     const endTime = performance.now();
     const duration = endTime - startTime;
 
@@ -82,7 +83,7 @@ describe('Vehicle Service Performance', () => {
 
     for (let i = 0; i < iterations; i++) {
       const startTime = performance.now();
-      await vehicleService.listVehicles();
+      await vehicleService.getAllVehicles();
       const duration = performance.now() - startTime;
       durations.push(duration);
     }
