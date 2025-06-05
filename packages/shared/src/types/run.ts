@@ -38,6 +38,9 @@ export interface Run {
   studentIds: string[];
   routeId?: string;
   notes?: string;
+  scheduledStartTime?: Date;
+  actualStartTime?: Date;
+  rating?: number;
   createdAt: Date;
   updatedAt: Date;
 
