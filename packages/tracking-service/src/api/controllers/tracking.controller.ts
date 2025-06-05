@@ -50,4 +50,23 @@ export class TrackingController {
       res.status(500).json({ error: 'Failed to get tracking status' });
     }
   }
-} 
+
+  async getLatestLocation(req: Request, res: Response): Promise<void> {
+    try {
+      const { routeId } = req.params;
+      const location = this.trackingService.getLatestLocation(routeId);
+      if (!location) {
+        res.status(404).json({ error: 'Location not found' });
+        return;
+      }
+      res.status(200).json({
+        lat: location.latitude,
+        lng: location.longitude,
+        timestamp: location.timestamp,
+      });
+    } catch (error) {
+      console.error('Failed to get latest location:', error);
+      res.status(500).json({ error: 'Failed to get latest location' });
+    }
+  }
+}
