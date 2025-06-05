@@ -8,6 +8,7 @@ export function createInvoiceRoutes(controller: InvoiceController): Router {
   router.get('/', controller.list.bind(controller));
   router.get('/:id', controller.getById.bind(controller));
   router.put('/:id/status', controller.updateStatus.bind(controller));
+  router.post('/:id/send', controller.send.bind(controller));
 
   return router;
 }

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { InvoiceService } from '../../services/invoice.service';
+import { InvoiceStatus } from '@shared/types/invoice';
 
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
@@ -27,7 +28,19 @@ export class InvoiceController {
   }
 
   async updateStatus(req: Request, res: Response): Promise<void> {
-    const invoice = await this.invoiceService.updateInvoiceStatus(req.params.id, req.body.status);
+    const invoice = await this.invoiceService.updateInvoiceStatus(
+      req.params.id,
+      req.body.status as InvoiceStatus
+    );
+    if (!invoice) {
+      res.status(404).json({ error: 'Invoice not found' });
+      return;
+    }
+    res.json(invoice);
+  }
+
+  async send(req: Request, res: Response): Promise<void> {
+    const invoice = await this.invoiceService.sendInvoiceToSage(req.params.id);
     if (!invoice) {
       res.status(404).json({ error: 'Invoice not found' });
       return;
