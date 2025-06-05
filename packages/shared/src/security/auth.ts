@@ -75,7 +75,7 @@ export class AuthService {
 }
 
 // Authentication middleware
-export const authenticate = (options: { requireApiKey?: boolean } = {}): RequestHandler => {
+export const authenticate = (options: { requireApiKey?: boolean } = {}) => {
   const authService = AuthService.getInstance();
   const authCounter = new prometheus.Counter({
     name: 'auth_attempts_total',
@@ -149,7 +149,7 @@ export const authenticate = (options: { requireApiKey?: boolean } = {}): Request
 };
 
 // Role-based access control middleware
-export const requireRole = (roles: string[]): RequestHandler => {
+export const requireRole = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !req.user.roles) {
       return res.status(403).json({

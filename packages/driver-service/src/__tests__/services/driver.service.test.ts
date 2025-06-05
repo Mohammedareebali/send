@@ -3,7 +3,7 @@ import { RabbitMQService } from '../../services/messaging/rabbitmq.service';
 import { PrismaClient } from '@prisma/client';
 import { Driver, DriverStatus } from '@send/shared';
 
-jest.mock('../../infra/messaging/rabbitmq');
+jest.mock('../../services/messaging/rabbitmq.service');
 
 const mockPrismaDriver = {
   create: jest.fn(),
@@ -28,7 +28,7 @@ describe('DriverService', () => {
   beforeEach(() => {
     mockRabbitMQ = new RabbitMQService('amqp://localhost') as jest.Mocked<RabbitMQService>;
     mockPrisma = new PrismaClient() as jest.Mocked<PrismaClient>;
-    Object.assign(mockPrisma.driver, mockPrismaDriver);
+    Object.assign((mockPrisma as any).driver, mockPrismaDriver);
 
     mockDriver = {
       id: 'driver-1',

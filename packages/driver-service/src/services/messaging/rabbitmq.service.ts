@@ -1,8 +1,8 @@
-import { Channel, Connection, connect } from 'amqplib';
+import { connect } from 'amqplib';
 
 export class RabbitMQService {
-  private connection: Connection | null = null;
-  private channel: Channel | null = null;
+  private connection: any = null;
+  private channel: any = null;
 
   constructor(private readonly url: string) {}
 

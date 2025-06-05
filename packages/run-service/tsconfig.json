@@ -14,7 +14,9 @@
     "types": ["node", "jest"],
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../shared/src/*"]
+      "@shared/*": ["../shared/src/*"],
+      "@send/shared": ["../shared/src"],
+      "@send/shared/*": ["../shared/src/*"]
     }
   },
   "include": ["src/**/*", "../shared/src/**/*"],
