@@ -1,19 +1,21 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-import { Run, RunStatus, RunType, ScheduleType } from '@shared/types/run';
+import { PrismaClient, Prisma } from "@prisma/client";
+import { Run, RunStatus, RunType, ScheduleType } from "@shared/types/run";
 
 type PrismaRun = Prisma.RunGetPayload<{}>;
 
 export class RunModel {
   constructor(private prisma: PrismaClient) {}
 
-  async create(data: Omit<Run, 'id' | 'createdAt' | 'updatedAt'>): Promise<Run> {
+  async create(
+    data: Omit<Run, "id" | "createdAt" | "updatedAt">,
+  ): Promise<Run> {
     const run = await this.prisma.run.create({
       data: {
         ...data,
         pickupLocation: JSON.stringify(data.pickupLocation),
         dropoffLocation: JSON.stringify(data.dropoffLocation),
-        studentIds: JSON.stringify(data.studentIds)
-      }
+        studentIds: JSON.stringify(data.studentIds),
+      },
     });
 
     return this.mapPrismaRunToRun(run);
@@ -21,7 +23,7 @@ export class RunModel {
 
   async update(id: string, data: Partial<Run>): Promise<Run> {
     const updateData: any = { ...data };
-    
+
     if (data.pickupLocation) {
       updateData.pickupLocation = JSON.stringify(data.pickupLocation);
     }
@@ -34,7 +36,7 @@ export class RunModel {
 
     const run = await this.prisma.run.update({
       where: { id },
-      data: updateData
+      data: updateData,
     });
 
     return this.mapPrismaRunToRun(run);
@@ -42,7 +44,7 @@ export class RunModel {
 
   async findById(id: string): Promise<Run | null> {
     const run = await this.prisma.run.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!run) {
@@ -54,7 +56,7 @@ export class RunModel {
 
   async findAll(filters?: Partial<Run>): Promise<Run[]> {
     const where: Prisma.RunWhereInput = {};
-    
+
     if (filters) {
       if (filters.status) where.status = filters.status;
       if (filters.type) where.type = filters.type;
@@ -65,8 +67,8 @@ export class RunModel {
     const runs = await this.prisma.run.findMany({
       where,
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     return runs.map((run: PrismaRun) => this.mapPrismaRunToRun(run));
@@ -74,7 +76,7 @@ export class RunModel {
 
   async delete(id: string): Promise<Run> {
     const run = await this.prisma.run.delete({
-      where: { id }
+      where: { id },
     });
 
     return this.mapPrismaRunToRun(run);
@@ -91,13 +93,15 @@ export class RunModel {
       routeId: prismaRun.routeId ?? undefined,
       notes: prismaRun.notes ?? undefined,
       endTime: prismaRun.endTime ?? undefined,
+      scheduledStartTime: prismaRun.scheduledStartTime ?? undefined,
+      actualStartTime: prismaRun.actualStartTime ?? undefined,
       recurrenceRule: prismaRun.recurrenceRule ?? undefined,
       endDate: prismaRun.endDate ?? undefined,
       lastOccurrence: prismaRun.lastOccurrence ?? undefined,
       nextOccurrence: prismaRun.nextOccurrence ?? undefined,
       pickupLocation: JSON.parse(prismaRun.pickupLocation as string),
       dropoffLocation: JSON.parse(prismaRun.dropoffLocation as string),
-      studentIds: JSON.parse(prismaRun.studentIds as string)
+      studentIds: JSON.parse(prismaRun.studentIds as string),
     };
   }
 }
