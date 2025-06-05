@@ -3,6 +3,7 @@ import { Vehicle, VehicleType, VehicleStatus } from '../types/vehicle';
 import { createVehicleSchema, updateVehicleSchema, vehicleQuerySchema } from '@shared/validation/schemas/vehicle.schema';
 import { prometheus } from '@shared/prometheus';
 import { logger } from '@shared/logger';
+import Redis from 'ioredis';
 import { z } from 'zod';
 
 interface PrismaVehicle {
@@ -37,7 +38,7 @@ export class VehicleService {
       }
 
       const mappedVehicle = this.mapToVehicle(result[0]);
-      this.cache.set(id, mappedVehicle);
+      await this.redis.set(`vehicle:${id}`, JSON.stringify(mappedVehicle), 'EX', this.cacheTTL);
       return mappedVehicle;
     } catch (error) {
       logger.error('Error assigning vehicle to run:', { id, runId, error });
@@ -63,7 +64,7 @@ export class VehicleService {
       }
 
       const mappedVehicle = this.mapToVehicle(result[0]);
-      this.cache.set(id, mappedVehicle);
+      await this.redis.set(`vehicle:${id}`, JSON.stringify(mappedVehicle), 'EX', this.cacheTTL);
       return mappedVehicle;
     } catch (error) {
       logger.error('Error unassigning vehicle from run:', { id, error });
@@ -140,11 +141,17 @@ export class VehicleService {
     }
   }
   private prisma: PrismaClient;
-  private cache: Map<string, Vehicle>;
+  private redis: Redis;
+  private cacheTTL: number;
 
   constructor() {
     this.prisma = new PrismaClient();
-    this.cache = new Map();
+    this.redis = new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD,
+    });
+    this.cacheTTL = parseInt(process.env.CACHE_TTL || '300');
   }
 
   private mapToVehicle(prismaVehicle: PrismaVehicle): Vehicle {
@@ -164,9 +171,9 @@ export class VehicleService {
 
   async getVehicleById(id: string): Promise<Vehicle | null> {
     try {
-      const cachedVehicle = this.cache.get(id);
-      if (cachedVehicle) {
-        return cachedVehicle;
+      const cached = await this.redis.get(`vehicle:${id}`);
+      if (cached) {
+        return JSON.parse(cached) as Vehicle;
       }
 
       const result = await this.prisma.$queryRaw<PrismaVehicle[]>`
@@ -178,7 +185,7 @@ export class VehicleService {
       }
 
       const mappedVehicle = this.mapToVehicle(result[0]);
-      this.cache.set(id, mappedVehicle);
+      await this.redis.set(`vehicle:${id}`, JSON.stringify(mappedVehicle), 'EX', this.cacheTTL);
       return mappedVehicle;
     } catch (error) {
       logger.error('Error getting vehicle by ID:', { id, error });
@@ -254,7 +261,7 @@ export class VehicleService {
       `;
 
       const mappedVehicle = this.mapToVehicle(result[0]);
-      this.cache.set(mappedVehicle.id, mappedVehicle);
+      await this.redis.set(`vehicle:${mappedVehicle.id}`, JSON.stringify(mappedVehicle), 'EX', this.cacheTTL);
       return mappedVehicle;
     } catch (error) {
       logger.error('Error creating vehicle:', { vehicleData, error });
@@ -288,7 +295,7 @@ export class VehicleService {
       }
 
       const mappedVehicle = this.mapToVehicle(result[0]);
-      this.cache.set(id, mappedVehicle);
+      await this.redis.set(`vehicle:${id}`, JSON.stringify(mappedVehicle), 'EX', this.cacheTTL);
       return mappedVehicle;
     } catch (error) {
       logger.error('Error updating vehicle:', { id, vehicleData, error });
@@ -305,7 +312,7 @@ export class VehicleService {
       await this.prisma.$queryRaw`
         DELETE FROM "vehicle"."Vehicle" WHERE id = ${id}
       `;
-      this.cache.delete(id);
+      await this.redis.del(`vehicle:${id}`);
       return true;
     } catch (error) {
       logger.error('Error deleting vehicle:', { id, error });
