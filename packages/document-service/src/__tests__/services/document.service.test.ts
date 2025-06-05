@@ -12,7 +12,9 @@ jest.mock('@prisma/client', () => {
     document: {
       create: jest.fn(),
       findUnique: jest.fn(),
-      update: jest.fn()
+      update: jest.fn(),
+      findMany: jest.fn(),
+      delete: jest.fn()
     },
     documentVersion: {
       create: jest.fn(),
@@ -308,6 +310,33 @@ describe('DocumentService', () => {
           expiresAt: expect.any(Date)
         }
       });
+    });
+  });
+
+  describe('listDocuments', () => {
+    it('should return documents filtered by userId and type', async () => {
+      const docs = [
+        { id: '1', userId: 'u1', type: 'LICENSE' },
+        { id: '2', userId: 'u1', type: 'DBS' },
+      ];
+      mockPrisma.document.findMany.mockResolvedValue(docs);
+
+      const result = await documentService.listDocuments({ userId: 'u1', type: 'LICENSE' });
+
+      expect(mockPrisma.document.findMany).toHaveBeenCalledWith({
+        where: { userId: 'u1', type: 'LICENSE' },
+      });
+      expect(result[0].id).toBe('1');
+    });
+  });
+
+  describe('deleteDocument', () => {
+    it('should delete a document by id', async () => {
+      mockPrisma.document.delete.mockResolvedValue({});
+
+      await documentService.deleteDocument('doc1');
+
+      expect(mockPrisma.document.delete).toHaveBeenCalledWith({ where: { id: 'doc1' } });
     });
   });
 }); 
