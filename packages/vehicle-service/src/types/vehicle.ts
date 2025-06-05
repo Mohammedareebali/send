@@ -66,4 +66,15 @@ export interface MaintenanceRecord {
   date: Date;
   createdAt: Date;
   updatedAt: Date;
-} 
+}
+
+export interface TelemetryRecord {
+  id: string;
+  vehicleId: string;
+  speed?: number;
+  fuelLevel?: number;
+  location?: { latitude: number; longitude: number } | null;
+  recordedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}

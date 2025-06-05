@@ -25,4 +25,11 @@ export interface MaintenanceRecordDto {
   description: string;
   cost: number;
   date?: Date;
-} 
+}
+
+export interface TelemetryRecordDto {
+  speed?: number;
+  fuelLevel?: number;
+  location?: { latitude: number; longitude: number } | null;
+  recordedAt?: Date;
+}

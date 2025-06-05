@@ -63,6 +63,16 @@ Optional query parameters:
 DELETE /vehicles/:id
 ```
 
+### Add Telemetry
+```http
+POST /vehicles/:id/telemetry
+```
+
+### Get Latest Telemetry
+```http
+GET /vehicles/:id/telemetry/latest
+```
+
 ## Performance Considerations
 
 The service implements several performance optimizations:
