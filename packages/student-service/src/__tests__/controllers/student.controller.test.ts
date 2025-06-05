@@ -4,7 +4,6 @@ import { StudentModel } from '../../data/models/student.model';
 import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { Student, StudentCreateInput } from '@send/shared';
 
-jest.mock('../../data/models/student.model');
 jest.mock('../../infra/messaging/rabbitmq');
 
 describe('StudentController', () => {
@@ -15,8 +14,18 @@ describe('StudentController', () => {
   let res: Partial<Response>;
 
   beforeEach(() => {
-    studentModel = StudentModel.getInstance() as jest.Mocked<StudentModel>;
-    (studentModel as any).prisma = {};
+    studentModel = {
+      create: jest.fn(),
+      update: jest.fn(),
+      findById: jest.fn(),
+      findAll: jest.fn(),
+      delete: jest.fn(),
+    } as unknown as jest.Mocked<StudentModel>;
+
+    jest
+      .spyOn(StudentModel, 'getInstance')
+      .mockReturnValue(studentModel as unknown as StudentModel);
+
     rabbitMQ = new RabbitMQService() as jest.Mocked<RabbitMQService>;
     studentController = new StudentController(studentModel, rabbitMQ);
 
@@ -34,7 +43,7 @@ describe('StudentController', () => {
   });
 
   afterEach(() => {
-    (StudentModel as any).instance = undefined;
+    jest.restoreAllMocks();
   });
 
   describe('createStudent', () => {
