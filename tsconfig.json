@@ -14,6 +14,8 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
+      "@send/shared": ["packages/shared/src"],
+      "@send/shared/*": ["packages/shared/src/*"],
       "@send/*": ["packages/*/src"],
       "@shared/*": ["packages/shared/src/*"]
     },
