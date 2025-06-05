@@ -12,14 +12,27 @@ import {
   SMSNotification,
   EmailNotification
 } from '../types/notification.types';
+import { logger } from '@shared/logger';
+import { PushProvider } from '../providers/push.provider';
+import { InAppProvider } from '../providers/inapp.provider';
+import { SMSProvider } from '../providers/sms.provider';
+import { EmailProvider } from '../providers/email.provider';
 
 export class NotificationService {
   private prisma: PrismaClient;
   private rabbitMQ: RabbitMQService;
+  private pushProvider: PushProvider;
+  private inAppProvider: InAppProvider;
+  private smsProvider: SMSProvider;
+  private emailProvider: EmailProvider;
 
   constructor() {
     this.prisma = new PrismaClient();
     this.rabbitMQ = new RabbitMQService();
+    this.pushProvider = new PushProvider(logger);
+    this.inAppProvider = new InAppProvider(logger);
+    this.smsProvider = new SMSProvider(logger);
+    this.emailProvider = new EmailProvider(logger);
   }
 
   async createNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>): Promise<Notification> {
@@ -52,23 +65,43 @@ export class NotificationService {
   }
 
   async sendPushNotification(notification: PushNotification): Promise<void> {
-    // Implementation for sending push notifications using Firebase Admin
-    // This would be implemented in a separate provider class
+    try {
+      await this.pushProvider.send(notification);
+      await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
+    } catch (error) {
+      await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
+      throw error;
+    }
   }
 
   async sendInAppNotification(notification: InAppNotification): Promise<void> {
-    // Implementation for sending in-app notifications
-    // This would be implemented in a separate provider class
+    try {
+      await this.inAppProvider.send(notification);
+      await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
+    } catch (error) {
+      await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
+      throw error;
+    }
   }
 
   async sendSMSNotification(notification: SMSNotification): Promise<void> {
-    // Implementation for sending SMS using Twilio
-    // This would be implemented in a separate provider class
+    try {
+      await this.smsProvider.send(notification);
+      await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
+    } catch (error) {
+      await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
+      throw error;
+    }
   }
 
   async sendEmailNotification(notification: EmailNotification): Promise<void> {
-    // Implementation for sending emails using Nodemailer
-    // This would be implemented in a separate provider class
+    try {
+      await this.emailProvider.send(notification);
+      await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
+    } catch (error) {
+      await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
+      throw error;
+    }
   }
 
   async getUserPreferences(userId: string): Promise<NotificationPreferences> {
