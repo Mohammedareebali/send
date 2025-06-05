@@ -80,9 +80,29 @@ docker build -t vehicle-service .
 docker run -p 3000:3000 vehicle-service
 ```
 
+### driver-service
+
+```bash
+cd packages/driver-service
+pnpm install
+pnpm prisma:generate
+pnpm prisma:migrate
+pnpm dev
+```
+
+### system-notification-service
+
+```bash
+cd packages/system-notification-service
+pnpm install
+pnpm prisma:generate
+pnpm prisma:migrate
+pnpm dev
+```
+
 ### Other Services
 
-`driver-service`, `student-service`, `document-service` and `system-notification-service` follow the same pattern:
+`student-service` and `document-service` follow the same basic pattern:
 
 ```bash
 pnpm install

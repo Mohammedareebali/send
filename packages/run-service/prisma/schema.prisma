@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RunStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RunType {
+  REGULAR
+  SPECIAL
+  EMERGENCY
+}
+
+enum ScheduleType {
+  ONE_TIME
+  DAILY
+  WEEKLY
+  CUSTOM
+}
+
+model Run {
+  id                 String        @id @default(uuid())
+  type               RunType
+  status             RunStatus     @default(PENDING)
+  startTime          DateTime
+  endTime            DateTime?
+  pickupLocation     Json
+  dropoffLocation    Json
+  driverId           String?
+  paId               String?
+  studentIds         Json
+  routeId            String?
+  notes              String?
+  scheduleType       ScheduleType
+  recurrenceRule     String?
+  endDate            DateTime?
+  lastOccurrence     DateTime?
+  nextOccurrence     DateTime?
+  scheduledStartTime DateTime?
+  actualStartTime    DateTime?
+  rating             Int?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}

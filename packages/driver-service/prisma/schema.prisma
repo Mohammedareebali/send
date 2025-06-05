@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DriverStatus {
+  ACTIVE
+  INACTIVE
+  ASSIGNED
+  ON_LEAVE
+}
+
+enum RunStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RunType {
+  REGULAR
+  SPECIAL
+  EMERGENCY
+}
+
+model Driver {
+  id                String   @id @default(uuid())
+  callNumber        String
+  pdaPassword       String
+  firstName         String
+  lastName          String
+  gender            String
+  dateOfBirth       DateTime
+  addressLine1      String
+  addressLine2      String?
+  postcode          String
+  phoneNumber       String
+  email             String   @unique
+  licenseNumber     String
+  licenseExpiryDate DateTime
+  dbsNumber         String
+  dbsExpiryDate     DateTime
+  medicalExpiryDate DateTime
+  rentalExpiryDate  DateTime
+  status            DriverStatus @default(ACTIVE)
+  currentRunId      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  runs Run[] @relation("DriverRuns")
+}
+
+model Run {
+  id                 String    @id @default(uuid())
+  type               RunType
+  status             RunStatus @default(PENDING)
+  startTime          DateTime
+  endTime            DateTime?
+  pickupLocation     Json
+  dropoffLocation    Json
+  driverId           String?
+  studentIds         Json
+  routeId            String?
+  notes              String?
+  scheduledStartTime DateTime?
+  actualStartTime    DateTime?
+  rating             Int?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  driver Driver? @relation("DriverRuns", fields: [driverId], references: [id])
+}
