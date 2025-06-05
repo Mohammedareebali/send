@@ -3,7 +3,7 @@ export class PrismaClient {
 }
 
 
-export var Prisma: any = {};
+export function Prisma() {}
 
 
 
