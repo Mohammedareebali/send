@@ -98,6 +98,22 @@ export class DriverService {
       throw new Error('Driver not found');
     }
 
+    const run = await (this.prisma as any).run.findUnique({ where: { id: runId } });
+    if (!run) {
+      throw new Error('Run not found');
+    }
+
+    const availability = await (this.prisma as any).driverAvailability.findFirst({
+      where: {
+        driverId,
+        startTime: { lte: run.startTime },
+        endTime: { gte: run.endTime ?? run.startTime }
+      }
+    });
+    if (!availability) {
+      throw new Error('Driver not available for this run');
+    }
+
     const updatedDriver = await (this.prisma as any).driver.update({
       where: { id: driverId },
       data: {
@@ -145,6 +161,23 @@ export class DriverService {
     });
 
     return this.mapPrismaDriverToDriver(updatedDriver);
+  }
+
+  async getDriverAvailability(driverId: string) {
+    return (this.prisma as any).driverAvailability.findMany({
+      where: { driverId },
+      orderBy: { startTime: 'asc' }
+    });
+  }
+
+  async updateDriverAvailability(driverId: string, slots: { startTime: Date; endTime: Date }[]) {
+    await (this.prisma as any).driverAvailability.deleteMany({ where: { driverId } });
+    if (slots.length) {
+      await (this.prisma as any).driverAvailability.createMany({
+        data: slots.map(s => ({ ...s, driverId }))
+      });
+    }
+    return this.getDriverAvailability(driverId);
   }
 
   async getAvailableDrivers(): Promise<Driver[]> {

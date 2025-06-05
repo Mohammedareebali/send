@@ -58,10 +58,22 @@ export function createDriverRoutes(controller: DriverController): Router {
   );
 
   // Unassign driver from run (admin and coordinator)
-  router.post('/drivers/:driverId/unassign', 
+  router.post('/drivers/:driverId/unassign',
     authenticate(),
     requireRole(['ADMIN', 'COORDINATOR']),
     controller.unassignDriverFromRun.bind(controller)
+  );
+
+  router.get('/drivers/:id/availability',
+    authenticate(),
+    requireRole(['ADMIN', 'COORDINATOR', 'DRIVER']),
+    controller.getDriverAvailability.bind(controller)
+  );
+
+  router.put('/drivers/:id/availability',
+    authenticate(),
+    requireRole(['ADMIN', 'DRIVER']),
+    controller.updateDriverAvailability.bind(controller)
   );
 
   // Get available drivers (admin and coordinator)

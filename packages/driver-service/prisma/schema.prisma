@@ -52,6 +52,7 @@ model Driver {
   updatedAt         DateTime @updatedAt
 
   runs Run[] @relation("DriverRuns")
+  availabilities DriverAvailability[]
 }
 
 model Run {
@@ -73,4 +74,15 @@ model Run {
   updatedAt          DateTime  @updatedAt
 
   driver Driver? @relation("DriverRuns", fields: [driverId], references: [id])
+}
+
+model DriverAvailability {
+  id        String   @id @default(uuid())
+  driverId  String
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  driver Driver @relation(fields: [driverId], references: [id])
 }
