@@ -9,6 +9,7 @@ module.exports = {
   moduleNameMapper: {
     '^@send/shared$': '<rootDir>/../../shared/src',
     '^@send/shared/(.*)$': '<rootDir>/../../shared/src/$1',
+    '^@shared/(.*)$': '<rootDir>/../shared/src/$1',
     '^@prisma/client$': '<rootDir>/../../test/prisma-client.ts'
   },
   globals: {
