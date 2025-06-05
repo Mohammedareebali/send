@@ -14,6 +14,12 @@ importers:
 
   packages/admin-service:
     dependencies:
+      '@prisma/client':
+        specifier: ^5.22.0
+        version: 5.22.0(prisma@5.22.0)
+      amqplib:
+        specifier: ^0.10.7
+        version: 0.10.7
       express:
         specifier: ^4.18.2
         version: 4.21.2
@@ -240,12 +246,21 @@ importers:
 
   packages/incident-service:
     dependencies:
+      '@prisma/client':
+        specifier: ^5.22.0
+        version: 5.22.0(prisma@5.22.0)
       express:
         specifier: ^4.18.2
         version: 4.21.2
+      node-cron:
+        specifier: ^4.1.0
+        version: 4.1.0
       shared:
         specifier: workspace:*
         version: link:../shared
+      winston:
+        specifier: ^3.11.0
+        version: 3.17.0
     devDependencies:
       '@types/express':
         specifier: ^4.17.21
@@ -256,6 +271,9 @@ importers:
       '@types/node':
         specifier: ^20.11.24
         version: 20.17.30
+      '@types/supertest':
+        specifier: ^6.0.2
+        version: 6.0.3
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.0.1
         version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
@@ -280,6 +298,12 @@ importers:
       prettier:
         specifier: ^3.2.5
         version: 3.5.3
+      prisma:
+        specifier: ^5.22.0
+        version: 5.22.0
+      supertest:
+        specifier: ^6.3.4
+        version: 6.3.4
       ts-jest:
         specifier: ^29.1.2
         version: 29.3.1(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(jest@29.7.0(@types/node@20.17.30)(ts-node@10.9.2(@types/node@20.17.30)(typescript@5.8.3)))(typescript@5.8.3)
@@ -292,6 +316,12 @@ importers:
 
   packages/invoicing-service:
     dependencies:
+      '@prisma/client':
+        specifier: ^5.22.0
+        version: 5.22.0(prisma@5.22.0)
+      axios:
+        specifier: ^1.6.0
+        version: 1.8.4
       express:
         specifier: ^4.18.2
         version: 4.21.2
@@ -332,6 +362,9 @@ importers:
       prettier:
         specifier: ^3.2.5
         version: 3.5.3
+      prisma:
+        specifier: ^5.22.0
+        version: 5.22.0
       ts-jest:
         specifier: ^29.1.2
         version: 29.3.1(@babel/core@7.26.10)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.10))(jest@29.7.0(@types/node@20.17.30)(ts-node@10.9.2(@types/node@20.17.30)(typescript@5.8.3)))(typescript@5.8.3)
@@ -669,6 +702,12 @@ importers:
       '@types/node':
         specifier: ^20.11.24
         version: 20.17.30
+      '@types/nodemailer':
+        specifier: ^6.4.8
+        version: 6.4.17
+      '@types/twilio':
+        specifier: ^3.19.3
+        version: 3.19.3
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.0.1
         version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
@@ -2746,6 +2785,9 @@ packages:
   '@types/node@20.17.30':
     resolution: {integrity: sha512-7zf4YyHA+jvBNfVrk2Gtvs6x7E8V+YDW05bNfG2XkWDJfYRXrTiP/DsB2zSYTaHX0bGIujTBQdMVAhb+j7mwpg==}
 
+  '@types/nodemailer@6.4.17':
+    resolution: {integrity: sha512-I9CCaIp6DTldEg7vyUTZi8+9Vo0hi1/T8gv3C89yk1rSAAzoKQ8H8ki/jBYJSFoH/BisgLP8tkZMlQ91CIquww==}
+
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
 
@@ -2811,6 +2853,10 @@ packages:
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
+
+  '@types/twilio@3.19.3':
+    resolution: {integrity: sha512-W53Z0TDCu6clZ5CzTWHRPnpQAad+AANglx6WiQ4Mkxxw21o4BYBx5EhkfR6J4iYqY58rtWB3r8kDGJ4y1uTUGQ==}
+    deprecated: This is a stub types definition. twilio provides its own type definitions, so you do not need this installed.
 
   '@types/validator@13.15.0':
     resolution: {integrity: sha512-nh7nrWhLr6CBq9ldtw0wx+z9wKnnv/uTVLA9g/3/TcOYxbpOSZE+MhKPmWqU+K0NvThjhv12uD8MuqijB0WzEA==}
@@ -9849,6 +9895,10 @@ snapshots:
     dependencies:
       undici-types: 6.19.8
 
+  '@types/nodemailer@6.4.17':
+    dependencies:
+      '@types/node': 20.17.30
+
   '@types/normalize-package-data@2.4.4': {}
 
   '@types/opossum@8.1.8':
@@ -9930,6 +9980,13 @@ snapshots:
 
   '@types/trusted-types@2.0.7':
     optional: true
+
+  '@types/twilio@3.19.3':
+    dependencies:
+      twilio: 4.23.0
+    transitivePeerDependencies:
+      - debug
+      - supports-color
 
   '@types/validator@13.15.0': {}
 
