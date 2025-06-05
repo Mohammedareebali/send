@@ -152,7 +152,7 @@ describe('VehicleService', () => {
 
       mockPrisma.$queryRaw.mockResolvedValue([vehicle]);
 
-      const result = service.getVehicles(vehicleId);
+      const result = await service.getVehicles(vehicleId);
 
       expect(mockPrisma.$queryRaw).toHaveBeenCalled();
       expect(result).toEqual(vehicle);
@@ -162,7 +162,7 @@ describe('VehicleService', () => {
       const vehicleId = '1';
       mockPrisma.$queryRaw.mockResolvedValue([]);
 
-      const result = service.getVehicles(vehicleId);
+      const result = await service.getVehicles(vehicleId);
 
       expect(mockPrisma.$queryRaw).toHaveBeenCalled();
       expect(result).toBeNull();
@@ -240,7 +240,7 @@ describe('VehicleService', () => {
         .mockResolvedValueOnce(vehicles)
         .mockResolvedValueOnce([{ count: vehicles.length }]);
 
-      const result = service.getAllVehicles();
+      const result = await service.getAllVehicles();
 
       expect(mockPrisma.$queryRaw).toHaveBeenCalled();
       expect(result).toEqual({ vehicles, total: vehicles.length });
@@ -267,7 +267,7 @@ describe('VehicleService', () => {
 
       mockPrisma.$queryRaw.mockResolvedValue([maintenanceRecord]);
 
-      const result = service.addMaintenanceRecord(vehicleId, maintenanceData);
+      const result = await service.addMaintenanceRecord(vehicleId, maintenanceData);
 
       expect(mockPrisma.$queryRaw).toHaveBeenCalled();
       expect(result).toEqual(maintenanceRecord);
@@ -321,7 +321,7 @@ describe('VehicleService', () => {
 
       mockPrisma.$queryRaw.mockResolvedValue([updatedVehicle]);
 
-      const result = service.assignVehicleToRun(vehicleId, runId);
+      const result = await service.assignVehicleToRun(vehicleId, runId);
 
       expect(mockPrisma.$queryRaw).toHaveBeenCalled();
       expect(result).toEqual(updatedVehicle);
@@ -346,7 +346,7 @@ describe('VehicleService', () => {
 
       mockPrisma.vehicle.update.mockResolvedValue(updatedVehicle);
 
-      const result = service.unassignVehicleFromRun(vehicleId);
+      const result = await service.unassignVehicleFromRun(vehicleId);
 
       expect(mockPrisma.$queryRaw).toHaveBeenCalled();
       expect(result).toEqual(updatedVehicle);
@@ -371,7 +371,7 @@ describe('VehicleService', () => {
 
       mockPrisma.$queryRaw.mockResolvedValue(maintenanceRecords);
 
-      const result = service.getMaintenanceHistory(vehicleId);
+      const result = await service.getMaintenanceHistory(vehicleId);
 
       expect(mockPrisma.$queryRaw).toHaveBeenCalled();
       expect(result).toEqual(maintenanceRecords);
