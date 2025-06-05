@@ -35,6 +35,27 @@ export class NotificationService {
     this.emailProvider = new EmailProvider(logger);
   }
 
+  private async sendWithRetry(
+    notification: Notification,
+    sendFn: () => Promise<void>
+  ): Promise<void> {
+    const retries = Number(process.env.NOTIFICATION_RETRIES || '3');
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        await sendFn();
+        await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
+        logger.info('Notification sent', { id: notification.id, channel: notification.channel, attempt });
+        return;
+      } catch (error) {
+        logger.error('Failed to send notification', { id: notification.id, attempt, error });
+        if (attempt === retries) {
+          await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
+          throw error;
+        }
+      }
+    }
+  }
+
   async createNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>): Promise<Notification> {
     const preferences = await this.getUserPreferences(notification.userId);
     
@@ -65,43 +86,19 @@ export class NotificationService {
   }
 
   async sendPushNotification(notification: PushNotification): Promise<void> {
-    try {
-      await this.pushProvider.send(notification);
-      await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
-    } catch (error) {
-      await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
-      throw error;
-    }
+    await this.sendWithRetry(notification, () => this.pushProvider.send(notification));
   }
 
   async sendInAppNotification(notification: InAppNotification): Promise<void> {
-    try {
-      await this.inAppProvider.send(notification);
-      await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
-    } catch (error) {
-      await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
-      throw error;
-    }
+    await this.sendWithRetry(notification, () => this.inAppProvider.send(notification));
   }
 
   async sendSMSNotification(notification: SMSNotification): Promise<void> {
-    try {
-      await this.smsProvider.send(notification);
-      await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
-    } catch (error) {
-      await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
-      throw error;
-    }
+    await this.sendWithRetry(notification, () => this.smsProvider.send(notification));
   }
 
   async sendEmailNotification(notification: EmailNotification): Promise<void> {
-    try {
-      await this.emailProvider.send(notification);
-      await this.updateNotificationStatus(notification.id, NotificationStatus.SENT);
-    } catch (error) {
-      await this.updateNotificationStatus(notification.id, NotificationStatus.FAILED);
-      throw error;
-    }
+    await this.sendWithRetry(notification, () => this.emailProvider.send(notification));
   }
 
   async getUserPreferences(userId: string): Promise<NotificationPreferences> {
