@@ -99,6 +99,29 @@ export class DriverController {
     }
   }
 
+  async getDriverAvailability(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const availability = await this.driverService.getDriverAvailability(id);
+      res.status(200).json(availability);
+    } catch (error) {
+      console.error('Failed to get driver availability:', error);
+      res.status(500).json({ error: 'Failed to get driver availability' });
+    }
+  }
+
+  async updateDriverAvailability(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const slots = req.body as { startTime: Date; endTime: Date }[];
+      const availability = await this.driverService.updateDriverAvailability(id, slots);
+      res.status(200).json(availability);
+    } catch (error) {
+      console.error('Failed to update driver availability:', error);
+      res.status(500).json({ error: 'Failed to update driver availability' });
+    }
+  }
+
   async getAvailableDrivers(req: Request, res: Response): Promise<void> {
     try {
       const drivers = await this.driverService.getAvailableDrivers();

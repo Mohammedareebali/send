@@ -58,6 +58,13 @@ export interface VehicleEvent {
       description: string;
       date: string;
     };
+    telemetryRecord?: {
+      id: string;
+      speed?: number;
+      fuelLevel?: number;
+      location?: { latitude: number; longitude: number } | null;
+      recordedAt: string;
+    };
     runId?: string;
     previousStatus?: VehicleStatus;
     newStatus?: VehicleStatus;

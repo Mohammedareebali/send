@@ -27,5 +27,8 @@ export function createVehicleRoutes(controller: VehicleController): Router {
   // Vehicle alerts route
   router.get('/:id/maintenance/history', controller.getMaintenanceHistory.bind(controller));
 
+  router.post('/:id/telemetry', controller.addTelemetryRecord.bind(controller));
+  router.get('/:id/telemetry/latest', controller.getLatestTelemetry.bind(controller));
+
   return router;
 } 

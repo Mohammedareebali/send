@@ -6,6 +6,8 @@ export function createAdminRoutes(controller: AdminController): Router {
 
   router.get('/admin/metrics', controller.metrics.bind(controller));
   router.get('/admin/reports', controller.reports.bind(controller));
+  router.get('/admin/config', controller.getConfig.bind(controller));
+  router.put('/admin/config', controller.updateConfig.bind(controller));
 
   return router;
 }

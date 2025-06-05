@@ -74,7 +74,7 @@
    @@map("maintenance_records")
  }
 
- model Alert {
+model Alert {
    id        String       @id @default(uuid())
    vehicleId String
    vehicle   Vehicle      @relation(fields: [vehicleId], references: [id])
@@ -83,7 +83,21 @@
    message   String
    timestamp DateTime
    status    AlertStatus  @default(ACTIVE)
-   details   Json
+  details   Json
 
-   @@map("vehicle_alerts")
- }
+  @@map("vehicle_alerts")
+}
+
+model TelemetryRecord {
+  id        String   @id @default(uuid())
+  vehicleId String
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  speed     Float?
+  fuelLevel Float?
+  location  Json?
+  recordedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("telemetry_records")
+}

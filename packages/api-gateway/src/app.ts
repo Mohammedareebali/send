@@ -74,6 +74,7 @@ app.use((req, res, next) => {
 app.use('/api', authenticate());
 
 // Proxy rules
+
 app.use('/api/auth', createResilientProxy(serviceConfig.userService, 'user-service'));
 app.use('/api/users', createResilientProxy(serviceConfig.userService, 'user-service'));
 app.use('/api/runs', createResilientProxy(serviceConfig.runService, 'run-service'));
@@ -115,5 +116,6 @@ app.get('/health', async (_req, res) => {
 
   res.status(200).json(results);
 });
+ main
 
 export default app;

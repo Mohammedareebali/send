@@ -1,10 +1,13 @@
 import * as amqp from 'amqplib';
 import { config } from '../config';
 
+let channel: amqp.Channel | null = null;
+let connection: amqp.Connection | null = null;
+
 export const setupEventBus = async () => {
   try {
-    const connection = await amqp.connect(config.rabbitMQ.url);
-    const channel = await connection.createChannel();
+    connection = await amqp.connect(config.rabbitMQ.url);
+    channel = await connection.createChannel();
 
     // Declare the exchange
     await channel.assertExchange(config.rabbitMQ.exchange, 'topic', {
@@ -17,6 +20,7 @@ export const setupEventBus = async () => {
       'user.updated',
       'user.deleted',
       'user.status.changed',
+      'user.login',
     ];
 
     for (const queue of queues) {
@@ -33,11 +37,13 @@ export const setupEventBus = async () => {
 };
 
 export const publishEvent = async (
-  channel: amqp.Channel,
   routingKey: string,
   message: any
 ) => {
   try {
+    if (!channel) {
+      throw new Error('Event bus not initialized');
+    }
     await channel.publish(
       config.rabbitMQ.exchange,
       routingKey,
@@ -48,4 +54,6 @@ export const publishEvent = async (
     console.error('Failed to publish event:', error);
     throw error;
   }
-}; 
+};
+
+export const getChannel = () => channel;

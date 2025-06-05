@@ -22,5 +22,8 @@ export function createTrackingRoutes(controller: TrackingController): Router {
   // Get tracking status for a run
   router.get('/tracking/:runId/status', authMiddleware, controller.getTrackingStatus.bind(controller));
 
+  // Get latest location for a run
+  router.get('/locations/:routeId/latest', authMiddleware, controller.getLatestLocation.bind(controller));
+
   return router;
 } 

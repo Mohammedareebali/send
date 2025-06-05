@@ -5,6 +5,7 @@ export { DriverStatus, Driver as DriverRecord } from './driver';
 export * from './student';
 export * from './document';
 export * from './service';
+export * from './guardian';
 export {
   Location as TrackingLocation,
   Geofence,
@@ -14,3 +15,4 @@ export {
   TrackingEvent,
   TrackingNotification
 } from './tracking';
+export * from './invoice';
