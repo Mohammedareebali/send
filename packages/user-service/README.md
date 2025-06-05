@@ -84,6 +84,7 @@ The service publishes the following events:
 - `user.updated` - When a user profile is updated
 - `user.deleted` - When a user is deleted
 - `user.status.changed` - When a user's status changes
+- `user.login` - When a user successfully logs in
 
 ## License
 

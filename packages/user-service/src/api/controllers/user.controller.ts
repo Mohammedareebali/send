@@ -9,6 +9,7 @@ import crypto from 'crypto';
 import { PasswordResetTokenModel } from '../../data/models/passwordResetToken.model';
 import { NotificationService } from '../../../../system-notification-service/src/services/notification.service';
 import { NotificationChannel, NotificationPriority } from '../../../../system-notification-service/src/types/notification.types';
+import { publishEvent } from '../../infra/eventBus';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -40,6 +41,8 @@ export const UserController = {
         } : undefined,
       });
 
+      await publishEvent('user.created', user);
+
       res.status(201).json(user);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -57,11 +60,20 @@ export const UserController = {
       if (!isValid) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
+
+      await UserModel.update(user.id, {
+        lastLoginAt: new Date(),
+        loginCount: (user.loginCount || 0) + 1,
+      });
+
+      await publishEvent('user.login', { id: user.id, email: user.email });
+
       const token = jwt.sign(
         { id: user.id, email: user.email, role: mapPrismaRoleToShared(user.role) },
         process.env.JWT_SECRET || 'your-secret-key',
         { expiresIn: '1d' }
       );
+
       res.json({ token });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -106,6 +118,8 @@ export const UserController = {
           address: roleData.address,
         } : undefined,
       });
+
+      await publishEvent('user.updated', user);
 
       res.json(user);
     } catch (error: any) {
@@ -221,6 +235,9 @@ export const UserController = {
         role: role ? mapSharedRoleToPrisma(role) : undefined,
         ...data,
       });
+
+      await publishEvent('user.updated', user);
+
       res.json(user);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -231,6 +248,8 @@ export const UserController = {
     try {
       const { id } = req.params;
       await UserModel.delete(id);
+      await publishEvent('user.deleted', { id });
+
       res.status(204).send();
     } catch (error: any) {
       res.status(400).json({ error: error.message });

@@ -141,6 +141,8 @@ export const UserModel = {
     status?: UserStatus;
     phoneNumber?: string;
     password?: string;
+    lastLoginAt?: Date;
+    loginCount?: number;
     driverData?: Partial<DriverData>;
     paData?: Partial<PAData>;
     guardianData?: Partial<GuardianData>;
@@ -157,6 +159,8 @@ export const UserModel = {
         status: data.status,
         phoneNumber: data.phoneNumber,
         password: data.password,
+        lastLoginAt: data.lastLoginAt,
+        loginCount: data.loginCount,
         driver: data.driverData ? {
           update: {
             licenseNumber: data.driverData.licenseNumber,
