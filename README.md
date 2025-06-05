@@ -159,6 +159,14 @@ pnpm run dev        # start all services in dev mode
 pnpm run test       # run tests across packages
 ```
 
+## Running Tests
+
+Tests require a PostgreSQL database. The helper in `shared/src/testing/setup.ts`
+sets `process.env.DATABASE_URL` to
+`postgresql://user:password@localhost:5432/send_test?schema=public` if the
+variable is undefined. You can override this by defining `DATABASE_URL` in your
+environment before running `pnpm run test`.
+
 ## License
 
 This project is licensed under the MIT License.
