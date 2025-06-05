@@ -36,6 +36,7 @@ model User {
   driver   Driver?
   pa       Pa?
   guardian Guardian?
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -93,3 +94,13 @@ model Child {
 
   @@map("children")
 } 
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_tokens")
+}
