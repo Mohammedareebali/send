@@ -28,7 +28,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: pnpm workspace @send/api-gateway test
+        run: pnpm test
         env:
           NODE_ENV: test
 
@@ -54,7 +54,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm workspace @send/api-gateway build
+        run: pnpm build
 
       - name: Build Docker image
         run: docker build -t api-gateway:latest -f packages/api-gateway/Dockerfile .
