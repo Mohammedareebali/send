@@ -5,6 +5,11 @@ import { AddressInfo } from 'net';
 import { promisify } from 'util';
 import { exec } from 'child_process';
 
+// Ensure Prisma has a database connection during tests
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL ||
+  'postgresql://user:password@localhost:5432/send_test?schema=public';
+
 const execAsync = promisify(exec);
 
 export class TestSetup {
