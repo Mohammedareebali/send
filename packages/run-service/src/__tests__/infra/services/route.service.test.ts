@@ -19,8 +19,8 @@ describe('RouteService', () => {
   };
 
   beforeEach(() => {
-    service = new RouteService();
     process.env.MAPS_API_KEY = 'test-key';
+    service = new RouteService();
   });
 
   describe('optimizeRoute', () => {

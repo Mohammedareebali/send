@@ -1,20 +1,15 @@
-import { Channel, Connection } from 'amqplib';
+import { Channel } from 'amqplib';
 import { RabbitMQService } from '../../../infra/messaging/rabbitmq';
-import { Run, RunStatus, RunType } from '@shared/types/run';
+import { Run, RunStatus, RunType, ScheduleType, RunNotification } from '@shared/types/run';
 
 jest.mock('amqplib');
 
 describe('RabbitMQService', () => {
   let rabbitMQ: RabbitMQService;
-  let mockConnection: jest.Mocked<Connection>;
+  let mockConnection: jest.Mocked<any>;
   let mockChannel: jest.Mocked<Channel>;
 
   beforeEach(() => {
-    mockConnection = {
-      createChannel: jest.fn().mockResolvedValue(mockChannel),
-      close: jest.fn().mockResolvedValue(undefined)
-    } as unknown as jest.Mocked<Connection>;
-
     mockChannel = {
       assertExchange: jest.fn().mockResolvedValue(undefined),
       assertQueue: jest.fn().mockResolvedValue({ queue: 'test-queue' }),
@@ -23,6 +18,11 @@ describe('RabbitMQService', () => {
       consume: jest.fn().mockResolvedValue({ consumerTag: 'test-consumer' }),
       close: jest.fn().mockResolvedValue(undefined)
     } as unknown as jest.Mocked<Channel>;
+
+    mockConnection = {
+      createChannel: jest.fn().mockResolvedValue(mockChannel),
+      close: jest.fn().mockResolvedValue(undefined)
+    } as unknown as jest.Mocked<any>;
 
     (require('amqplib').connect as jest.Mock).mockResolvedValue(mockConnection);
     rabbitMQ = new RabbitMQService();
@@ -68,7 +68,8 @@ describe('RabbitMQService', () => {
         studentIds: ['student-1'],
         endTime: undefined,
         routeId: undefined,
-        notes: undefined
+        notes: undefined,
+        scheduleType: ScheduleType.ONE_TIME
       };
 
       await rabbitMQ.publishRunEvent('run.created', run);
@@ -96,7 +97,8 @@ describe('RabbitMQService', () => {
         studentIds: ['student-1'],
         endTime: undefined,
         routeId: undefined,
-        notes: undefined
+        notes: undefined,
+        scheduleType: ScheduleType.ONE_TIME
       };
 
       await expect(rabbitMQ.publishRunEvent('run.created', run)).rejects.toThrow(
@@ -109,11 +111,9 @@ describe('RabbitMQService', () => {
     it('should publish a notification', async () => {
       await rabbitMQ.connect();
 
-      const notification = {
-        type: 'RUN_CREATED',
-        userId: 'user-1',
-        message: 'New run created',
-        data: { runId: 'run-1' }
+      const notification: RunNotification = {
+        type: 'ASSIGNMENT',
+        data: { runId: 'run-1', message: 'New run created' }
       };
 
       await rabbitMQ.publishNotification(notification);
@@ -127,11 +127,9 @@ describe('RabbitMQService', () => {
     });
 
     it('should throw error if not connected', async () => {
-      const notification = {
-        type: 'RUN_CREATED',
-        userId: 'user-1',
-        message: 'New run created',
-        data: { runId: 'run-1' }
+      const notification: RunNotification = {
+        type: 'ASSIGNMENT',
+        data: { runId: 'run-1', message: 'New run created' }
       };
 
       await expect(rabbitMQ.publishNotification(notification)).rejects.toThrow(

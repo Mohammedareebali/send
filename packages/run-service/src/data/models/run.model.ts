@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma } from '@prisma/client';
-import { Run, RunStatus, RunType } from '@shared/types/run';
+import { Run, RunStatus, RunType, ScheduleType } from '@shared/types/run';
 
 type PrismaRun = Prisma.RunGetPayload<{}>;
 
@@ -83,9 +83,21 @@ export class RunModel {
   private mapPrismaRunToRun(prismaRun: PrismaRun): Run {
     return {
       ...prismaRun,
+      type: prismaRun.type as unknown as RunType,
+      status: prismaRun.status as unknown as RunStatus,
+      scheduleType: prismaRun.scheduleType as unknown as ScheduleType,
+      driverId: prismaRun.driverId ?? undefined,
+      paId: prismaRun.paId ?? undefined,
+      routeId: prismaRun.routeId ?? undefined,
+      notes: prismaRun.notes ?? undefined,
+      endTime: prismaRun.endTime ?? undefined,
+      recurrenceRule: prismaRun.recurrenceRule ?? undefined,
+      endDate: prismaRun.endDate ?? undefined,
+      lastOccurrence: prismaRun.lastOccurrence ?? undefined,
+      nextOccurrence: prismaRun.nextOccurrence ?? undefined,
       pickupLocation: JSON.parse(prismaRun.pickupLocation as string),
       dropoffLocation: JSON.parse(prismaRun.dropoffLocation as string),
       studentIds: JSON.parse(prismaRun.studentIds as string)
     };
   }
-} 
+}
