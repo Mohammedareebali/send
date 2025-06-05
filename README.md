@@ -152,6 +152,12 @@ Each service defines its own environment variables. Refer to the service READMEs
 
 Variables such as `JWT_SECRET`, database connection strings and RabbitMQ URLs must be set before starting the services.
 
+Example `.env` configuration for RabbitMQ:
+
+```bash
+RABBITMQ_URL=amqp://user:password@localhost:5672
+```
+
 ## Workspace Commands
 
 Lerna is configured for the workspace. From the root you can run:

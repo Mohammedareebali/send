@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { RabbitMQService } from '../infra/messaging/rabbitmq.service';
+import { RabbitMQService } from '../infra/messaging/rabbitmq';
 import {
   Notification,
   NotificationChannel,
@@ -77,7 +77,7 @@ export class NotificationService {
     });
 
     // Publish notification to RabbitMQ for processing
-    await this.rabbitMQ.publishMessage('notifications', {
+    await this.rabbitMQ.publishMessage('notifications.new', {
       type: 'NEW_NOTIFICATION',
       data: createdNotification
     });

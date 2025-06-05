@@ -40,12 +40,18 @@ describe('RabbitMQService', () => {
       );
       expect(mockChannel.assertQueue).toHaveBeenCalledWith(
         'run-notifications',
-        { durable: true }
+        {
+          durable: true,
+          arguments: {
+            'x-dead-letter-exchange': 'run-events.dlx',
+            'x-dead-letter-routing-key': 'run-notifications.dead-letter'
+          }
+        }
       );
       expect(mockChannel.bindQueue).toHaveBeenCalledWith(
         'run-notifications',
         'run-events',
-        'run.*'
+        'run-notifications.*'
       );
     });
   });

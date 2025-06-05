@@ -1,6 +1,6 @@
 import { NotificationService } from '../../services/notification.service';
 import { PrismaClient } from '@prisma/client';
-import { RabbitMQService } from '../../infra/messaging/rabbitmq.service';
+import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { PushProvider } from '../../providers/push.provider';
 import { InAppProvider } from '../../providers/inapp.provider';
 import { SMSProvider } from '../../providers/sms.provider';
@@ -21,7 +21,7 @@ jest.mock('../../providers/push.provider');
 jest.mock('../../providers/inapp.provider');
 jest.mock('../../providers/sms.provider');
 jest.mock('../../providers/email.provider');
-jest.mock('../../infra/messaging/rabbitmq.service');
+jest.mock('../../infra/messaging/rabbitmq');
 jest.mock('amqplib', () => ({
   connect: jest.fn().mockResolvedValue({
     createChannel: jest.fn().mockResolvedValue({
