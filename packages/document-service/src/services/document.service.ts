@@ -155,6 +155,19 @@ export class DocumentService {
     return versions.map(this.mapToSharedDocumentVersion);
   }
 
+  async listDocuments(filters: { userId?: string; type?: string } = {}): Promise<Document[]> {
+    const where: any = {};
+    if (filters.userId) where.userId = filters.userId;
+    if (filters.type) where.type = filters.type;
+
+    const documents = await (this.prisma as any).document.findMany({ where });
+    return documents.map((d: any) => this.mapToSharedDocument(d));
+  }
+
+  async deleteDocument(id: string): Promise<void> {
+    await (this.prisma as any).document.delete({ where: { id } });
+  }
+
   async updateDocumentAccess(
     documentId: string,
     userId: string,

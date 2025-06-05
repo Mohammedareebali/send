@@ -21,5 +21,8 @@ app.use('/api/students', createProxyMiddleware({ target: serviceConfig.studentSe
 app.use('/api/drivers', createProxyMiddleware({ target: serviceConfig.driverService, changeOrigin: true }));
 app.use('/api/vehicles', createProxyMiddleware({ target: serviceConfig.vehicleService, changeOrigin: true }));
 app.use('/api/documents', createProxyMiddleware({ target: serviceConfig.documentService, changeOrigin: true }));
+app.use('/api/incidents', createProxyMiddleware({ target: serviceConfig.incidentService, changeOrigin: true }));
+app.use('/api/invoices', createProxyMiddleware({ target: serviceConfig.invoicingService, changeOrigin: true }));
+app.use('/api/admin', createProxyMiddleware({ target: serviceConfig.adminService, changeOrigin: true }));
 
 export default app;

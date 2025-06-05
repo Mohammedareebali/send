@@ -11,6 +11,9 @@ This repository contains the microservices that make up the **SEN Dispatch** sys
 - **driver-service** – driver related APIs
 - **student-service** – student records and assignments
 - **document-service** – secure document storage
+- **incident-service** – incident reporting and management
+- **invoicing-service** – invoice generation APIs
+- **admin-service** – admin dashboard metrics and reports
 - **system-notification-service** – delivery of notifications (email, SMS, push)
 - **shared** – common utilities and TypeScript types
 
@@ -102,7 +105,7 @@ pnpm dev
 
 ### Other Services
 
-`student-service` and `document-service` follow the same basic pattern:
+`student-service`, `document-service`, `incident-service`, `invoicing-service`, and `admin-service` follow the same basic pattern:
 
 ```bash
 pnpm install
