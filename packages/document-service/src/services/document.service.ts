@@ -306,9 +306,52 @@ export class DocumentService {
   }
 
   private async evaluateComplianceRule(document: any, rule: any): Promise<boolean> {
-    // Implement compliance rule evaluation logic based on conditions
-    const conditions = rule.conditions as Record<string, any>;
-    // This is a placeholder - implement based on your specific compliance requirements
+    const conditions = (rule.conditions || []) as {
+      field: string;
+      operator: string;
+      value: any;
+    }[];
+
+    for (const condition of conditions) {
+      const { field, operator, value } = condition;
+      const actual = field.split('.').reduce((obj: any, key: string) => obj?.[key], document);
+
+      switch (operator) {
+        case 'eq':
+          if (actual !== value) return false;
+          break;
+        case 'neq':
+          if (actual === value) return false;
+          break;
+        case 'gt':
+          if (!(actual > value)) return false;
+          break;
+        case 'gte':
+          if (!(actual >= value)) return false;
+          break;
+        case 'lt':
+          if (!(actual < value)) return false;
+          break;
+        case 'lte':
+          if (!(actual <= value)) return false;
+          break;
+        case 'contains':
+          if (typeof actual === 'string' && typeof value === 'string') {
+            if (!actual.includes(value)) return false;
+          } else if (Array.isArray(actual)) {
+            if (!actual.includes(value)) return false;
+          } else {
+            return false;
+          }
+          break;
+        case 'exists':
+          if (actual === undefined || actual === null) return false;
+          break;
+        default:
+          return false;
+      }
+    }
+
     return true;
   }
 
