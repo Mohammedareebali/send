@@ -69,7 +69,7 @@ export class RunModel {
       }
     });
 
-    return runs.map(run => this.mapPrismaRunToRun(run));
+    return runs.map((run: PrismaRun) => this.mapPrismaRunToRun(run));
   }
 
   async delete(id: string): Promise<Run> {
