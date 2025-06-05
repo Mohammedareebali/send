@@ -83,14 +83,8 @@ describe('TrackingService', () => {
       );
 
       expect(result).toEqual({
-        id: mockEvent.id,
-        vehicleId: mockEvent.vehicleId,
-        location: {
-          latitude: mockEvent.latitude,
-          longitude: mockEvent.longitude,
-          speed: mockEvent.speed,
-          heading: mockEvent.heading
-        },
+        type: 'LOCATION_UPDATE',
+        data: location,
         timestamp: mockEvent.timestamp
       });
     });
@@ -109,7 +103,9 @@ describe('TrackingService', () => {
         id: 'geofence-1',
         name: 'Test Geofence',
         boundary: [
-          { latitude: 40.7128, longitude: -74.0060 },
+          { latitude: 40.7127, longitude: -74.0061 },
+          { latitude: 40.7127, longitude: -74.0059 },
+          { latitude: 40.7129, longitude: -74.0059 },
           { latitude: 40.7129, longitude: -74.0061 }
         ],
         isActive: true

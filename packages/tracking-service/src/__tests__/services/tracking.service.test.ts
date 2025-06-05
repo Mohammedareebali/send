@@ -1,10 +1,8 @@
 import { TrackingService } from '../../infra/services/tracking.service';
-import { RabbitMQService } from '../../infra/messaging/rabbitmq';
+import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
 import { Logger } from 'winston';
 import { Run, RunStatus, RunType, ScheduleType } from '@shared/types/run';
 import { Location } from '@shared/types/tracking';
-
-jest.mock('../../infra/messaging/rabbitmq');
 
 describe('TrackingService', () => {
   let trackingService: TrackingService;
@@ -15,7 +13,9 @@ describe('TrackingService', () => {
   let mockGeofences: any[];
 
   beforeEach(() => {
-    mockRabbitMQ = new RabbitMQService() as jest.Mocked<RabbitMQService>;
+    mockRabbitMQ = {
+      publishMessage: jest.fn()
+    } as unknown as jest.Mocked<RabbitMQService>;
     mockLogger = { info: jest.fn(), error: jest.fn() } as any;
     mockGeofences = [
       {
@@ -27,7 +27,13 @@ describe('TrackingService', () => {
           longitude: -0.1278,
           timestamp: new Date()
         },
-        radius: 100
+        radius: 100,
+        boundary: [
+          { latitude: 51.5073, longitude: -0.1279 },
+          { latitude: 51.5073, longitude: -0.1277 },
+          { latitude: 51.5075, longitude: -0.1277 },
+          { latitude: 51.5075, longitude: -0.1279 }
+        ]
       },
       {
         id: 'dropoff-zone',
@@ -38,7 +44,13 @@ describe('TrackingService', () => {
           longitude: -0.1278,
           timestamp: new Date()
         },
-        radius: 100
+        radius: 100,
+        boundary: [
+          { latitude: 51.5073, longitude: -0.1279 },
+          { latitude: 51.5073, longitude: -0.1277 },
+          { latitude: 51.5075, longitude: -0.1277 },
+          { latitude: 51.5075, longitude: -0.1279 }
+        ]
       }
     ];
 
@@ -80,7 +92,8 @@ describe('TrackingService', () => {
     it('should start tracking a run', async () => {
       await trackingService.startTracking(mockRun);
 
-      expect(mockRabbitMQ.publishTrackingEvent).toHaveBeenCalledWith(
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith(
+        'tracking.journey.started',
         expect.objectContaining({
           type: 'JOURNEY_START',
           data: expect.objectContaining({
@@ -110,7 +123,8 @@ describe('TrackingService', () => {
     it('should update location and publish events', async () => {
       await trackingService.updateLocation(mockRun.id, mockLocation);
 
-      expect(mockRabbitMQ.publishTrackingEvent).toHaveBeenCalledWith(
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith(
+        'tracking.location.updated',
         expect.objectContaining({
           type: 'LOCATION_UPDATE',
           data: mockLocation
@@ -132,7 +146,8 @@ describe('TrackingService', () => {
     it('should stop tracking and publish journey end event', async () => {
       await trackingService.stopTracking(mockRun.id);
 
-      expect(mockRabbitMQ.publishTrackingEvent).toHaveBeenCalledWith(
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith(
+        'tracking.journey.ended',
         expect.objectContaining({
           type: 'JOURNEY_END',
           data: expect.objectContaining({
@@ -161,15 +176,15 @@ describe('TrackingService', () => {
     });
 
     it('should detect entering geofence', async () => {
-      await trackingService.updateLocation(mockRun.id, mockLocation);
+      await trackingService.trackLocation(mockRun.id, mockLocation);
 
-      expect(mockRabbitMQ.publishTrackingEvent).toHaveBeenCalledWith(
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith(
+        'tracking.geofence.entered',
         expect.objectContaining({
-          type: 'GEOFENCE_EVENT',
-          data: expect.objectContaining({
-            type: 'ENTER',
-            location: 'PICKUP'
-          })
+          vehicleId: mockRun.id,
+          geofenceId: mockGeofences[0].id,
+          location: mockLocation,
+          timestamp: expect.any(Date)
         })
       );
     });
@@ -189,7 +204,8 @@ describe('TrackingService', () => {
     it('should calculate and publish ETA', async () => {
       await trackingService.updateLocation(mockRun.id, mockLocation);
 
-      expect(mockRabbitMQ.publishTrackingEvent).toHaveBeenCalledWith(
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith(
+        'tracking.eta.updated',
         expect.objectContaining({
           type: 'ETA_UPDATE',
           data: expect.objectContaining({
