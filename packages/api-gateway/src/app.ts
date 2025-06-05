@@ -116,6 +116,5 @@ app.get('/health', async (_req, res) => {
 
   res.status(200).json(results);
 });
- main
 
 export default app;
