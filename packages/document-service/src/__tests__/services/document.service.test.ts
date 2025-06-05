@@ -339,4 +339,37 @@ describe('DocumentService', () => {
       expect(mockPrisma.document.delete).toHaveBeenCalledWith({ where: { id: 'doc1' } });
     });
   });
-}); 
+
+  describe('updateDocumentMetadata', () => {
+    it('should update metadata and publish event', async () => {
+      const mockDoc = { id: '1', userId: 'u1', metadata: { expiryDate: new Date() } };
+      mockPrisma.document.update.mockResolvedValue(mockDoc);
+
+      const result = await documentService.updateDocumentMetadata('1', { foo: 'bar' });
+
+      expect(result).toEqual(expect.objectContaining({ id: '1' }));
+      expect(mockPrisma.document.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: { metadata: expect.any(Object) }
+      });
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith('document.metadata.updated', expect.any(Object));
+    });
+  });
+
+  describe('expireOutdatedDocuments', () => {
+    it('should mark expired documents and publish event', async () => {
+      const past = new Date(Date.now() - 1000);
+      const doc = { id: '1', userId: 'u1', metadata: { expiryDate: past }, status: 'UPLOADED' };
+      mockPrisma.document.findMany.mockResolvedValue([doc]);
+      mockPrisma.document.update.mockResolvedValue({});
+
+      await documentService.expireOutdatedDocuments();
+
+      expect(mockPrisma.document.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: { status: 'EXPIRED' }
+      });
+      expect(mockRabbitMQ.publishMessage).toHaveBeenCalledWith('document.expired', expect.any(Object));
+    });
+  });
+});

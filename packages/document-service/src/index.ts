@@ -1,10 +1,12 @@
-import { app, prisma, rabbitMQ, logger } from './app';
+import { app, prisma, rabbitMQ, logger, documentService } from './app';
+import { startExpirationJob } from './jobs/expire-documents';
 
 const port = process.env.PORT || 3006;
 
 async function start() {
   try {
     await rabbitMQ.connect();
+    startExpirationJob(documentService);
     app.listen(port, () => {
       console.log(`Document service running on port ${port}`);
     });
