@@ -5,6 +5,10 @@ import { UserRole, DriverData, PAData, GuardianData } from '@shared/types';
 import { mapPrismaRoleToShared, mapSharedRoleToPrisma } from '../../data/mappers/user.mapper';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { PasswordResetTokenModel } from '../../data/models/passwordResetToken.model';
+import { NotificationService } from '../../../../system-notification-service/src/services/notification.service';
+import { NotificationChannel, NotificationPriority } from '../../../../system-notification-service/src/types/notification.types';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -123,6 +127,65 @@ export const UserController = {
       }
       const updatedUser = await UserModel.update(id, { password: newPassword });
       res.json(updatedUser);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  async requestPasswordReset(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+
+      const user = await UserModel.findByEmail(email);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const token = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+      await PasswordResetTokenModel.create({ userId: user.id, token, expiresAt });
+
+      const notificationService = new NotificationService();
+      const base = await notificationService.createNotification({
+        userId: user.id,
+        title: 'Password Reset Request',
+        message: 'Use the provided token to reset your password.',
+        channel: NotificationChannel.EMAIL,
+        priority: NotificationPriority.MEDIUM
+      });
+
+      await notificationService.sendEmailNotification({
+        ...base,
+        email: user.email,
+        subject: 'Password Reset',
+        htmlContent: `<p>Your password reset token is: <strong>${token}</strong></p>`
+      });
+
+      res.json({ message: 'Password reset email sent' });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { token, newPassword } = req.body;
+      if (!token || !newPassword) {
+        return res.status(400).json({ error: 'Token and newPassword are required' });
+      }
+
+      const record = await PasswordResetTokenModel.findByToken(token);
+      if (!record) {
+        return res.status(400).json({ error: 'Invalid or expired token' });
+      }
+
+      await UserModel.update(record.userId, { password: newPassword });
+      await PasswordResetTokenModel.delete(record.id);
+
+      res.json({ message: 'Password reset successful' });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
