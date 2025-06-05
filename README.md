@@ -21,7 +21,7 @@ A monitoring stack (Prometheus, Grafana, Elasticsearch, Kibana, Jaeger) and an A
 - **Node.js** (>=18)
 - **pnpm** – `npm i -g pnpm`
 - **Docker** and **Docker Compose**
-- **Yarn** is required for `user-service`
+- All services use **pnpm**; Yarn is no longer needed
 
 Install all workspace dependencies from the repository root:
 
@@ -50,8 +50,9 @@ A sample `docker-compose.yml` is available in the service directory for running 
 
 ```bash
 cd packages/user-service
-yarn install
-yarn dev               # development
+pnpm install
+pnpm start            # run the service
+pnpm dev              # development
 ```
 
 ### tracking-service
