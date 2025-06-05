@@ -11,7 +11,6 @@ module.exports = {
     '^@send/shared/(.*)$': '<rootDir>/../shared/src/$1',
     '^@shared/(.*)$': '<rootDir>/../shared/src/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -19,4 +18,4 @@ module.exports = {
     '!src/index.ts',
     '!src/**/__tests__/**',
   ],
-}; 
+};

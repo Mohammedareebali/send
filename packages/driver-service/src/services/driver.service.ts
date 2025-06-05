@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, Run, } from '@prisma/client';
+import { PrismaClient, Prisma, Run } from '@prisma/client';
 import { Driver, DriverStatus } from '@send/shared';
 import { RabbitMQService } from './messaging/rabbitmq.service';
 
@@ -6,7 +6,7 @@ type RunWithPerformance = Pick<Run, 'id' | 'status' | 'scheduledStartTime' | 'ac
 
 export class DriverService {
   constructor(
-    private prisma: PrismaClient,
+    private prisma: any,
     private rabbitMQService: RabbitMQService
   ) {}
 
@@ -143,17 +143,21 @@ export class DriverService {
 
     const runs = driver.runs || [];
     const totalRuns = runs.length;
-    const onTimeRuns = runs.filter((run) => 
-      run.status === 'COMPLETED' && 
-      run.actualStartTime && run.actualStartTime <= run.scheduledStartTime
+    const onTimeRuns = runs.filter((run: RunWithPerformance) =>
+      run.status === 'COMPLETED' &&
+      run.actualStartTime &&
+      run.scheduledStartTime &&
+      run.actualStartTime <= run.scheduledStartTime
     ).length;
 
-    const lateRuns = runs.filter((run) => 
-      run.status === 'COMPLETED' && 
-      run.actualStartTime && run.actualStartTime > run.scheduledStartTime
+    const lateRuns = runs.filter((run: RunWithPerformance) =>
+      run.status === 'COMPLETED' &&
+      run.actualStartTime &&
+      run.scheduledStartTime &&
+      run.actualStartTime > run.scheduledStartTime
     ).length;
 
-    const totalRating = runs.reduce((sum: number, run) => sum + (run.rating || 0), 0);
+    const totalRating = runs.reduce((sum: number, run: RunWithPerformance) => sum + (run.rating || 0), 0);
     const averageRating = totalRuns > 0 ? totalRating / totalRuns : 0;
 
     return {

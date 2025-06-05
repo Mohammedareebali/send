@@ -9,12 +9,12 @@ const execAsync = promisify(exec);
 
 export class TestSetup {
   private static instance: TestSetup;
-  private prisma: PrismaClient;
+  private prisma: any;
   private server!: Server;
   private baseUrl!: string;
 
   private constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient() as any;
   }
 
   public static getInstance(): TestSetup {
