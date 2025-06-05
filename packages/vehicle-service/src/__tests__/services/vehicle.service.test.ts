@@ -111,6 +111,7 @@ describe('VehicleService', () => {
         model: 'Camry',
         year: 2020,
         type: VehicleType.SEDAN,
+        capacity: 4,
       };
 
       const createdVehicle = {

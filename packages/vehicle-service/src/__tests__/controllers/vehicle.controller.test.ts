@@ -15,14 +15,14 @@ describe('VehicleController', () => {
 
     vehicleService = {
       createVehicle: jest.fn(),
-      getVehicle: jest.fn(),
+      getVehicleById: jest.fn(),
       updateVehicle: jest.fn(),
       deleteVehicle: jest.fn(),
-      listVehicles: jest.fn(),
+      getAllVehicles: jest.fn(),
       addMaintenanceRecord: jest.fn(),
       updateVehicleStatus: jest.fn(),
-      assignToRun: jest.fn(),
-      releaseFromRun: jest.fn()
+      assignVehicleToRun: jest.fn(),
+      unassignVehicleFromRun: jest.fn()
     } as any;
 
     vehicleController = new VehicleController(vehicleService);
@@ -31,11 +31,11 @@ describe('VehicleController', () => {
     app.get('/vehicles/:id', (req, res) => vehicleController.getVehicle(req, res));
     app.put('/vehicles/:id', (req, res) => vehicleController.updateVehicle(req, res));
     app.delete('/vehicles/:id', (req, res) => vehicleController.deleteVehicle(req, res));
-    app.get('/vehicles', (req, res) => vehicleController.listVehicles(req, res));
+    app.get('/vehicles', (req, res) => vehicleController.getVehicles(req, res));
     app.post('/vehicles/:id/maintenance', (req, res) => vehicleController.addMaintenanceRecord(req, res));
     app.put('/vehicles/:id/status', (req, res) => vehicleController.updateVehicleStatus(req, res));
-    app.post('/vehicles/:id/assign', (req, res) => vehicleController.assignToRun(req, res));
-    app.post('/vehicles/:id/release', (req, res) => vehicleController.releaseFromRun(req, res));
+    app.post('/vehicles/:id/assign', (req, res) => vehicleController.assignVehicleToRun(req, res));
+    app.post('/vehicles/:id/release', (req, res) => vehicleController.unassignVehicleFromRun(req, res));
   });
 
   describe('POST /vehicles', () => {
@@ -45,7 +45,8 @@ describe('VehicleController', () => {
         make: 'Toyota',
         model: 'Camry',
         year: 2020,
-        licensePlate: 'ABC123'
+        licensePlate: 'ABC123',
+        capacity: 4
       };
 
       const mockVehicle = {
@@ -86,20 +87,21 @@ describe('VehicleController', () => {
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
+        capacity: 4,
         status: VehicleStatus.AVAILABLE
       };
 
-      vehicleService.getVehicle.mockResolvedValue(mockVehicle);
+      vehicleService.getVehicleById.mockResolvedValue(mockVehicle);
 
       const response = await request(app).get('/vehicles/1');
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockVehicle);
-      expect(vehicleService.getVehicle).toHaveBeenCalledWith('1');
+      expect(vehicleService.getVehicleById).toHaveBeenCalledWith('1');
     });
 
     it('should return 404 if vehicle not found', async () => {
-      vehicleService.getVehicle.mockResolvedValue(null);
+      vehicleService.getVehicleById.mockResolvedValue(null);
 
       const response = await request(app).get('/vehicles/1');
 
@@ -108,7 +110,7 @@ describe('VehicleController', () => {
     });
 
     it('should handle errors', async () => {
-      vehicleService.getVehicle.mockRejectedValue(new Error('Test error'));
+      vehicleService.getVehicleById.mockRejectedValue(new Error('Test error'));
 
       const response = await request(app).get('/vehicles/1');
 
@@ -130,6 +132,7 @@ describe('VehicleController', () => {
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
+        capacity: 4,
         status: VehicleStatus.AVAILABLE
       };
 
@@ -201,17 +204,17 @@ describe('VehicleController', () => {
         }
       ];
 
-      vehicleService.listVehicles.mockResolvedValue(mockVehicles);
+      vehicleService.getAllVehicles.mockResolvedValue(mockVehicles);
 
       const response = await request(app).get('/vehicles');
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockVehicles);
-      expect(vehicleService.listVehicles).toHaveBeenCalled();
+      expect(vehicleService.getAllVehicles).toHaveBeenCalled();
     });
 
     it('should handle errors', async () => {
-      vehicleService.listVehicles.mockRejectedValue(new Error('Test error'));
+      vehicleService.getAllVehicles.mockRejectedValue(new Error('Test error'));
 
       const response = await request(app).get('/vehicles');
 
@@ -330,11 +333,12 @@ describe('VehicleController', () => {
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
+        capacity: 4,
         status: VehicleStatus.IN_USE,
         currentRunId: runId
       };
 
-      vehicleService.assignToRun.mockResolvedValue(mockVehicle);
+      vehicleService.assignVehicleToRun.mockResolvedValue(mockVehicle);
 
       const response = await request(app)
         .post('/vehicles/1/assign')
@@ -342,11 +346,11 @@ describe('VehicleController', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockVehicle);
-      expect(vehicleService.assignToRun).toHaveBeenCalledWith('1', runId);
+      expect(vehicleService.assignVehicleToRun).toHaveBeenCalledWith('1', runId);
     });
 
     it('should return 404 if vehicle not found', async () => {
-      vehicleService.assignToRun.mockResolvedValue(null);
+      vehicleService.assignVehicleToRun.mockResolvedValue(null);
 
       const response = await request(app)
         .post('/vehicles/1/assign')
@@ -357,7 +361,7 @@ describe('VehicleController', () => {
     });
 
     it('should handle errors', async () => {
-      vehicleService.assignToRun.mockRejectedValue(new Error('Test error'));
+      vehicleService.assignVehicleToRun.mockRejectedValue(new Error('Test error'));
 
       const response = await request(app)
         .post('/vehicles/1/assign')
@@ -377,21 +381,22 @@ describe('VehicleController', () => {
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
+        capacity: 4,
         status: VehicleStatus.AVAILABLE,
         currentRunId: null
       };
 
-      vehicleService.releaseFromRun.mockResolvedValue(mockVehicle);
+      vehicleService.unassignVehicleFromRun.mockResolvedValue(mockVehicle);
 
       const response = await request(app).post('/vehicles/1/release');
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(mockVehicle);
-      expect(vehicleService.releaseFromRun).toHaveBeenCalledWith('1');
+      expect(vehicleService.unassignVehicleFromRun).toHaveBeenCalledWith('1');
     });
 
     it('should return 404 if vehicle not found', async () => {
-      vehicleService.releaseFromRun.mockResolvedValue(null);
+      vehicleService.unassignVehicleFromRun.mockResolvedValue(null);
 
       const response = await request(app).post('/vehicles/1/release');
 
@@ -400,7 +405,7 @@ describe('VehicleController', () => {
     });
 
     it('should handle errors', async () => {
-      vehicleService.releaseFromRun.mockRejectedValue(new Error('Test error'));
+      vehicleService.unassignVehicleFromRun.mockRejectedValue(new Error('Test error'));
 
       const response = await request(app).post('/vehicles/1/release');
 
