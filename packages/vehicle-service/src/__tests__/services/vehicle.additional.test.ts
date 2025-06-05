@@ -9,6 +9,7 @@ describe('VehicleService additional methods', () => {
     prisma = { $queryRaw: jest.fn() } as any;
     service = new VehicleService();
     (service as any).prisma = prisma;
+    (service as any).redis = { get: jest.fn(), set: jest.fn(), del: jest.fn() };
   });
 
   it('assignVehicleToRun should update run and status', async () => {
