@@ -145,7 +145,7 @@ Each service defines its own environment variables. Refer to the service READMEs
 - `packages/run-service/README.md` lines 66‑73 for run management variables
 - `packages/user-service/README.md` lines 63‑75 for user related variables
 - `packages/tracking-service/README.md` lines 102‑107 for tracking variables
-- `packages/vehicle-service/README.md` lines 169‑175 for vehicle service variables
+- `packages/vehicle-service/README.md` lines 169‑176 for vehicle service variables
 
 Variables such as `JWT_SECRET`, database connection strings and RabbitMQ URLs must be set before starting the services.
 

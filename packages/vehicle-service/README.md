@@ -170,6 +170,7 @@ Environment variables:
 - `REDIS_HOST`: Redis server host
 - `REDIS_PORT`: Redis server port
 - `REDIS_PASSWORD`: Redis server password
+- `CACHE_TTL`: Vehicle cache TTL in seconds (default: 300)
 - `DATABASE_URL`: Database connection string
 - `JWT_SECRET`: JWT signing secret
 - `API_KEY`: API key for service authentication
