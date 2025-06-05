@@ -117,6 +117,27 @@ The root `docker-compose.yml` starts the API Gateway and the monitoring/observab
 docker-compose up --build
 ```
 
+## Local Environment Setup
+
+Several services rely on PostgreSQL and RabbitMQ. You can spin up these
+dependencies using the compose file included with `run-service`:
+
+```bash
+docker-compose -f packages/run-service/docker-compose.yml up -d postgres rabbitmq
+```
+
+This launches PostgreSQL on `localhost:5432` and RabbitMQ on `localhost:5672`
+with the default credentials `user/password`. Configure your service
+environment variables to use these values. Example for `run-service`:
+
+```bash
+DATABASE_URL=postgresql://user:password@localhost:5432/send_runs?schema=public
+RABBITMQ_URL=amqp://user:password@localhost:5672
+```
+
+Services that specify individual DB host or user variables can use the same
+host (`localhost`), port (`5432`), username (`user`) and password (`password`).
+
 ## Environment Variables
 
 Each service defines its own environment variables. Refer to the service READMEs for the exhaustive lists:
