@@ -1,0 +1,70 @@
+ generator client {
+   provider = "prisma-client-js"
+ }
+
+ datasource db {
+   provider = "postgresql"
+   url      = env("DATABASE_URL")
+ }
+
+ model Geofence {
+   id        String          @id @default(uuid())
+   name      String
+   type      String
+   center    Json
+   radius    Float
+   boundary  Json
+   createdAt DateTime        @default(now())
+   updatedAt DateTime        @updatedAt
+   events    GeofenceEvent[]
+
+   @@map("geofences")
+ }
+
+ model GeofenceEvent {
+   id         String   @id @default(uuid())
+   geofenceId String
+   geofence   Geofence @relation(fields: [geofenceId], references: [id])
+   eventType  String
+   runId      String
+   timestamp  DateTime
+   location   Json
+
+   @@map("geofence_events")
+ }
+
+ model TrackingEvent {
+   id        String   @id @default(uuid())
+   runId     String
+   type      String
+   location  Json
+   timestamp DateTime
+   createdAt DateTime @default(now())
+
+   @@map("tracking_events")
+ }
+
+ model ETACalculation {
+   id        String   @id @default(uuid())
+   runId     String
+   eta       DateTime
+   distance  Float
+   duration  Float
+   traffic   Json?
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+
+   @@map("eta_calculations")
+ }
+
+ model Journey {
+   id        String   @id @default(uuid())
+   runId     String
+   startTime DateTime
+   endTime   DateTime?
+   path      Json
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+
+   @@map("journeys")
+ }
