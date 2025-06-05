@@ -4,8 +4,12 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { AdminController } from './api/controllers/admin.controller';
 import { createAdminRoutes } from './api/routes/admin.routes';
+import { MetricsService } from './services/metrics.service';
+import { ConfigService } from './services/config.service';
 
-const controller = new AdminController();
+const metricsService = new MetricsService();
+const configService = new ConfigService();
+const controller = new AdminController(metricsService, configService);
 
 const app = express();
 app.use(express.json());
