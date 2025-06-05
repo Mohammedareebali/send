@@ -1,5 +1,5 @@
 import * as amqp from 'amqplib';
-import { Logger } from 'winston';
+import winston, { Logger } from 'winston';
 
 export class RabbitMQService {
   private connection: amqp.Connection | null = null;
@@ -92,16 +92,16 @@ export class RabbitMQService {
   }
 
   private createLogger(): Logger {
-    return require('winston').createLogger({
+    return winston.createLogger({
       level: 'info',
-      format: require('winston').format.combine(
-        require('winston').format.timestamp(),
-        require('winston').format.json()
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json(),
       ),
       transports: [
-        new require('winston').transports.Console(),
-        new require('winston').transports.File({ filename: 'logs/rabbitmq.log' })
-      ]
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'logs/rabbitmq.log' }),
+      ],
     });
   }
 } 
