@@ -22,7 +22,6 @@
   "include": ["packages/**/*.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"],
   "references": [
-    { "path": "./packages/shared" },
-    { "path": "./packages/api-gateway" }
+    { "path": "./packages/shared" }
   ]
-} 
+}
