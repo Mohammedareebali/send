@@ -94,4 +94,51 @@ export class StudentController {
       res.status(500).json({ error: 'Failed to delete student' });
     }
   }
-} 
+
+  async addGuardian(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const guardianData = req.body;
+      const guardian = await this.studentModel.addGuardian(id, guardianData);
+
+      await this.rabbitMQ.publishStudentEvent({
+        type: 'StudentGuardianAdded',
+        studentId: id,
+        data: guardian
+      });
+
+      res.status(201).json({ guardian });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to add guardian' });
+    }
+  }
+
+  async removeGuardian(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { guardianId } = req.body as { guardianId: string };
+      await this.studentModel.removeGuardian(id, guardianId);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to remove guardian' });
+    }
+  }
+
+  async recordAttendance(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const attendanceData = req.body;
+      const attendance = await this.studentModel.recordAttendance(id, attendanceData);
+
+      await this.rabbitMQ.publishStudentEvent({
+        type: 'StudentAttendanceRecorded',
+        studentId: id,
+        data: attendance
+      });
+
+      res.status(201).json({ attendance });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to record attendance' });
+    }
+  }
+}

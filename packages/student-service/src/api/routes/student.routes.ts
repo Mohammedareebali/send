@@ -77,4 +77,34 @@ router.delete('/:id', (async (req: AuthRequest, res: Response) => {
   }
 }) as RequestHandler);
 
+// Add a guardian to a student
+router.post('/:id/add-guardian', (async (req: AuthRequest, res: Response) => {
+  try {
+    const guardian = await studentModel.addGuardian(req.params.id, req.body);
+    res.status(201).json(guardian);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add guardian' });
+  }
+}) as RequestHandler);
+
+// Remove a guardian from a student
+router.delete('/:id/remove-guardian', (async (req: AuthRequest, res: Response) => {
+  try {
+    await studentModel.removeGuardian(req.params.id, req.body.guardianId);
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to remove guardian' });
+  }
+}) as RequestHandler);
+
+// Record attendance for a student
+router.post('/:id/attendance', (async (req: AuthRequest, res: Response) => {
+  try {
+    const attendance = await studentModel.recordAttendance(req.params.id, req.body);
+    res.status(201).json(attendance);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to record attendance' });
+  }
+}) as RequestHandler);
+
 export default router; 

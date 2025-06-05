@@ -11,6 +11,16 @@ jest.mock('@prisma/client', () => ({
       findMany: jest.fn(),
       delete: jest.fn(),
     },
+    guardian: {
+      create: jest.fn(),
+    },
+    studentGuardian: {
+      create: jest.fn(),
+      deleteMany: jest.fn(),
+    },
+    attendance: {
+      create: jest.fn(),
+    }
   })),
 }));
 
@@ -183,4 +193,42 @@ describe('StudentModel', () => {
       });
     });
   });
-}); 
+
+  describe('addGuardian', () => {
+    it('should create guardian and link to student', async () => {
+      const guardianData = { firstName: 'Jane', lastName: 'Doe' };
+      const guardian = { id: 'g1', ...guardianData };
+      (prisma.guardian.create as jest.Mock).mockResolvedValue(guardian);
+      (prisma.studentGuardian.create as jest.Mock).mockResolvedValue({});
+
+      const result = await studentModel.addGuardian('s1', guardianData as any);
+
+      expect(prisma.guardian.create).toHaveBeenCalledWith({ data: guardianData });
+      expect(prisma.studentGuardian.create).toHaveBeenCalledWith({ data: { studentId: 's1', guardianId: guardian.id } });
+      expect(result).toEqual(guardian);
+    });
+  });
+
+  describe('removeGuardian', () => {
+    it('should delete relation', async () => {
+      (prisma.studentGuardian.deleteMany as jest.Mock).mockResolvedValue({});
+
+      await studentModel.removeGuardian('s1', 'g1');
+
+      expect(prisma.studentGuardian.deleteMany).toHaveBeenCalledWith({ where: { studentId: 's1', guardianId: 'g1' } });
+    });
+  });
+
+  describe('recordAttendance', () => {
+    it('should create attendance record', async () => {
+      const attendanceData = { status: 'PRESENT', date: new Date() };
+      const attendance = { id: 'a1', studentId: 's1', ...attendanceData };
+      (prisma.attendance.create as jest.Mock).mockResolvedValue(attendance);
+
+      const result = await studentModel.recordAttendance('s1', attendanceData as any);
+
+      expect(prisma.attendance.create).toHaveBeenCalledWith({ data: { ...attendanceData, studentId: 's1' } });
+      expect(result).toEqual(attendance);
+    });
+  });
+});
