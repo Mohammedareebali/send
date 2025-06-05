@@ -1,26 +1,22 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "lib": ["es2018"],
-    "declaration": true,
-    "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "types": ["node", "jest"],
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["../shared/src/*"],
       "@send/shared": ["../shared/src"],
       "@send/shared/*": ["../shared/src/*"]
-    }
+    },
+    "types": ["node", "jest"]
   },
-  "include": ["src/**/*", "../shared/src/**/*"],
-  "references": [
-    { "path": "../shared" }
-  ]
-} 
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "../shared/src/**/__tests__/*",
+    "../shared/src/**/*.test.ts"
+  ],
+  "references": [{ "path": "../shared" }]
+}
