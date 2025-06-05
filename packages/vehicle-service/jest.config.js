@@ -8,8 +8,8 @@ module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
-    '^@send/shared$': '<rootDir>/../../shared/src',
-    '^@send/shared/(.*)$': '<rootDir>/../../shared/src/$1',
-    '^@shared/(.*)$': '<rootDir>/../../shared/src/$1',
+    '^@send/shared$': '<rootDir>/../shared/src',
+    '^@send/shared/(.*)$': '<rootDir>/../shared/src/$1',
+    '^@shared/(.*)$': '<rootDir>/../shared/src/$1',
   },
 };

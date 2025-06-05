@@ -2,7 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import { VehicleController } from '../../api/controllers/vehicle.controller';
 import { VehicleService } from '../../services/vehicle.service';
-import { VehicleStatus } from '@prisma/client';
+import { VehicleStatus } from '../../types/vehicle';
 
 describe('VehicleController', () => {
   let app: express.Application;

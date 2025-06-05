@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma, Run } from '@prisma/client';
-import { Driver, DriverStatus } from '@send/shared';
+import { Driver, DriverStatus } from '@shared/types/driver';
 import { RabbitMQService } from './messaging/rabbitmq.service';
 
 type RunWithPerformance = Pick<Run, 'id' | 'status' | 'scheduledStartTime' | 'actualStartTime' | 'rating'>;
