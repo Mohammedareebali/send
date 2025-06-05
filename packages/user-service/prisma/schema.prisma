@@ -10,16 +10,18 @@ datasource db {
 
 enum UserRole {
   ADMIN
+  COORDINATOR
+  MANAGER
   DRIVER
   PA
   GUARDIAN
+  PARENT
 }
 
 enum UserStatus {
   ACTIVE
   INACTIVE
-  PENDING
-  BLOCKED
+  SUSPENDED
 }
 
 model User {
@@ -27,7 +29,7 @@ model User {
   email     String     @unique
   password  String
   role      UserRole
-  status    UserStatus @default(PENDING)
+  status    UserStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
