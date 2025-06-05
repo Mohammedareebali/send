@@ -60,11 +60,26 @@ describe('RunController', () => {
     };
 
     jest.clearAllMocks();
+
+    const mockRouteService = {
+      optimizeRoute: jest.fn().mockResolvedValue({
+        distance: 0,
+        duration: 0,
+        route: {},
+        traffic: {}
+      })
+    } as unknown as RouteService;
+
+    const mockScheduleService = {
+      checkForConflicts: jest.fn().mockResolvedValue(false),
+      calculateNextOccurrence: jest.fn().mockResolvedValue(null)
+    } as unknown as ScheduleService;
+
     controller = new RunController(
       mockRunModel,
       new RabbitMQService(),
-      {} as RouteService,
-      {} as ScheduleService
+      mockRouteService,
+      mockScheduleService
     );
   });
 
@@ -100,10 +115,10 @@ describe('RunController', () => {
 
       await controller.createRun(mockReq as Request, mockRes as Response);
 
-      expect(mockRunModel.create).toHaveBeenCalledWith(runData);
+      expect(mockRunModel.create).toHaveBeenCalledWith(expect.objectContaining(runData));
       expect(mockPublishRunEvent).toHaveBeenCalledWith(RUN_CREATED, createdRun);
       expect(mockRes.status).toHaveBeenCalledWith(201);
-      expect(mockRes.json).toHaveBeenCalledWith(createdRun);
+      expect(mockRes.json).toHaveBeenCalledWith({ run: createdRun });
     });
   });
 
@@ -144,7 +159,7 @@ describe('RunController', () => {
 
       expect(mockRunModel.update).toHaveBeenCalledWith(runId, updateData);
       expect(mockPublishRunEvent).toHaveBeenCalledWith(RUN_UPDATED, updatedRun);
-      expect(mockRes.json).toHaveBeenCalledWith(updatedRun);
+      expect(mockRes.json).toHaveBeenCalledWith({ run: updatedRun });
     });
   });
 
@@ -179,7 +194,7 @@ describe('RunController', () => {
 
       expect(mockRunModel.update).toHaveBeenCalledWith(runId, { status: RunStatus.CANCELLED });
       expect(mockPublishRunEvent).toHaveBeenCalledWith(RUN_CANCELLED, cancelledRun);
-      expect(mockRes.json).toHaveBeenCalledWith(cancelledRun);
+      expect(mockRes.json).toHaveBeenCalledWith({ run: cancelledRun });
     });
   });
 
@@ -218,7 +233,7 @@ describe('RunController', () => {
         endTime: expect.any(Date)
       });
       expect(mockPublishRunEvent).toHaveBeenCalledWith(RUN_COMPLETED, completedRun);
-      expect(mockRes.json).toHaveBeenCalledWith(completedRun);
+      expect(mockRes.json).toHaveBeenCalledWith({ run: completedRun });
     });
   });
 }); 

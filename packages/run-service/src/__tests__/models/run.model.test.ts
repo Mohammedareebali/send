@@ -50,12 +50,24 @@ describe('RunModel', () => {
         notes: undefined
       };
 
-      mockPrismaDriver.create.mockResolvedValue(createdRun);
+      const prismaCreatedRun = {
+        ...createdRun,
+        pickupLocation: JSON.stringify(runData.pickupLocation),
+        dropoffLocation: JSON.stringify(runData.dropoffLocation),
+        studentIds: JSON.stringify(runData.studentIds)
+      };
+
+      mockPrismaDriver.create.mockResolvedValue(prismaCreatedRun);
 
       const result = await model.create(runData);
 
       expect(mockPrismaDriver.create).toHaveBeenCalledWith({
-        data: runData
+        data: {
+          ...runData,
+          pickupLocation: JSON.stringify(runData.pickupLocation),
+          dropoffLocation: JSON.stringify(runData.dropoffLocation),
+          studentIds: JSON.stringify(runData.studentIds)
+        }
       });
       expect(result).toEqual(createdRun);
     });
@@ -87,7 +99,14 @@ describe('RunModel', () => {
         scheduleType: ScheduleType.ONE_TIME
       };
 
-      mockPrismaDriver.update.mockResolvedValue(updatedRun);
+      const prismaUpdatedRun = {
+        ...updatedRun,
+        pickupLocation: JSON.stringify(updatedRun.pickupLocation),
+        dropoffLocation: JSON.stringify(updatedRun.dropoffLocation),
+        studentIds: JSON.stringify(updatedRun.studentIds)
+      };
+
+      mockPrismaDriver.update.mockResolvedValue(prismaUpdatedRun);
 
       const result = await model.update(runId, updateData);
 
@@ -120,7 +139,14 @@ describe('RunModel', () => {
         scheduleType: ScheduleType.ONE_TIME
       };
 
-      mockPrismaDriver.findUnique.mockResolvedValue(run);
+      const prismaRun = {
+        ...run,
+        pickupLocation: JSON.stringify(run.pickupLocation),
+        dropoffLocation: JSON.stringify(run.dropoffLocation),
+        studentIds: JSON.stringify(run.studentIds)
+      };
+
+      mockPrismaDriver.findUnique.mockResolvedValue(prismaRun);
 
       const result = await model.findById(runId);
 
@@ -165,11 +191,21 @@ describe('RunModel', () => {
         }
       ];
 
-      mockPrismaDriver.findMany.mockResolvedValue(runs);
+      const prismaRuns = runs.map(r => ({
+        ...r,
+        pickupLocation: JSON.stringify(r.pickupLocation),
+        dropoffLocation: JSON.stringify(r.dropoffLocation),
+        studentIds: JSON.stringify(r.studentIds)
+      }));
+
+      mockPrismaDriver.findMany.mockResolvedValue(prismaRuns);
 
       const result = await model.findAll();
 
-      expect(mockPrismaDriver.findMany).toHaveBeenCalledWith();
+      expect(mockPrismaDriver.findMany).toHaveBeenCalledWith({
+        where: {},
+        orderBy: { createdAt: 'desc' }
+      });
       expect(result).toEqual(runs);
     });
 
@@ -199,12 +235,20 @@ describe('RunModel', () => {
         }
       ];
 
-      mockPrismaDriver.findMany.mockResolvedValue(runs);
+      const prismaRuns = runs.map(r => ({
+        ...r,
+        pickupLocation: JSON.stringify(r.pickupLocation),
+        dropoffLocation: JSON.stringify(r.dropoffLocation),
+        studentIds: JSON.stringify(r.studentIds)
+      }));
+
+      mockPrismaDriver.findMany.mockResolvedValue(prismaRuns);
 
       const result = await model.findAll(filters);
 
       expect(mockPrismaDriver.findMany).toHaveBeenCalledWith({
-        where: filters
+        where: filters,
+        orderBy: { createdAt: 'desc' }
       });
       expect(result).toEqual(runs);
     });
@@ -231,7 +275,14 @@ describe('RunModel', () => {
         scheduleType: ScheduleType.ONE_TIME
       };
 
-      mockPrismaDriver.delete.mockResolvedValue(deletedRun);
+      const prismaDeletedRun = {
+        ...deletedRun,
+        pickupLocation: JSON.stringify(deletedRun.pickupLocation),
+        dropoffLocation: JSON.stringify(deletedRun.dropoffLocation),
+        studentIds: JSON.stringify(deletedRun.studentIds)
+      };
+
+      mockPrismaDriver.delete.mockResolvedValue(prismaDeletedRun);
 
       const result = await model.delete(runId);
 

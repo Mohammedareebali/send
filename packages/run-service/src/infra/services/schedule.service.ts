@@ -9,7 +9,7 @@ export class ScheduleService {
     }
 
     const now = new Date();
-    const startTime = parseISO(run.startTime.toString());
+    const startTime = parseISO(run.startTime.toISOString());
 
     switch (run.scheduleType) {
       case 'DAILY':
@@ -55,12 +55,12 @@ export class ScheduleService {
   }
 
   async checkForConflicts(run: Run, existingRuns: Run[]): Promise<boolean> {
-    const startTime = parseISO(run.startTime.toString());
-    const endTime = run.endTime ? parseISO(run.endTime.toString()) : null;
+    const startTime = parseISO(run.startTime.toISOString());
+    const endTime = run.endTime ? parseISO(run.endTime.toISOString()) : null;
 
     return existingRuns.some(existingRun => {
-      const existingStart = parseISO(existingRun.startTime.toString());
-      const existingEnd = existingRun.endTime ? parseISO(existingRun.endTime.toString()) : null;
+      const existingStart = parseISO(existingRun.startTime.toISOString());
+      const existingEnd = existingRun.endTime ? parseISO(existingRun.endTime.toISOString()) : null;
 
       // Check for time overlap
       if (endTime && existingEnd) {
