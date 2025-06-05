@@ -2,7 +2,10 @@ export class PrismaClient {
   [key: string]: any
 }
 
-export function Prisma() {}
+
+export var Prisma: any = {};
+
+
 
 export namespace Prisma {
   // Original exports
