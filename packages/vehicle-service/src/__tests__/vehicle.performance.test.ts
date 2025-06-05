@@ -1,7 +1,7 @@
 import { setupTestEnvironment, cleanupTestEnvironment } from '@shared/testing/setup';
 import { VehicleService } from '../services/vehicle.service';
 import { PrismaClient } from '@prisma/client';
-import { VehicleStatus } from '@shared/types';
+import { VehicleStatus, VehicleType } from '@send/shared/types/vehicle';
 import { performance } from 'perf_hooks';
 
 describe('Vehicle Service Performance', () => {
@@ -17,7 +17,7 @@ describe('Vehicle Service Performance', () => {
 
     // Create test vehicles
     const vehicles = Array.from({ length: NUM_VEHICLES }, (_, i) => ({
-      type: 'SEDAN',
+      type: VehicleType.SEDAN,
       make: 'Toyota',
       model: 'Camry',
       year: 2022,
