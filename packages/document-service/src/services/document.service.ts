@@ -203,6 +203,59 @@ export class DocumentService {
     }
   }
 
+  async updateDocumentMetadata(
+    documentId: string,
+    metadata: Record<string, any>
+  ): Promise<Document> {
+    try {
+      this.logger.info('Updating document metadata', { documentId, metadata });
+      const updated = await (this.prisma as any).document.update({
+        where: { id: documentId },
+        data: { metadata: metadata as Prisma.JsonObject }
+      });
+
+      await this.rabbitMQ.publishMessage('document.metadata.updated', {
+        documentId,
+        metadata,
+        timestamp: new Date()
+      });
+
+      return this.mapToSharedDocument(updated);
+    } catch (error) {
+      this.logger.error('Failed to update document metadata', { error, documentId });
+      throw error;
+    }
+  }
+
+  async expireOutdatedDocuments(): Promise<void> {
+    try {
+      const documents = await (this.prisma as any).document.findMany({
+        where: { NOT: { status: 'EXPIRED' } }
+      });
+
+      const now = new Date();
+      for (const doc of documents) {
+        const expiry = (doc.metadata as any)?.expiryDate;
+        if (expiry && new Date(expiry) < now) {
+          await (this.prisma as any).document.update({
+            where: { id: doc.id },
+            data: { status: 'EXPIRED' }
+          });
+
+          await this.rabbitMQ.publishMessage('document.expired', {
+            documentId: doc.id,
+            userId: doc.userId,
+            expiredAt: now
+          });
+
+          this.logger.info('Document expired', { documentId: doc.id });
+        }
+      }
+    } catch (error) {
+      this.logger.error('Failed to expire documents', { error });
+    }
+  }
+
   async performOCR(documentId: string): Promise<OCRResultData> {
     if (!this.ocrWorker) {
       throw new Error('OCR worker not initialized');
