@@ -28,4 +28,13 @@ export interface Driver {
   currentRunId: string | null;
   createdAt: Date;
   updatedAt: Date;
-} 
+}
+
+export interface DriverAvailability {
+  id: string;
+  driverId: string;
+  startTime: Date;
+  endTime: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}

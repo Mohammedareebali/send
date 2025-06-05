@@ -1,5 +1,14 @@
 import { PrismaClient } from '@prisma/client';
-import { Student, StudentCreateInput, StudentUpdateInput, StudentWhereInput, StudentWhereUniqueInput } from '@send/shared';
+import {
+  Student,
+  StudentCreateInput,
+  StudentUpdateInput,
+  StudentWhereInput,
+  Guardian,
+  GuardianCreateInput,
+  Attendance,
+  AttendanceCreateInput
+} from '@send/shared';
 
 export class StudentModel {
   private static instance: StudentModel;
@@ -44,4 +53,24 @@ export class StudentModel {
       where: { id },
     });
   }
-} 
+
+  async addGuardian(studentId: string, data: GuardianCreateInput): Promise<Guardian> {
+    const guardian = await this.prisma.guardian.create({ data });
+    await this.prisma.studentGuardian.create({
+      data: { studentId, guardianId: guardian.id }
+    });
+    return guardian as unknown as Guardian;
+  }
+
+  async removeGuardian(studentId: string, guardianId: string): Promise<void> {
+    await this.prisma.studentGuardian.deleteMany({
+      where: { studentId, guardianId }
+    });
+  }
+
+  async recordAttendance(studentId: string, data: AttendanceCreateInput): Promise<Attendance> {
+    return this.prisma.attendance.create({
+      data: { ...data, studentId }
+    }) as unknown as Attendance;
+  }
+}

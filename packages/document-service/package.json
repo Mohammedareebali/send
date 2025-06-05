@@ -17,8 +17,9 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "shared": "workspace:*",
     "express": "^4.18.2",
+    "node-cron": "^4.1.0",
+    "shared": "workspace:*",
     "winston": "^3.11.0"
   },
   "devDependencies": {

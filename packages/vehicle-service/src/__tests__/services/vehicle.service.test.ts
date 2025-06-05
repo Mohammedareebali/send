@@ -1,10 +1,10 @@
 import { VehicleService } from '../../services/vehicle.service';
 import { PrismaClient } from '@prisma/client';
-import { RabbitMQService } from '../../infra/messaging/rabbitmq.service';
+import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { VehicleType, VehicleStatus, AlertType, AlertSeverity, AlertStatus } from '../../types/vehicle';
 
 jest.mock('@prisma/client');
-jest.mock('../../infra/messaging/rabbitmq.service');
+jest.mock('../../infra/messaging/rabbitmq');
 
 class MockRabbitMQService {
   url = 'amqp://localhost';
@@ -50,6 +50,10 @@ type MockPrismaClient = {
   run: {
     findMany: jest.Mock;
   };
+  telemetryRecord?: {
+    create: jest.Mock;
+    findFirst: jest.Mock;
+  };
 };
 
 describe('VehicleService', () => {
@@ -94,6 +98,10 @@ describe('VehicleService', () => {
       },
       run: {
         findMany: jest.fn()
+      },
+      telemetryRecord: {
+        create: jest.fn(),
+        findFirst: jest.fn()
       }
     };
 
@@ -377,4 +385,33 @@ describe('VehicleService', () => {
       expect(result).toEqual(maintenanceRecords);
     });
   });
-}); 
+
+  describe('addTelemetryRecord', () => {
+    it('should store telemetry for a vehicle', async () => {
+      const vehicleId = '1';
+      const telemetryData = { speed: 50, fuelLevel: 0.5 };
+      const record = { id: 'rec1', vehicleId, ...telemetryData, recordedAt: new Date(), createdAt: new Date(), updatedAt: new Date() };
+
+      (mockPrisma as any).telemetryRecord = { create: jest.fn().mockResolvedValue(record), findFirst: jest.fn() };
+
+      const result = await service.addTelemetryRecord(vehicleId, telemetryData);
+
+      expect((mockPrisma as any).telemetryRecord.create).toHaveBeenCalled();
+      expect(result).toEqual(record);
+    });
+  });
+
+  describe('getLatestTelemetry', () => {
+    it('should return latest telemetry for a vehicle', async () => {
+      const vehicleId = '1';
+      const record = { id: 'rec1', vehicleId, speed: 40, recordedAt: new Date(), createdAt: new Date(), updatedAt: new Date() };
+
+      (mockPrisma as any).telemetryRecord = { create: jest.fn(), findFirst: jest.fn().mockResolvedValue(record) };
+
+      const result = await service.getLatestTelemetry(vehicleId);
+
+      expect((mockPrisma as any).telemetryRecord.findFirst).toHaveBeenCalled();
+      expect(result).toEqual(record);
+    });
+  });
+});

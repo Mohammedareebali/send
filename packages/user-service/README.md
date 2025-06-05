@@ -17,6 +17,8 @@ The User Service is a microservice responsible for user management in the SEND T
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/refresh-token` - Refresh JWT token
+- `POST /api/users/password/reset-request` - Request password reset
+- `POST /api/users/password/reset` - Reset password
 
 ### User Management
 - `GET /api/users/profile` - Get user profile
@@ -82,6 +84,7 @@ The service publishes the following events:
 - `user.updated` - When a user profile is updated
 - `user.deleted` - When a user is deleted
 - `user.status.changed` - When a user's status changes
+- `user.login` - When a user successfully logs in
 
 ## License
 

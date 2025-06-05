@@ -14,6 +14,11 @@ traffic to the underlying services and enforces authentication using the shared
 - `VEHICLE_SERVICE_URL` - URL of the vehicle service (default: `http://localhost:3005`)
 - `DOCUMENT_SERVICE_URL` - URL of the document service (default: `http://localhost:3006`)
 
+- `LOG_LEVEL` - Log verbosity (default: `info`)
+- `PROXY_RETRY_ATTEMPTS` - Number of retry attempts for proxied requests (default: `3`)
+- `PROXY_RETRY_DELAY_MS` - Delay between retries in milliseconds (default: `100`)
+ main
+
 ## Development
 
 ```bash

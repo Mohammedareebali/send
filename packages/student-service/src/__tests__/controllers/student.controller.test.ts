@@ -20,6 +20,9 @@ describe('StudentController', () => {
       findById: jest.fn(),
       findAll: jest.fn(),
       delete: jest.fn(),
+      addGuardian: jest.fn(),
+      removeGuardian: jest.fn(),
+      recordAttendance: jest.fn(),
     } as unknown as jest.Mocked<StudentModel>;
 
     jest
@@ -191,6 +194,96 @@ describe('StudentController', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to get students' });
+    });
+  });
+
+  describe('addGuardian', () => {
+    it('should add guardian and publish event', async () => {
+      const guardianData = { firstName: 'Jane', lastName: 'Doe' };
+      const mockGuardian = { id: 'g1', ...guardianData, createdAt: new Date(), updatedAt: new Date() };
+
+      req.params = { id: 'student-1' };
+      req.body = guardianData;
+      studentModel.addGuardian.mockResolvedValue(mockGuardian);
+      rabbitMQ.publishStudentEvent.mockResolvedValue(undefined);
+
+      await studentController.addGuardian(req as Request, res as Response);
+
+      expect(studentModel.addGuardian).toHaveBeenCalledWith('student-1', guardianData);
+      expect(rabbitMQ.publishStudentEvent).toHaveBeenCalledWith({
+        type: 'StudentGuardianAdded',
+        studentId: 'student-1',
+        data: mockGuardian,
+      });
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({ guardian: mockGuardian });
+    });
+
+    it('should handle errors', async () => {
+      req.params = { id: 's1' };
+      studentModel.addGuardian.mockRejectedValue(new Error('fail'));
+
+      await studentController.addGuardian(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to add guardian' });
+    });
+  });
+
+  describe('removeGuardian', () => {
+    it('should remove guardian', async () => {
+      req.params = { id: 's1' };
+      req.body = { guardianId: 'g1' };
+
+      await studentController.removeGuardian(req as Request, res as Response);
+
+      expect(studentModel.removeGuardian).toHaveBeenCalledWith('s1', 'g1');
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.send).toHaveBeenCalled();
+    });
+
+    it('should handle errors', async () => {
+      req.params = { id: 's1' };
+      req.body = { guardianId: 'g1' };
+      studentModel.removeGuardian.mockRejectedValue(new Error('err'));
+
+      await studentController.removeGuardian(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to remove guardian' });
+    });
+  });
+
+  describe('recordAttendance', () => {
+    it('should record attendance and publish event', async () => {
+      const attendanceData = { status: 'PRESENT', date: new Date() };
+      const mockAttendance = { id: 'a1', studentId: 's1', ...attendanceData, createdAt: new Date(), updatedAt: new Date() };
+
+      req.params = { id: 's1' };
+      req.body = attendanceData;
+      studentModel.recordAttendance.mockResolvedValue(mockAttendance);
+      rabbitMQ.publishStudentEvent.mockResolvedValue(undefined);
+
+      await studentController.recordAttendance(req as Request, res as Response);
+
+      expect(studentModel.recordAttendance).toHaveBeenCalledWith('s1', attendanceData);
+      expect(rabbitMQ.publishStudentEvent).toHaveBeenCalledWith({
+        type: 'StudentAttendanceRecorded',
+        studentId: 's1',
+        data: mockAttendance,
+      });
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({ attendance: mockAttendance });
+    });
+
+    it('should handle errors', async () => {
+      req.params = { id: 's1' };
+      studentModel.recordAttendance.mockRejectedValue(new Error('err'));
+
+      await studentController.recordAttendance(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to record attendance' });
     });
   });
 }); 

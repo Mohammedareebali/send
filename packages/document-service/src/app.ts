@@ -65,4 +65,4 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-export { app, prisma, rabbitMQ, logger }; 
+export { app, prisma, rabbitMQ, logger, documentService };

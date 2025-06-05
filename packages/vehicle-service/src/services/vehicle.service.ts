@@ -1,5 +1,7 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Vehicle, VehicleType, VehicleStatus } from '../types/vehicle';
+import { VehicleEventType } from '@shared/types/vehicle';
+import { RabbitMQService } from '../infra/messaging/rabbitmq';
 import { createVehicleSchema, updateVehicleSchema, vehicleQuerySchema } from '@shared/validation/schemas/vehicle.schema';
 import { prometheus } from '@shared/prometheus';
 import { logger } from '@shared/logger';
@@ -140,11 +142,69 @@ export class VehicleService {
       throw error;
     }
   }
+
+  async addTelemetryRecord(
+    id: string,
+    data: {
+      speed?: number;
+      fuelLevel?: number;
+      location?: { latitude: number; longitude: number } | null;
+      recordedAt?: Date;
+    }
+  ): Promise<any> {
+    try {
+      const timestamp = data.recordedAt || new Date();
+      const record = await (this.prisma as any).telemetryRecord.create({
+        data: {
+          vehicleId: id,
+          speed: data.speed,
+          fuelLevel: data.fuelLevel,
+          location: data.location as any,
+          recordedAt: timestamp
+        }
+      });
+      if (this.rabbitMQ) {
+        await this.rabbitMQ.publishVehicleEvent({
+          type: VehicleEventType.TELEMETRY_RECORDED,
+          vehicleId: id,
+          timestamp: Date.now(),
+          data: { telemetryRecord: { ...record, recordedAt: record.recordedAt.toISOString() } }
+        });
+      }
+
+      return record;
+    } catch (error) {
+      logger.error('Error adding telemetry record:', { id, data, error });
+      prometheus.serviceRequestsTotal.inc({
+        service: 'vehicle-service',
+        status: 'error'
+      });
+      throw error;
+    }
+  }
+
+  async getLatestTelemetry(id: string): Promise<any | null> {
+    try {
+      const record = await (this.prisma as any).telemetryRecord.findFirst({
+        where: { vehicleId: id },
+        orderBy: { recordedAt: 'desc' }
+      });
+      return record || null;
+    } catch (error) {
+      logger.error('Error getting latest telemetry:', { id, error });
+      prometheus.serviceRequestsTotal.inc({
+        service: 'vehicle-service',
+        status: 'error'
+      });
+      throw error;
+    }
+  }
   private prisma: PrismaClient;
   private redis: Redis;
   private cacheTTL: number;
+  private rabbitMQ?: RabbitMQService;
 
-  constructor() {
+  constructor(rabbitMQ?: RabbitMQService) {
     this.prisma = new PrismaClient();
     this.redis = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
@@ -152,6 +212,7 @@ export class VehicleService {
       password: process.env.REDIS_PASSWORD,
     });
     this.cacheTTL = parseInt(process.env.CACHE_TTL || '300');
+    this.rabbitMQ = rabbitMQ;
   }
 
   private mapToVehicle(prismaVehicle: PrismaVehicle): Vehicle {

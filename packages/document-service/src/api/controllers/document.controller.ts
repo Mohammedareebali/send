@@ -65,4 +65,34 @@ export class DocumentController {
       res.status(500).json({ error: 'Failed to delete document' });
     }
   }
+
+  async updateDocumentAccess(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { userId, permission, grantedBy, expiresAt } = req.body;
+      const access = await this.documentService.updateDocumentAccess(
+        id,
+        userId,
+        permission,
+        grantedBy,
+        expiresAt ? new Date(expiresAt) : undefined
+      );
+      res.json(access);
+    } catch (error) {
+      console.error('Failed to update document access:', error);
+      res.status(500).json({ error: 'Failed to update document access' });
+    }
+  }
+
+  async updateDocumentMetadata(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const metadata = req.body.metadata;
+      const doc = await this.documentService.updateDocumentMetadata(id, metadata);
+      res.json(doc);
+    } catch (error) {
+      console.error('Failed to update document metadata:', error);
+      res.status(500).json({ error: 'Failed to update document metadata' });
+    }
+  }
 }

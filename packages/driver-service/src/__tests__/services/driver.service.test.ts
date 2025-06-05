@@ -1,9 +1,9 @@
 import { DriverService } from '../../services/driver.service';
-import { RabbitMQService } from '../../services/messaging/rabbitmq.service';
+import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { PrismaClient } from '@prisma/client';
 import { Driver, DriverStatus } from '@shared/types/driver';
 
-jest.mock('../../services/messaging/rabbitmq.service');
+jest.mock('../../infra/messaging/rabbitmq');
 
 const mockPrismaDriver = {
   create: jest.fn(),
@@ -12,10 +12,21 @@ const mockPrismaDriver = {
   findMany: jest.fn(),
   delete: jest.fn()
 };
+const mockPrismaRun = {
+  findUnique: jest.fn()
+};
+const mockPrismaAvailability = {
+  findMany: jest.fn(),
+  findFirst: jest.fn(),
+  createMany: jest.fn(),
+  deleteMany: jest.fn()
+};
 
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn().mockImplementation(() => ({
-    driver: mockPrismaDriver
+    driver: mockPrismaDriver,
+    run: mockPrismaRun,
+    driverAvailability: mockPrismaAvailability
   }))
 }));
 
@@ -26,9 +37,13 @@ describe('DriverService', () => {
   let mockDriver: Driver;
 
   beforeEach(() => {
+    jest.resetAllMocks();
     mockRabbitMQ = new RabbitMQService('amqp://localhost') as jest.Mocked<RabbitMQService>;
-    mockPrisma = new PrismaClient() as jest.Mocked<PrismaClient>;
-    Object.assign((mockPrisma as any).driver, mockPrismaDriver);
+    mockPrisma = {
+      driver: mockPrismaDriver,
+      run: mockPrismaRun,
+      driverAvailability: mockPrismaAvailability
+    } as unknown as jest.Mocked<PrismaClient>;
 
     mockDriver = {
       id: 'driver-1',
@@ -179,10 +194,15 @@ describe('DriverService', () => {
   describe('assignDriverToRun', () => {
     it('should assign driver to run', async () => {
       const updatedDriver = { ...mockDriver, currentRunId: 'run-1', status: DriverStatus.ASSIGNED };
+      const run = { id: 'run-1', startTime: new Date(), endTime: new Date(Date.now() + 3600) };
+      mockPrismaRun.findUnique.mockResolvedValue(run);
+      mockPrismaAvailability.findFirst.mockResolvedValue({ id: 'a1' });
       mockPrismaDriver.update.mockResolvedValue(updatedDriver);
 
       const result = await driverService.assignDriverToRun(mockDriver.id, 'run-1');
 
+      expect(mockPrismaRun.findUnique).toHaveBeenCalledWith({ where: { id: 'run-1' } });
+      expect(mockPrismaAvailability.findFirst).toHaveBeenCalled();
       expect(mockPrismaDriver.update).toHaveBeenCalledWith({
         where: { id: mockDriver.id },
         data: {
@@ -228,6 +248,33 @@ describe('DriverService', () => {
       });
 
       expect(result).toEqual(updatedDriver);
+    });
+  });
+
+  describe('getDriverAvailability', () => {
+    it('should return availability for driver', async () => {
+      mockPrismaAvailability.findMany.mockResolvedValue([]);
+      const result = await driverService.getDriverAvailability('driver-1');
+      expect(mockPrismaAvailability.findMany).toHaveBeenCalledWith({
+        where: { driverId: 'driver-1' },
+        orderBy: { startTime: 'asc' }
+      });
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('updateDriverAvailability', () => {
+    it('should replace availability for driver', async () => {
+      mockPrismaAvailability.deleteMany.mockResolvedValue({ count: 1 } as any);
+      mockPrismaAvailability.createMany.mockResolvedValue({ count: 2 } as any);
+      mockPrismaAvailability.findMany.mockResolvedValue([{ id: 'a1' } as any]);
+
+      const slots = [{ startTime: new Date(), endTime: new Date() }];
+      const result = await driverService.updateDriverAvailability('driver-1', slots);
+
+      expect(mockPrismaAvailability.deleteMany).toHaveBeenCalledWith({ where: { driverId: 'driver-1' } });
+      expect(mockPrismaAvailability.createMany).toHaveBeenCalled();
+      expect(result).toEqual([{ id: 'a1' }]);
     });
   });
 

@@ -3,16 +3,16 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "../../",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
       "@services/*": ["./services/*"],
       "@types/*": ["./types/*"],
-      "@shared/*": ["../../shared/src/*"],
-      "@send/shared": ["../../shared/src"],
-      "@send/shared/*": ["../../shared/src/*"]
+      "@shared/*": ["../shared/src/*"],
+      "@send/shared": ["../shared/src"],
+      "@send/shared/*": ["../shared/src/*"]
     },
     "types": ["node", "jest", "express"]
   },
-  "include": ["src/**/*.ts", "../shared/src/**/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 } 

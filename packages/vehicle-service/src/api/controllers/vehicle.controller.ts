@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { VehicleService } from '../../services/vehicle.service';
-import { CreateVehicleDto, UpdateVehicleDto } from '../dto/vehicle.dto';
+import { CreateVehicleDto, UpdateVehicleDto, TelemetryRecordDto } from '../dto/vehicle.dto';
 import { VehicleStatus } from '@shared/types/vehicle';
 
 export class VehicleController {
@@ -116,4 +116,29 @@ export class VehicleController {
       res.status(500).json({ message: 'Error getting maintenance history', error });
     }
   }
-} 
+
+  async addTelemetryRecord(req: Request, res: Response): Promise<void> {
+    try {
+      const record = await this.vehicleService.addTelemetryRecord(
+        req.params.id,
+        req.body as TelemetryRecordDto
+      );
+      res.status(201).json(record);
+    } catch (error) {
+      res.status(500).json({ message: 'Error adding telemetry record', error });
+    }
+  }
+
+  async getLatestTelemetry(req: Request, res: Response): Promise<void> {
+    try {
+      const record = await this.vehicleService.getLatestTelemetry(req.params.id);
+      if (!record) {
+        res.status(404).json({ message: 'Telemetry not found' });
+        return;
+      }
+      res.json(record);
+    } catch (error) {
+      res.status(500).json({ message: 'Error getting latest telemetry', error });
+    }
+  }
+}

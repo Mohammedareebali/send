@@ -107,6 +107,10 @@ export class TrackingService {
     });
   }
 
+  getLatestLocation(runId: string): Location | undefined {
+    return this.activeRuns.get(runId)?.lastLocation;
+  }
+
   private async checkGeofences(location: Location): Promise<Geofence[]> {
     const point: GeolibCoordinates = {
       latitude: location.latitude,
