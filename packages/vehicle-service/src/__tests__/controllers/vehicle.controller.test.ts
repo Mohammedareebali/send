@@ -2,7 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import { VehicleController } from '../../api/controllers/vehicle.controller';
 import { VehicleService } from '../../services/vehicle.service';
-import { VehicleStatus } from '../../types/vehicle';
+import { VehicleStatus, VehicleType } from '../../types/vehicle';
 
 describe('VehicleController', () => {
   let app: express.Application;
@@ -22,7 +22,7 @@ describe('VehicleController', () => {
       addMaintenanceRecord: jest.fn(),
       assignVehicleToRun: jest.fn(),
       unassignVehicleFromRun: jest.fn()
-    } as any;
+    } as unknown as jest.Mocked<VehicleService>;
 
     vehicleController = new VehicleController(vehicleService);
 
@@ -40,7 +40,7 @@ describe('VehicleController', () => {
   describe('POST /vehicles', () => {
     it('should create a vehicle', async () => {
       const vehicleData = {
-        type: 'SEDAN',
+        type: VehicleType.SEDAN,
         make: 'Toyota',
         model: 'Camry',
         year: 2020,
@@ -51,7 +51,9 @@ describe('VehicleController', () => {
       const mockVehicle = {
         id: '1',
         ...vehicleData,
-        status: VehicleStatus.AVAILABLE
+        status: VehicleStatus.AVAILABLE,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       vehicleService.createVehicle.mockResolvedValue(mockVehicle);
@@ -81,13 +83,15 @@ describe('VehicleController', () => {
     it('should get a vehicle', async () => {
       const mockVehicle = {
         id: '1',
-        type: 'SEDAN',
+        type: VehicleType.SEDAN,
         make: 'Toyota',
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
         capacity: 4,
-        status: VehicleStatus.AVAILABLE
+        status: VehicleStatus.AVAILABLE,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       vehicleService.getVehicleById.mockResolvedValue(mockVehicle);
@@ -126,13 +130,15 @@ describe('VehicleController', () => {
 
       const mockVehicle = {
         id: '1',
-        type: 'SEDAN',
+        type: VehicleType.SEDAN,
         make: 'Honda',
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
         capacity: 4,
-        status: VehicleStatus.AVAILABLE
+        status: VehicleStatus.AVAILABLE,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       vehicleService.updateVehicle.mockResolvedValue(mockVehicle);
@@ -171,7 +177,7 @@ describe('VehicleController', () => {
 
   describe('DELETE /vehicles/:id', () => {
     it('should delete a vehicle', async () => {
-      vehicleService.deleteVehicle.mockResolvedValue();
+      vehicleService.deleteVehicle.mockResolvedValue(true);
 
       const response = await request(app).delete('/vehicles/1');
 
@@ -194,21 +200,23 @@ describe('VehicleController', () => {
       const mockVehicles = [
         {
           id: '1',
-          type: 'SEDAN',
+          type: VehicleType.SEDAN,
           make: 'Toyota',
           model: 'Camry',
           year: 2020,
           licensePlate: 'ABC123',
-          status: VehicleStatus.AVAILABLE
+          status: VehicleStatus.AVAILABLE,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       ];
 
-      vehicleService.getAllVehicles.mockResolvedValue(mockVehicles);
+      vehicleService.getAllVehicles.mockResolvedValue({ vehicles: mockVehicles, total: mockVehicles.length });
 
       const response = await request(app).get('/vehicles');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockVehicles);
+      expect(response.body).toEqual({ vehicles: mockVehicles, total: mockVehicles.length });
       expect(vehicleService.getAllVehicles).toHaveBeenCalled();
     });
 
@@ -231,15 +239,17 @@ describe('VehicleController', () => {
 
       const mockVehicle = {
         id: '1',
-        type: 'SEDAN',
+        type: VehicleType.SEDAN,
         make: 'Toyota',
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
-        status: VehicleStatus.AVAILABLE
+        status: VehicleStatus.AVAILABLE,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
-      vehicleService.addMaintenanceRecord.mockResolvedValue(mockVehicle);
+      vehicleService.addMaintenanceRecord.mockResolvedValue(mockVehicle as any);
 
       const response = await request(app)
         .post('/vehicles/1/maintenance')
@@ -251,7 +261,7 @@ describe('VehicleController', () => {
     });
 
     it('should return 404 if vehicle not found', async () => {
-      vehicleService.addMaintenanceRecord.mockResolvedValue(null);
+      vehicleService.addMaintenanceRecord.mockResolvedValue(null as any);
 
       const response = await request(app)
         .post('/vehicles/1/maintenance')
@@ -279,12 +289,14 @@ describe('VehicleController', () => {
 
       const mockVehicle = {
         id: '1',
-        type: 'SEDAN',
+        type: VehicleType.SEDAN,
         make: 'Toyota',
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
-        status: VehicleStatus.MAINTENANCE
+        status: VehicleStatus.MAINTENANCE,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       vehicleService.updateVehicle.mockResolvedValue(mockVehicle);
@@ -327,14 +339,16 @@ describe('VehicleController', () => {
 
       const mockVehicle = {
         id: '1',
-        type: 'SEDAN',
+        type: VehicleType.SEDAN,
         make: 'Toyota',
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
         capacity: 4,
         status: VehicleStatus.IN_USE,
-        currentRunId: runId
+        currentRunId: runId,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       vehicleService.assignVehicleToRun.mockResolvedValue(mockVehicle);
@@ -375,14 +389,16 @@ describe('VehicleController', () => {
     it('should release vehicle from run', async () => {
       const mockVehicle = {
         id: '1',
-        type: 'SEDAN',
+        type: VehicleType.SEDAN,
         make: 'Toyota',
         model: 'Camry',
         year: 2020,
         licensePlate: 'ABC123',
         capacity: 4,
         status: VehicleStatus.AVAILABLE,
-        currentRunId: null
+        currentRunId: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       vehicleService.unassignVehicleFromRun.mockResolvedValue(mockVehicle);
