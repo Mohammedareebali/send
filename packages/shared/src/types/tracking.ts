@@ -8,7 +8,7 @@ export interface Location {
 }
 
 export interface Geofence {
-  boundary(arg0: { latitude: number; longitude: number; }, boundary: any): unknown;
+  boundary: { latitude: number; longitude: number }[];
   id: string;
   name: string;
   type: 'PICKUP' | 'DROPOFF';
