@@ -1,4 +1,5 @@
-import { PrismaClient, Prisma, Run } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
+import { Run } from '@shared/types/run';
 import { Driver, DriverStatus } from '@shared/types/driver';
 import { RabbitMQService } from './messaging/rabbitmq.service';
 
