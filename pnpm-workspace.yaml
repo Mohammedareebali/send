@@ -9,9 +9,6 @@ public-hoist-pattern:
 ignoredBuiltDependencies:
   - '@nestjs/core'
   - '@parcel/watcher'
-  - '@prisma/client'
-  - '@prisma/engines'
-  - 'prisma'
   - 'esbuild'
 
 node-linker: hoisted
