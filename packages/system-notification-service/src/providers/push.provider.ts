@@ -1,11 +1,38 @@
 import { PushNotification } from '../types/notification.types';
 import { Logger } from 'winston';
+import admin from 'firebase-admin';
 
 export class PushProvider {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: Logger) {
+    if (!admin.apps.length) {
+      const serviceAccount = process.env.FCM_SERVICE_ACCOUNT;
+      if (serviceAccount) {
+        admin.initializeApp({
+          credential: admin.credential.cert(JSON.parse(serviceAccount))
+        });
+      } else {
+        admin.initializeApp();
+      }
+    }
+  }
 
   async send(notification: PushNotification): Promise<void> {
-    this.logger.info('Sending push notification', { notification });
-    // Placeholder for actual Firebase or other push notification service
+    this.logger.info('Sending push notification', { id: notification.id });
+    try {
+      await admin.messaging().send({
+        token: notification.deviceToken,
+        notification: {
+          title: notification.title,
+          body: notification.message
+        }
+      });
+      this.logger.info('Push notification sent', { id: notification.id });
+    } catch (error) {
+      this.logger.error('Failed to send push notification', {
+        id: notification.id,
+        error
+      });
+      throw error;
+    }
   }
 }

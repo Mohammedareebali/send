@@ -101,6 +101,35 @@ describe('NotificationService send methods', () => {
     });
   });
 
+  it('retries sending push notification on failure', async () => {
+    process.env.NOTIFICATION_RETRIES = '2';
+    pushInstance.send
+      .mockRejectedValueOnce(new Error('fail'))
+      .mockResolvedValueOnce(undefined);
+
+    await notificationService.sendPushNotification(mockNotification);
+    expect(pushInstance.send).toHaveBeenCalledTimes(2);
+    expect(mockPrisma.notification.update).toHaveBeenCalledWith({
+      where: { id: mockNotification.id },
+      data: { status: NotificationStatus.SENT }
+    });
+  });
+
+  it('marks notification failed after retries exhausted', async () => {
+    process.env.NOTIFICATION_RETRIES = '2';
+    pushInstance.send.mockRejectedValue(new Error('boom'));
+
+    await expect(
+      notificationService.sendPushNotification(mockNotification)
+    ).rejects.toThrow('boom');
+
+    expect(pushInstance.send).toHaveBeenCalledTimes(2);
+    expect(mockPrisma.notification.update).toHaveBeenCalledWith({
+      where: { id: mockNotification.id },
+      data: { status: NotificationStatus.FAILED }
+    });
+  });
+
   it('should send SMS notification', async () => {
     const notif = { ...mockNotification, channel: NotificationChannel.SMS };
     await notificationService.sendSMSNotification(notif as any);
