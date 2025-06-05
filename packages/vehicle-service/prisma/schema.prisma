@@ -57,6 +57,7 @@
    updatedAt          DateTime           @updatedAt
    maintenanceRecords MaintenanceRecord[]
    alerts             Alert[]
+   telemetryRecords   TelemetryRecord[]
 
    @@map("vehicles")
  }
