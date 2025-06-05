@@ -99,6 +99,7 @@ export class RunModel {
       endDate: prismaRun.endDate ?? undefined,
       lastOccurrence: prismaRun.lastOccurrence ?? undefined,
       nextOccurrence: prismaRun.nextOccurrence ?? undefined,
+      rating: prismaRun.rating ?? undefined,
       pickupLocation: JSON.parse(prismaRun.pickupLocation as string),
       dropoffLocation: JSON.parse(prismaRun.dropoffLocation as string),
       studentIds: JSON.parse(prismaRun.studentIds as string),
