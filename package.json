@@ -7,7 +7,8 @@
   ],
   "scripts": {
     "build": "lerna run build",
-    "test": "lerna run test",
+    "generate:prisma": "npx prisma generate --schema=packages/driver-service/prisma/schema.prisma && npx prisma generate --schema=packages/run-service/prisma/schema.prisma && npx prisma generate --schema=packages/system-notification-service/prisma/schema.prisma && npx prisma generate --schema=packages/user-service/prisma/schema.prisma",
+    "test": "npm run generate:prisma && lerna run test",
     "lint": "lerna run lint",
     "format": "lerna run format",
     "start": "lerna run start",

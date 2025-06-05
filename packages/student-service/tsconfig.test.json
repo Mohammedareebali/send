@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@services/*": ["./src/services/*"],
+      "@types/*": ["./src/types/*"],
+      "@shared/*": ["../shared/src/*"],
+      "@send/shared": ["../shared/src"],
+      "@send/shared/*": ["../shared/src/*"],
+      "@prisma/client": ["../../test/prisma-client.ts"]
+    }
+  }
+}

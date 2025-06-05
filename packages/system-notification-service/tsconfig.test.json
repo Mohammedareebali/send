@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@shared/*": ["../shared/src/*"],
+      "@prisma/client": ["../../test/prisma-client.ts"],
+      "amqplib": ["../../test/amqplib.ts"]
+    }
+  }
+}

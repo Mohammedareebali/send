@@ -64,7 +64,8 @@ jest.mock('@shared/messaging/rabbitmq.service', () => ({
 jest.mock('winston', () => ({
   Logger: jest.fn().mockImplementation(() => ({
     info: jest.fn(),
-    error: jest.fn()
+    error: jest.fn(),
+    debug: jest.fn()
   }))
 }));
 

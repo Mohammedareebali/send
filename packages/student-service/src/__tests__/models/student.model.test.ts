@@ -20,7 +20,12 @@ describe('StudentModel', () => {
 
   beforeEach(() => {
     prisma = new PrismaClient();
-    studentModel = new StudentModel(prisma);
+    studentModel = StudentModel.getInstance();
+    (studentModel as any).prisma = prisma;
+  });
+
+  afterEach(() => {
+    (StudentModel as any).instance = undefined;
   });
 
   describe('create', () => {

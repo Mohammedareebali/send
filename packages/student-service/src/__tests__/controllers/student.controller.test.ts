@@ -15,7 +15,8 @@ describe('StudentController', () => {
   let res: Partial<Response>;
 
   beforeEach(() => {
-    studentModel = new StudentModel({} as any) as jest.Mocked<StudentModel>;
+    studentModel = StudentModel.getInstance() as jest.Mocked<StudentModel>;
+    (studentModel as any).prisma = {};
     rabbitMQ = new RabbitMQService() as jest.Mocked<RabbitMQService>;
     studentController = new StudentController(studentModel, rabbitMQ);
 
@@ -30,6 +31,10 @@ describe('StudentController', () => {
       json: jest.fn(),
       send: jest.fn(),
     };
+  });
+
+  afterEach(() => {
+    (StudentModel as any).instance = undefined;
   });
 
   describe('createStudent', () => {

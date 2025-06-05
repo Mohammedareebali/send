@@ -71,11 +71,11 @@ describe('RabbitMQService', () => {
         notes: undefined
       };
 
-      await rabbitMQ.publishRunEvent('run.created', run);
+      await rabbitMQ.publishRunEvent('RUN_CREATED', run);
 
       expect(mockChannel.publish).toHaveBeenCalledWith(
         'run-events',
-        'run.created',
+        'RUN_CREATED',
         expect.any(Buffer),
         { persistent: true }
       );
@@ -99,7 +99,7 @@ describe('RabbitMQService', () => {
         notes: undefined
       };
 
-      await expect(rabbitMQ.publishRunEvent('run.created', run)).rejects.toThrow(
+      await expect(rabbitMQ.publishRunEvent('RUN_CREATED', run)).rejects.toThrow(
         'Not connected to RabbitMQ'
       );
     });

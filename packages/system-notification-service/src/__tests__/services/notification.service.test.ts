@@ -22,6 +22,19 @@ jest.mock('../../providers/inapp.provider');
 jest.mock('../../providers/sms.provider');
 jest.mock('../../providers/email.provider');
 jest.mock('../../infra/messaging/rabbitmq.service');
+jest.mock('amqplib', () => ({
+  connect: jest.fn().mockResolvedValue({
+    createChannel: jest.fn().mockResolvedValue({
+      assertExchange: jest.fn(),
+      assertQueue: jest.fn(),
+      bindQueue: jest.fn(),
+      publish: jest.fn(),
+      consume: jest.fn(),
+      close: jest.fn(),
+    }),
+    close: jest.fn(),
+  }),
+}));
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn().mockImplementation(() => mockPrisma)
 }));

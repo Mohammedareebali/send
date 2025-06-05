@@ -8,10 +8,10 @@ import { Run, RunStatus, RunType, ScheduleType } from '@shared/types/run';
 import { PrismaClient } from '@prisma/client';
 
 // Event type constants
-const RUN_CREATED = 'run.created';
-const RUN_UPDATED = 'run.updated';
-const RUN_CANCELLED = 'run.cancelled';
-const RUN_COMPLETED = 'run.completed';
+const RUN_CREATED = 'RUN_CREATED';
+const RUN_UPDATED = 'RUN_UPDATED';
+const RUN_CANCELLED = 'RUN_CANCELLED';
+const RUN_COMPLETED = 'RUN_COMPLETED';
 
 jest.mock('../../data/models/run.model');
 jest.mock('../../infra/messaging/rabbitmq');

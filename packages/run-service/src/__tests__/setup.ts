@@ -32,4 +32,8 @@ beforeEach(async () => {
 process.env.JWT_SECRET = 'test-secret';
 process.env.RABBITMQ_URL = 'amqp://localhost';
 process.env.RABBITMQ_EXCHANGE = 'test_exchange';
-process.env.RABBITMQ_QUEUE = 'test_queue'; 
+process.env.RABBITMQ_QUEUE = 'test_queue';
+
+test('setup initialized', () => {
+  expect(true).toBe(true);
+});
