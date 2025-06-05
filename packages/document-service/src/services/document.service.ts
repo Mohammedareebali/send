@@ -76,7 +76,7 @@ export class DocumentService {
         .promise();
 
       // Create document record
-      const document = await this.prisma.$transaction(async (tx) => {
+      const document = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const doc = await (tx as any).document.create({
           data: {
             userId,
