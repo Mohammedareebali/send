@@ -6,10 +6,12 @@ import { AdminController } from './api/controllers/admin.controller';
 import { createAdminRoutes } from './api/routes/admin.routes';
 import { MetricsService } from './services/metrics.service';
 import { ConfigService } from './services/config.service';
+import { ReportService } from './services/report.service';
 
 const metricsService = new MetricsService();
 const configService = new ConfigService();
-const controller = new AdminController(metricsService, configService);
+const reportService = new ReportService(metricsService);
+const controller = new AdminController(metricsService, configService, reportService);
 
 const app = express();
 app.use(express.json());

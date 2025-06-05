@@ -80,7 +80,7 @@ async function start() {
       // Handle tracking events as needed
     });
 
-    const port = process.env.PORT || 3003;
+    const port = process.env.PORT || 3007;
     httpServer.listen(port, () => {
       console.log(`Tracking service listening on port ${port}`);
     });
