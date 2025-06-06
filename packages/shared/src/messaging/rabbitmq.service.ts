@@ -1,4 +1,4 @@
-import { connect, Channel, Connection, Options } from 'amqplib';
+import { connect, Channel, Connection } from 'amqplib';
 import { Logger } from 'winston';
 
 export interface RabbitMQConfig {
