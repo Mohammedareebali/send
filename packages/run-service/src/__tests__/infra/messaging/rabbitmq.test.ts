@@ -1,4 +1,4 @@
-import { Channel } from 'amqplib';
+import type { Channel } from 'amqplib';
 import { RabbitMQService } from '../../../infra/messaging/rabbitmq';
 import { Run, RunStatus, RunType, ScheduleType, RunNotification } from '@shared/types/run';
 
@@ -108,7 +108,7 @@ describe('RabbitMQService', () => {
       };
 
       await expect(rabbitMQ.publishRunEvent('RUN_CREATED', run)).rejects.toThrow(
-        'Not connected to RabbitMQ'
+        'RabbitMQ channel not initialized'
       );
     });
   });
@@ -139,7 +139,7 @@ describe('RabbitMQService', () => {
       };
 
       await expect(rabbitMQ.publishNotification(notification)).rejects.toThrow(
-        'Not connected to RabbitMQ'
+        'RabbitMQ channel not initialized'
       );
     });
   });
@@ -161,7 +161,7 @@ describe('RabbitMQService', () => {
       const callback = jest.fn();
 
       await expect(rabbitMQ.subscribeToRunEvents(callback)).rejects.toThrow(
-        'Not connected to RabbitMQ'
+        'RabbitMQ channel not initialized'
       );
     });
   });
