@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { StudentModel } from '../../data/models/student.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { Student, StudentEvent, StudentNotification, StudentCreateInput, StudentUpdateInput } from '@send/shared';
+import { AppError } from '@shared/errors';
 
 const rabbitMQ = new RabbitMQService();
 
@@ -12,7 +13,7 @@ export class StudentController {
     private rabbitMQ: RabbitMQService
   ) {}
 
-  async createStudent(req: Request, res: Response) {
+  async createStudent(req: Request, res: Response, next: NextFunction) {
     try {
       const data = req.body as StudentCreateInput;
       const student = await this.studentModel.create(data);
@@ -26,11 +27,11 @@ export class StudentController {
 
       res.status(201).json({ student });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create student' });
+      next(error);
     }
   }
 
-  async updateStudent(req: Request, res: Response) {
+  async updateStudent(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const data = req.body as StudentUpdateInput;
@@ -45,26 +46,26 @@ export class StudentController {
 
       res.json({ student });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update student' });
+      next(error);
     }
   }
 
-  async getStudent(req: Request, res: Response) {
+  async getStudent(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const student = await this.studentModel.findById(id);
 
       if (!student) {
-        return res.status(404).json({ error: 'Student not found' });
+        throw new AppError('Student not found', 404);
       }
 
       res.json({ student });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to get student' });
+      next(error);
     }
   }
 
-  async getStudents(req: Request, res: Response) {
+  async getStudents(req: Request, res: Response, next: NextFunction) {
     try {
       const { parentId } = req.query;
       const students = await this.studentModel.findAll(
@@ -73,11 +74,11 @@ export class StudentController {
 
       res.json({ students });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to get students' });
+      next(error);
     }
   }
 
-  async deleteStudent(req: Request, res: Response) {
+  async deleteStudent(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       await this.studentModel.delete(id);
@@ -91,11 +92,11 @@ export class StudentController {
 
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ error: 'Failed to delete student' });
+      next(error);
     }
   }
 
-  async addGuardian(req: Request, res: Response) {
+  async addGuardian(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const guardianData = req.body;
@@ -109,22 +110,22 @@ export class StudentController {
 
       res.status(201).json({ guardian });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to add guardian' });
+      next(error);
     }
   }
 
-  async removeGuardian(req: Request, res: Response) {
+  async removeGuardian(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { guardianId } = req.body as { guardianId: string };
       await this.studentModel.removeGuardian(id, guardianId);
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ error: 'Failed to remove guardian' });
+      next(error);
     }
   }
 
-  async recordAttendance(req: Request, res: Response) {
+  async recordAttendance(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const attendanceData = req.body;
@@ -138,7 +139,7 @@ export class StudentController {
 
       res.status(201).json({ attendance });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to record attendance' });
+      next(error);
     }
   }
 }
