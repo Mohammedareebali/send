@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { serviceConfig } from '../config';
 
 declare global {
   namespace Express {
@@ -23,7 +24,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    const secret = process.env.JWT_SECRET || 'your-secret-key';
+    const secret = serviceConfig.security.jwtSecret;
     const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();

@@ -1,10 +1,9 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { RunModel } from '../../data/models/run.model';
 import { Run, RunEvent, RunNotification, RunStatus, RunType } from '@shared/types/run';
 import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { RouteService } from '../../infra/services/route.service';
 import { ScheduleService } from '../../infra/services/schedule.service';
-import { createSuccessResponse, createErrorResponse } from '@shared/responses';
 import { AppError } from '@shared/errors';
 
 declare global {
@@ -26,7 +25,7 @@ export class RunController {
     private readonly scheduleService: ScheduleService
   ) {}
 
-  async createRun(req: Request, res: Response) {
+  async createRun(req: Request, res: Response, next: NextFunction) {
     try {
       const runData = req.body;
 
@@ -38,7 +37,7 @@ export class RunController {
 
       const hasConflict = await this.scheduleService.checkForConflicts(runData, existingRuns);
       if (hasConflict) {
-        return res.status(400).json(createErrorResponse(new AppError('Schedule conflict detected', 400)));
+        throw new AppError('Schedule conflict detected', 400);
       }
 
       // Optimize route
@@ -74,13 +73,13 @@ export class RunController {
         await this.rabbitMQ.publishNotification(notification);
       }
 
-      res.status(201).json(createSuccessResponse({ run }));
+      res.status(201).json({ run });
     } catch (error) {
-      res.status(500).json(createErrorResponse(error as Error));
+      next(error);
     }
   }
 
-  async updateRun(req: Request, res: Response) {
+  async updateRun(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const updates = req.body;
@@ -89,7 +88,7 @@ export class RunController {
       if (updates.pickupLocation || updates.dropoffLocation) {
         const existingRun = await this.runModel.findById(id);
         if (!existingRun) {
-          return res.status(404).json(createErrorResponse(new AppError('Run not found', 404)));
+          throw new AppError('Run not found', 404);
         }
 
         const routeInfo = await this.routeService.optimizeRoute(
@@ -120,13 +119,13 @@ export class RunController {
         await this.rabbitMQ.publishNotification(notification);
       }
 
-      res.json(createSuccessResponse({ run }));
+      res.json({ run });
     } catch (error) {
-      res.status(500).json(createErrorResponse(error as Error));
+      next(error);
     }
   }
 
-  async cancelRun(req: Request, res: Response) {
+  async cancelRun(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const run = await this.runModel.update(id, { status: RunStatus.CANCELLED });
@@ -146,13 +145,13 @@ export class RunController {
         await this.rabbitMQ.publishNotification(notification);
       }
 
-      res.json(createSuccessResponse({ run }));
+      res.json({ run });
     } catch (error) {
-      res.status(500).json(createErrorResponse(error as Error));
+      next(error);
     }
   }
 
-  async completeRun(req: Request, res: Response) {
+  async completeRun(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const run = await this.runModel.update(id, {
@@ -163,26 +162,26 @@ export class RunController {
       // Publish run completed event
       await this.rabbitMQ.publishRunEvent('RUN_COMPLETED', run);
 
-      res.json(createSuccessResponse({ run }));
+      res.json({ run });
     } catch (error) {
-      res.status(500).json(createErrorResponse(error as Error));
+      next(error);
     }
   }
 
-  async getRun(req: Request, res: Response) {
+  async getRun(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const run = await this.runModel.findById(id);
       if (!run) {
-        return res.status(404).json(createErrorResponse(new AppError('Run not found', 404)));
+        throw new AppError('Run not found', 404);
       }
-      res.json(createSuccessResponse({ run }));
+      res.json({ run });
     } catch (error) {
-      res.status(500).json(createErrorResponse(error as Error));
+      next(error);
     }
   }
 
-  async getAllRuns(req: Request, res: Response) {
+  async getAllRuns(req: Request, res: Response, next: NextFunction) {
     try {
       const { status, type, driverId } = req.query;
       const runs = await this.runModel.findAll({
@@ -190,9 +189,9 @@ export class RunController {
         type: type as RunType,
         driverId: driverId as string
       });
-      res.json(createSuccessResponse({ runs }));
+      res.json({ runs });
     } catch (error) {
-      res.status(500).json(createErrorResponse(error as Error));
+      next(error);
     }
   }
 }

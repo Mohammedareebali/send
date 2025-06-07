@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { DocumentService } from '../../services/document.service';
 import { Document } from '@shared/types/document';
+import { logger } from '@shared/logger';
 
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
@@ -21,7 +22,7 @@ export class DocumentController {
       }, type, metadata || {});
       res.status(201).json(document);
     } catch (error) {
-      console.error('Failed to upload document:', error);
+      logger.error('Failed to upload document:', error);
       res.status(500).json({ error: 'Failed to upload document' });
     }
   }
@@ -36,7 +37,7 @@ export class DocumentController {
       }
       res.json(doc);
     } catch (error) {
-      console.error('Failed to get document:', error);
+      logger.error('Failed to get document:', error);
       res.status(500).json({ error: 'Failed to get document' });
     }
   }
@@ -50,7 +51,7 @@ export class DocumentController {
       });
       res.json(docs);
     } catch (error) {
-      console.error('Failed to list documents:', error);
+      logger.error('Failed to list documents:', error);
       res.status(500).json({ error: 'Failed to list documents' });
     }
   }
@@ -61,7 +62,7 @@ export class DocumentController {
       await this.documentService.deleteDocument(id);
       res.status(204).send();
     } catch (error) {
-      console.error('Failed to delete document:', error);
+      logger.error('Failed to delete document:', error);
       res.status(500).json({ error: 'Failed to delete document' });
     }
   }
@@ -79,7 +80,7 @@ export class DocumentController {
       );
       res.json(access);
     } catch (error) {
-      console.error('Failed to update document access:', error);
+      logger.error('Failed to update document access:', error);
       res.status(500).json({ error: 'Failed to update document access' });
     }
   }
@@ -91,7 +92,7 @@ export class DocumentController {
       const doc = await this.documentService.updateDocumentMetadata(id, metadata);
       res.json(doc);
     } catch (error) {
-      console.error('Failed to update document metadata:', error);
+      logger.error('Failed to update document metadata:', error);
       res.status(500).json({ error: 'Failed to update document metadata' });
     }
   }

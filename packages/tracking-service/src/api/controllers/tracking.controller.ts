@@ -2,8 +2,7 @@ import { Request, Response } from 'express';
 import { TrackingService } from '../../infra/services/tracking.service';
 import { Run } from '@shared/types/run';
 import { Location } from '@shared/types/tracking';
-import { createSuccessResponse, createErrorResponse } from '@shared/responses';
-import { AppError } from '@shared/errors';
+import { logger } from '@shared/logger';
 
 export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
@@ -12,10 +11,10 @@ export class TrackingController {
     try {
       const run = req.body as Run;
       await this.trackingService.startTracking(run);
-      res.status(200).json(createSuccessResponse({ message: 'Tracking started' }));
+      res.status(200).json({ message: 'Tracking started' });
     } catch (error) {
-      console.error('Failed to start tracking:', error);
-      res.status(500).json(createErrorResponse(error as Error));
+      logger.error('Failed to start tracking:', error);
+      res.status(500).json({ error: 'Failed to start tracking' });
     }
   }
 
@@ -24,10 +23,10 @@ export class TrackingController {
       const { runId } = req.params;
       const location = req.body as Location;
       await this.trackingService.updateLocation(runId, location);
-      res.status(200).json(createSuccessResponse({ message: 'Location updated' }));
+      res.status(200).json({ message: 'Location updated' });
     } catch (error) {
-      console.error('Failed to update location:', error);
-      res.status(500).json(createErrorResponse(error as Error));
+      logger.error('Failed to update location:', error);
+      res.status(500).json({ error: 'Failed to update location' });
     }
   }
 
@@ -35,10 +34,10 @@ export class TrackingController {
     try {
       const { runId } = req.params;
       await this.trackingService.stopTracking(runId);
-      res.status(200).json(createSuccessResponse({ message: 'Tracking stopped' }));
+      res.status(200).json({ message: 'Tracking stopped' });
     } catch (error) {
-      console.error('Failed to stop tracking:', error);
-      res.status(500).json(createErrorResponse(error as Error));
+      logger.error('Failed to stop tracking:', error);
+      res.status(500).json({ error: 'Failed to stop tracking' });
     }
   }
 
@@ -47,13 +46,13 @@ export class TrackingController {
       const { runId } = req.params;
       const status = this.trackingService.getTrackingStatus(runId);
       if (!status) {
-        res.status(404).json(createErrorResponse(new AppError('Run not found', 404)));
+        res.status(404).json({ error: 'Run not found' });
         return;
       }
-      res.status(200).json(createSuccessResponse({ status }));
+      res.status(200).json({ status });
     } catch (error) {
-      console.error('Failed to get tracking status:', error);
-      res.status(500).json(createErrorResponse(error as Error));
+      logger.error('Failed to get tracking status:', error);
+      res.status(500).json({ error: 'Failed to get tracking status' });
     }
   }
 
@@ -62,19 +61,17 @@ export class TrackingController {
       const { routeId } = req.params;
       const location = this.trackingService.getLatestLocation(routeId);
       if (!location) {
-        res.status(404).json(createErrorResponse(new AppError('Location not found', 404)));
+        res.status(404).json({ error: 'Location not found' });
         return;
       }
-      res.status(200).json(
-        createSuccessResponse({
-          lat: location.latitude,
-          lng: location.longitude,
-          timestamp: location.timestamp,
-        })
-      );
+      res.status(200).json({
+        lat: location.latitude,
+        lng: location.longitude,
+        timestamp: location.timestamp,
+      });
     } catch (error) {
-      console.error('Failed to get latest location:', error);
-      res.status(500).json(createErrorResponse(error as Error));
+      logger.error('Failed to get latest location:', error);
+      res.status(500).json({ error: 'Failed to get latest location' });
     }
   }
 }

@@ -1,13 +1,13 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { StudentModel } from '../../data/models/student.model';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { StudentCreateInput, StudentUpdateInput } from '@send/shared';
+import { authenticate } from '@send/shared/src/security/auth';
 
 const router = Router();
 const studentModel = StudentModel.getInstance();
 
 // Create a new student
-router.post('/', (async (req: AuthRequest, res: Response) => {
+router.post('/', authenticate(), (async (req: Request, res: Response) => {
   try {
     const studentData: StudentCreateInput = {
       ...req.body,
@@ -21,7 +21,7 @@ router.post('/', (async (req: AuthRequest, res: Response) => {
 }) as RequestHandler);
 
 // Get all students for the authenticated parent
-router.get('/', (async (req: AuthRequest, res: Response) => {
+router.get('/', authenticate(), (async (req: Request, res: Response) => {
   try {
     const students = await studentModel.findAll({ parentId: req.user?.id });
     res.json(students);
@@ -31,7 +31,7 @@ router.get('/', (async (req: AuthRequest, res: Response) => {
 }) as RequestHandler);
 
 // Get a specific student
-router.get('/:id', (async (req: AuthRequest, res: Response) => {
+router.get('/:id', authenticate(), (async (req: Request, res: Response) => {
   try {
     const student = await studentModel.findById(req.params.id);
     if (!student) {
@@ -44,7 +44,7 @@ router.get('/:id', (async (req: AuthRequest, res: Response) => {
 }) as RequestHandler);
 
 // Update a student
-router.put('/:id', (async (req: AuthRequest, res: Response) => {
+router.put('/:id', authenticate(), (async (req: Request, res: Response) => {
   try {
     const student = await studentModel.findById(req.params.id);
     if (!student) {
@@ -61,7 +61,7 @@ router.put('/:id', (async (req: AuthRequest, res: Response) => {
 }) as RequestHandler);
 
 // Delete a student
-router.delete('/:id', (async (req: AuthRequest, res: Response) => {
+router.delete('/:id', authenticate(), (async (req: Request, res: Response) => {
   try {
     const student = await studentModel.findById(req.params.id);
     if (!student) {
@@ -78,7 +78,7 @@ router.delete('/:id', (async (req: AuthRequest, res: Response) => {
 }) as RequestHandler);
 
 // Add a guardian to a student
-router.post('/:id/add-guardian', (async (req: AuthRequest, res: Response) => {
+router.post('/:id/add-guardian', authenticate(), (async (req: Request, res: Response) => {
   try {
     const guardian = await studentModel.addGuardian(req.params.id, req.body);
     res.status(201).json(guardian);
@@ -88,7 +88,7 @@ router.post('/:id/add-guardian', (async (req: AuthRequest, res: Response) => {
 }) as RequestHandler);
 
 // Remove a guardian from a student
-router.delete('/:id/remove-guardian', (async (req: AuthRequest, res: Response) => {
+router.delete('/:id/remove-guardian', authenticate(), (async (req: Request, res: Response) => {
   try {
     await studentModel.removeGuardian(req.params.id, req.body.guardianId);
     res.status(204).send();
@@ -98,7 +98,7 @@ router.delete('/:id/remove-guardian', (async (req: AuthRequest, res: Response) =
 }) as RequestHandler);
 
 // Record attendance for a student
-router.post('/:id/attendance', (async (req: AuthRequest, res: Response) => {
+router.post('/:id/attendance', authenticate(), (async (req: Request, res: Response) => {
   try {
     const attendance = await studentModel.recordAttendance(req.params.id, req.body);
     res.status(201).json(attendance);
