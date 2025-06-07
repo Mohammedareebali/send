@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { prometheus } from '@shared/prometheus';
 import { logger } from '../services/logging.service';
+import { createErrorResponse } from '@shared/responses';
 
 export const errorHandler = (
   err: Error,
@@ -24,10 +25,7 @@ export const errorHandler = (
   });
 
   // Send error response
-  res.status(500).json({
-    status: 'error',
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : err.message
-  });
-}; 
+  res
+    .status(500)
+    .json(createErrorResponse(err));
+};

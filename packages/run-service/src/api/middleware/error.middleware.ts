@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
+import { createErrorResponse } from '@shared/responses';
+import { AppError } from '@shared/errors';
 
 export const errorHandler = (
   err: Error,
@@ -9,21 +11,16 @@ export const errorHandler = (
   console.error(err.stack);
 
   if (err.name === 'ValidationError') {
-    return res.status(400).json({
-      error: 'Validation Error',
-      message: err.message,
-    });
+    return res
+      .status(400)
+      .json(createErrorResponse(new AppError(err.message, 400)));
   }
 
   if (err.name === 'UnauthorizedError') {
-    return res.status(401).json({
-      error: 'Unauthorized',
-      message: err.message,
-    });
+    return res
+      .status(401)
+      .json(createErrorResponse(new AppError(err.message, 401)));
   }
 
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: 'An unexpected error occurred',
-  });
-}; 
+  res.status(500).json(createErrorResponse(err));
+};

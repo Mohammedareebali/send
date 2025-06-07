@@ -9,6 +9,7 @@ import { RabbitMQService } from './infra/messaging/rabbitmq';
 import { RouteService } from './infra/services/route.service';
 import { ScheduleService } from './infra/services/schedule.service';
 import { createRunRoutes } from './api/routes/run.routes';
+import { createErrorResponse } from '@shared/responses';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -40,7 +41,7 @@ app.use('/api/runs', createRunRoutes(runController));
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  res.status(500).json(createErrorResponse(err));
 });
 
 export default app; 

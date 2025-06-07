@@ -4,6 +4,8 @@ import { Run, RunEvent, RunNotification, RunStatus, RunType } from '@shared/type
 import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { RouteService } from '../../infra/services/route.service';
 import { ScheduleService } from '../../infra/services/schedule.service';
+import { createSuccessResponse, createErrorResponse } from '@shared/responses';
+import { AppError } from '@shared/errors';
 
 declare global {
   namespace Express {
@@ -36,7 +38,7 @@ export class RunController {
 
       const hasConflict = await this.scheduleService.checkForConflicts(runData, existingRuns);
       if (hasConflict) {
-        return res.status(400).json({ error: 'Schedule conflict detected' });
+        return res.status(400).json(createErrorResponse(new AppError('Schedule conflict detected', 400)));
       }
 
       // Optimize route
@@ -72,9 +74,9 @@ export class RunController {
         await this.rabbitMQ.publishNotification(notification);
       }
 
-      res.status(201).json({ run });
+      res.status(201).json(createSuccessResponse({ run }));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create run' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -87,7 +89,7 @@ export class RunController {
       if (updates.pickupLocation || updates.dropoffLocation) {
         const existingRun = await this.runModel.findById(id);
         if (!existingRun) {
-          return res.status(404).json({ error: 'Run not found' });
+          return res.status(404).json(createErrorResponse(new AppError('Run not found', 404)));
         }
 
         const routeInfo = await this.routeService.optimizeRoute(
@@ -118,9 +120,9 @@ export class RunController {
         await this.rabbitMQ.publishNotification(notification);
       }
 
-      res.json({ run });
+      res.json(createSuccessResponse({ run }));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update run' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -144,9 +146,9 @@ export class RunController {
         await this.rabbitMQ.publishNotification(notification);
       }
 
-      res.json({ run });
+      res.json(createSuccessResponse({ run }));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to cancel run' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -161,9 +163,9 @@ export class RunController {
       // Publish run completed event
       await this.rabbitMQ.publishRunEvent('RUN_COMPLETED', run);
 
-      res.json({ run });
+      res.json(createSuccessResponse({ run }));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to complete run' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -172,11 +174,11 @@ export class RunController {
       const { id } = req.params;
       const run = await this.runModel.findById(id);
       if (!run) {
-        return res.status(404).json({ error: 'Run not found' });
+        return res.status(404).json(createErrorResponse(new AppError('Run not found', 404)));
       }
-      res.json({ run });
+      res.json(createSuccessResponse({ run }));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch run' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -188,9 +190,9 @@ export class RunController {
         type: type as RunType,
         driverId: driverId as string
       });
-      res.json({ runs });
+      res.json(createSuccessResponse({ runs }));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch runs' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
-} 
+}

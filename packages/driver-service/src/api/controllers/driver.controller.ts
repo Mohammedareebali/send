@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { DriverService } from '../../infra/services/driver.service';
 import { Driver, DriverStatus } from '@shared/types/driver';
+import { createSuccessResponse, createErrorResponse } from '@shared/responses';
+import { AppError } from '@shared/errors';
 
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
@@ -9,10 +11,10 @@ export class DriverController {
     try {
       const driver = req.body as Omit<Driver, 'id' | 'createdAt' | 'updatedAt'>;
       const createdDriver = await this.driverService.createDriver(driver);
-      res.status(201).json(createdDriver);
+      res.status(201).json(createSuccessResponse(createdDriver));
     } catch (error) {
       console.error('Failed to create driver:', error);
-      res.status(500).json({ error: 'Failed to create driver' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -21,10 +23,10 @@ export class DriverController {
       const { id } = req.params;
       const driver = req.body as Partial<Driver>;
       const updatedDriver = await this.driverService.updateDriver(id, driver);
-      res.status(200).json(updatedDriver);
+      res.status(200).json(createSuccessResponse(updatedDriver));
     } catch (error) {
       console.error('Failed to update driver:', error);
-      res.status(500).json({ error: 'Failed to update driver' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -33,23 +35,23 @@ export class DriverController {
       const { id } = req.params;
       const driver = await this.driverService.getDriver(id);
       if (!driver) {
-        res.status(404).json({ error: 'Driver not found' });
+        res.status(404).json(createErrorResponse(new AppError('Driver not found', 404)));
         return;
       }
-      res.status(200).json(driver);
+      res.status(200).json(createSuccessResponse(driver));
     } catch (error) {
       console.error('Failed to get driver:', error);
-      res.status(500).json({ error: 'Failed to get driver' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
   async getDrivers(req: Request, res: Response): Promise<void> {
     try {
       const drivers = await this.driverService.getDrivers();
-      res.status(200).json(drivers);
+      res.status(200).json(createSuccessResponse(drivers));
     } catch (error) {
       console.error('Failed to get drivers:', error);
-      res.status(500).json({ error: 'Failed to get drivers' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -60,7 +62,7 @@ export class DriverController {
       res.status(204).send();
     } catch (error) {
       console.error('Failed to delete driver:', error);
-      res.status(500).json({ error: 'Failed to delete driver' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -69,10 +71,10 @@ export class DriverController {
       const { id } = req.params;
       const { status } = req.body as { status: DriverStatus };
       const updatedDriver = await this.driverService.updateDriverStatus(id, status);
-      res.status(200).json(updatedDriver);
+      res.status(200).json(createSuccessResponse(updatedDriver));
     } catch (error) {
       console.error('Failed to update driver status:', error);
-      res.status(500).json({ error: 'Failed to update driver status' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -81,10 +83,10 @@ export class DriverController {
       const { driverId } = req.params;
       const { runId } = req.body as { runId: string };
       const updatedDriver = await this.driverService.assignDriverToRun(driverId, runId);
-      res.status(200).json(updatedDriver);
+      res.status(200).json(createSuccessResponse(updatedDriver));
     } catch (error) {
       console.error('Failed to assign driver to run:', error);
-      res.status(500).json({ error: 'Failed to assign driver to run' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -92,10 +94,10 @@ export class DriverController {
     try {
       const { driverId } = req.params;
       const updatedDriver = await this.driverService.unassignDriverFromRun(driverId);
-      res.status(200).json(updatedDriver);
+      res.status(200).json(createSuccessResponse(updatedDriver));
     } catch (error) {
       console.error('Failed to unassign driver from run:', error);
-      res.status(500).json({ error: 'Failed to unassign driver from run' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -103,10 +105,10 @@ export class DriverController {
     try {
       const { id } = req.params;
       const availability = await this.driverService.getDriverAvailability(id);
-      res.status(200).json(availability);
+      res.status(200).json(createSuccessResponse(availability));
     } catch (error) {
       console.error('Failed to get driver availability:', error);
-      res.status(500).json({ error: 'Failed to get driver availability' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -115,20 +117,20 @@ export class DriverController {
       const { id } = req.params;
       const slots = req.body as { startTime: Date; endTime: Date }[];
       const availability = await this.driverService.updateDriverAvailability(id, slots);
-      res.status(200).json(availability);
+      res.status(200).json(createSuccessResponse(availability));
     } catch (error) {
       console.error('Failed to update driver availability:', error);
-      res.status(500).json({ error: 'Failed to update driver availability' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
   async getAvailableDrivers(req: Request, res: Response): Promise<void> {
     try {
       const drivers = await this.driverService.getAvailableDrivers();
-      res.status(200).json(drivers);
+      res.status(200).json(createSuccessResponse(drivers));
     } catch (error) {
       console.error('Failed to get available drivers:', error);
-      res.status(500).json({ error: 'Failed to get available drivers' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -136,10 +138,10 @@ export class DriverController {
     try {
       const { driverId } = req.params;
       const performance = await this.driverService.getDriverPerformance(driverId);
-      res.status(200).json(performance);
+      res.status(200).json(createSuccessResponse(performance));
     } catch (error) {
       console.error('Failed to get driver performance:', error);
-      res.status(500).json({ error: 'Failed to get driver performance' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
-} 
+}

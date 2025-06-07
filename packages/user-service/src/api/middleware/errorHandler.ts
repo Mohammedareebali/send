@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
+import { createErrorResponse } from '@shared/responses';
+import { AppError as SharedAppError } from '@shared/errors';
 
 export class AppError extends Error {
   constructor(
@@ -17,17 +19,12 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
-      status: 'error',
-      message: err.message,
-    });
+  if (err instanceof AppError || err instanceof SharedAppError) {
+    const status = (err as any).statusCode;
+    return res.status(status).json(createErrorResponse(err));
   }
 
   // Handle unexpected errors
   console.error('Unexpected error:', err);
-  return res.status(500).json({
-    status: 'error',
-    message: 'Internal server error',
-  });
-}; 
+  return res.status(500).json(createErrorResponse(err));
+};
