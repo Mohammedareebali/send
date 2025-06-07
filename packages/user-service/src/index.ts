@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { createConnection } from 'typeorm';
 import { config } from './config';
-import { errorHandler } from './middleware/errorHandler';
+import { errorHandler } from '@shared/errors';
 import { authRoutes } from './api/routes/auth.routes';
 import userRoutes from './api/routes/user.routes';
 import { setupEventBus } from './infra/eventBus';

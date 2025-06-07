@@ -1,6 +1,6 @@
 import { User } from '../../data/entities/User';
 import { UserRepository } from '../../data/repositories/UserRepository';
-import { AppError } from '../../api/middleware/errorHandler';
+import { AppError } from '@shared/errors';
 import { config } from '../../config';
 import * as jwt from 'jsonwebtoken';
 
