@@ -12,6 +12,8 @@ import { RouteService } from './infra/services/route.service';
 import { ScheduleService } from './infra/services/schedule.service';
 import { createRunRoutes } from './api/routes/run.routes';
 import { errorHandler } from '@shared/errors';
+import { MonitoringService } from '@send/shared';
+import { logger } from '@shared/logger';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -42,6 +44,18 @@ const runController = new RunController(
 
 // Routes
 app.use('/api/runs', createRunRoutes(runController));
+
+const monitoringService = MonitoringService.getInstance();
+app.get('/metrics', async (_req, res) => {
+  try {
+    const metrics = await monitoringService.getMetrics();
+    res.set('Content-Type', 'text/plain');
+    res.send(metrics);
+  } catch (error) {
+    logger.error('Failed to get metrics:', error);
+    res.status(500).send('Failed to get metrics');
+  }
+});
 
 // Error handling middleware
 app.use(errorHandler as ErrorRequestHandler);

@@ -3,10 +3,14 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+
 import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
+
 import promBundle from 'express-prom-bundle';
 import { MonitoringService } from './infra/monitoring/monitoring.service';
-import { LoggingService } from 'shared/src/services/logging.service';
+import { LoggingService } from '@shared/services/logging.service';
+
+
 import userRoutes from './api/routes/user.routes';
 import { errorHandler } from '@shared/errors';
 
@@ -15,12 +19,6 @@ const logger = new LoggingService('user-service');
 
 // Initialize monitoring
 const monitoringService = MonitoringService.getInstance();
-const metricsMiddleware = promBundle({
-    includeMethod: true,
-    includePath: true,
-    customLabels: { service: 'user-service' },
-    promRegistry: monitoringService.getRegistry(),
-});
 
 // Middleware
 app.use(securityHeaders);
@@ -34,9 +32,6 @@ app.use((req, res, next) => {
   logger.info('Incoming request', { method: req.method, url: req.url, ip: req.ip });
   next();
 });
-
-// Monitoring middleware
-app.use(metricsMiddleware);
 
 // Routes
 app.use('/api/users', userRoutes);

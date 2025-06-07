@@ -10,6 +10,7 @@ import { RabbitMQService } from './infra/messaging/rabbitmq';
 import { DriverService } from './infra/services/driver.service';
 import { DriverController } from './api/controllers/driver.controller';
 import { createDriverRoutes } from './api/routes/driver.routes';
+import { MonitoringService } from '@send/shared';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -29,6 +30,18 @@ app.use(rateLimit('driver-service'));
 
 // Set up routes
 app.use('/api', createDriverRoutes(driverController));
+
+const monitoringService = MonitoringService.getInstance();
+app.get('/metrics', async (_req, res) => {
+  try {
+    const metrics = await monitoringService.getMetrics();
+    res.set('Content-Type', 'text/plain');
+    res.send(metrics);
+  } catch (error) {
+    logger.error('Failed to get metrics:', error);
+    res.status(500).send('Failed to get metrics');
+  }
+});
 
 // Connect to RabbitMQ and start listening for events
 async function start() {

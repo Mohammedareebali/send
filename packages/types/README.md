@@ -10,7 +10,7 @@ Other packages can import these definitions using a path alias or relative impor
 ```ts
 import { Driver, DriverStatus } from '@shared/types/driver';
 // or
-import { Driver, DriverStatus } from '../shared/src/types/driver';
+import { Driver, DriverStatus } from '../shared/types/driver';
 ```
 
 Configure your `tsconfig.json` paths if you prefer the `@shared/types` alias.

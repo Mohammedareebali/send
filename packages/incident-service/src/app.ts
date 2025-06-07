@@ -11,6 +11,7 @@ import { createIncidentRoutes } from './api/routes/incident.routes';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
 import { LoggerService } from '@shared/logging/logger.service';
 import { startEscalationJob } from './jobs/escalation.job';
+import { MonitoringService } from '@send/shared';
 
 export const prisma = new PrismaClient();
 export const logger = new LoggerService({
@@ -39,6 +40,18 @@ app.use(express.json());
 app.use(rateLimit('incident-service'));
 
 app.use('/api/incidents', createIncidentRoutes(incidentController));
+
+const monitoringService = MonitoringService.getInstance();
+app.get('/metrics', async (_req, res) => {
+  try {
+    const metrics = await monitoringService.getMetrics();
+    res.set('Content-Type', 'text/plain');
+    res.send(metrics);
+  } catch (error) {
+    logger.error('Failed to get metrics', { error });
+    res.status(500).send('Failed to get metrics');
+  }
+});
 
 startEscalationJob(incidentService, rabbitMQ);
 

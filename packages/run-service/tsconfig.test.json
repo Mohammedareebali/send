@@ -1,11 +1,14 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "types": ["node", "jest"],
     "paths": {
       "@shared/*": ["../shared/src/*"],
       "@send/shared": ["../shared/src"],
       "@send/shared/*": ["../shared/src/*"],
       "@prisma/client": ["../../test/prisma-client.ts"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.test.ts", "src/**/__tests__/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
