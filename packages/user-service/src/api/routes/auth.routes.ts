@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { AuthService } from '../../core/services/AuthService';
 import { UserRepository } from '../../data/repositories/UserRepository';
-import { AppError } from '../middleware/errorHandler';
+import { AppError } from '@shared/errors';
 import { validateRequest } from '../middleware/validateRequest';
 import { loginSchema, registerSchema } from '../validators/auth.validator';
 import { getRepository } from 'typeorm';
