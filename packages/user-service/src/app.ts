@@ -4,11 +4,12 @@ import helmet from 'helmet';
 import compression from 'compression';
 import promBundle from 'express-prom-bundle';
 import { MonitoringService } from './infra/monitoring/monitoring.service';
-import { logger } from '@send/shared';
+import { LoggingService } from 'shared/src/services/logging.service';
 import userRoutes from './api/routes/user.routes';
 import { errorHandler } from './api/middleware/error.middleware';
 
 const app: express.Application = express();
+const logger = new LoggingService('user-service');
 
 // Initialize monitoring
 const monitoringService = MonitoringService.getInstance();
@@ -24,6 +25,10 @@ app.use(helmet());
 app.use(cors());
 app.use(compression() as unknown as express.RequestHandler);
 app.use(express.json());
+app.use((req, res, next) => {
+  logger.info('Incoming request', { method: req.method, url: req.url, ip: req.ip });
+  next();
+});
 
 // Monitoring middleware
 app.use(metricsMiddleware);

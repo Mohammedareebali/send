@@ -1,4 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
+import { LoggingService } from 'shared/src/services/logging.service';
+
+const logger = new LoggingService('user-service');
 
 export const errorHandler = (
   err: Error,
@@ -6,7 +9,7 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.error(err.stack);
+  logger.error('Unhandled error', { error: err.message, stack: err.stack });
 
   if (err.name === 'ValidationError') {
     return res.status(400).json({
