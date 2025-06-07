@@ -9,6 +9,7 @@ import { RabbitMQService } from './infra/messaging/rabbitmq';
 import { RouteService } from './infra/services/route.service';
 import { ScheduleService } from './infra/services/schedule.service';
 import { createRunRoutes } from './api/routes/run.routes';
+import { logger } from '@shared/logger';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -18,7 +19,7 @@ const routeService = new RouteService();
 const scheduleService = new ScheduleService();
 
 // Initialize RabbitMQ connection
-rabbitMQ.connect().catch(console.error);
+rabbitMQ.connect().catch(logger.error);
 
 // Middleware
 app.use(helmet());
@@ -39,7 +40,7 @@ app.use('/api/runs', createRunRoutes(runController));
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
+  logger.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
 

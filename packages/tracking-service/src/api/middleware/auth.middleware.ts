@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { logger } from '@shared/logger';
 
 declare global {
   namespace Express {
@@ -28,7 +29,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     req.user = decoded;
     next();
   } catch (error) {
-    console.error('Authentication error:', error);
+    logger.error('Authentication error:', error);
     res.status(401).json({ error: 'Invalid token' });
   }
-} 
+}

@@ -1,5 +1,6 @@
 import * as amqp from 'amqplib';
 import { config } from '../config';
+import { logger } from '@shared/logger';
 
 let channel: amqp.Channel | null = null;
 let connection: amqp.Connection | null = null;
@@ -28,10 +29,10 @@ export const setupEventBus = async () => {
       await channel.bindQueue(queue, config.rabbitMQ.exchange, queue);
     }
 
-    console.log('Event bus setup completed');
+    logger.info('Event bus setup completed');
     return { connection, channel };
   } catch (error) {
-    console.error('Failed to setup event bus:', error);
+    logger.error('Failed to setup event bus:', error);
     throw error;
   }
 };
@@ -51,7 +52,7 @@ export const publishEvent = async (
       { persistent: true }
     );
   } catch (error) {
-    console.error('Failed to publish event:', error);
+    logger.error('Failed to publish event:', error);
     throw error;
   }
 };

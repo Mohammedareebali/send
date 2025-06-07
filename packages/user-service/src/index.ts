@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { logger } from '@shared/logger';
 import { createConnection } from 'typeorm';
 import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
@@ -29,10 +30,10 @@ const startServer = async () => {
     await setupEventBus();
     
     app.listen(config.port, () => {
-      console.log(`User Service running on port ${config.port}`);
+      logger.info(`User Service running on port ${config.port}`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    logger.error('Failed to start server:', error);
     process.exit(1);
   }
 };

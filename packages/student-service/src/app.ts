@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import studentRoutes from './api/routes/student.routes';
+import { logger } from '@shared/logger';
 
 const app = express();
 
@@ -13,7 +14,7 @@ app.use('/api/students', studentRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
+  logger.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
 

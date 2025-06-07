@@ -5,6 +5,7 @@ import { VehicleService } from './services/vehicle.service';
 import { VehicleController } from './api/controllers/vehicle.controller';
 import { createVehicleRoutes } from './api/routes/vehicle.routes';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
+import { logger } from '@shared/logger';
 
 const app = express();
 const server = new Server(app);
@@ -25,10 +26,10 @@ async function start() {
     await rabbitMQService.connect();
     const port = process.env.PORT || 3005;
     server.listen(port, () => {
-      console.log(`Vehicle service listening on port ${port}`);
+      logger.info(`Vehicle service listening on port ${port}`);
     });
   } catch (error) {
-    console.error('Failed to start vehicle service:', error);
+    logger.error('Failed to start vehicle service:', error);
     process.exit(1);
   }
 }
@@ -37,8 +38,8 @@ start();
 
 // Handle graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
+  logger.info('SIGTERM received. Shutting down gracefully...');
   await rabbitMQService.close();
   await prisma.$disconnect();
   process.exit(0);
-}); 
+});

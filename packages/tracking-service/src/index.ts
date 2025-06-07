@@ -1,6 +1,7 @@
 import express from 'express';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
+import { logger } from '@shared/logger';
 import { PrismaClient } from '@prisma/client';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
 import { TrackingService } from './infra/services/tracking.service';
@@ -55,11 +56,11 @@ app.use('/api', createTrackingRoutes(trackingController));
 
 // Set up WebSocket connections
 io.on('connection', (socket) => {
-  console.log('Client connected');
+  logger.info('Client connected');
 
   socket.on('join-run', (runId: string) => {
     trackingService.addClient(runId, socket);
-    console.log(`Client joined run ${runId}`);
+    logger.info(`Client joined run ${runId}`);
   });
 
   socket.on('disconnect', () => {
@@ -67,7 +68,7 @@ io.on('connection', (socket) => {
     for (const [runId, tracking] of trackingService['activeRuns']) {
       tracking.sockets.delete(socket);
     }
-    console.log('Client disconnected');
+    logger.info('Client disconnected');
   });
 });
 
@@ -76,16 +77,16 @@ async function start() {
   try {
     await rabbitMQ.connect();
     await rabbitMQ.subscribeToTrackingEvents(async (event) => {
-      console.log('Received tracking event:', event);
+      logger.info('Received tracking event:', event);
       // Handle tracking events as needed
     });
 
     const port = process.env.PORT || 3007;
     httpServer.listen(port, () => {
-      console.log(`Tracking service listening on port ${port}`);
+      logger.info(`Tracking service listening on port ${port}`);
     });
   } catch (error) {
-    console.error('Failed to start tracking service:', error);
+    logger.error('Failed to start tracking service:', error);
     process.exit(1);
   }
 }
@@ -94,11 +95,11 @@ start();
 
 // Handle graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
+  logger.info('SIGTERM received. Shutting down gracefully...');
   await rabbitMQ.close();
   await prisma.$disconnect();
   httpServer.close(() => {
-    console.log('HTTP server closed');
+    logger.info('HTTP server closed');
     process.exit(0);
   });
-}); 
+});
