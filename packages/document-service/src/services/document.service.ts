@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient} from '@prisma/client';
 
 import { S3 } from 'aws-sdk';
 import { createWorker, Worker } from 'tesseract.js';
