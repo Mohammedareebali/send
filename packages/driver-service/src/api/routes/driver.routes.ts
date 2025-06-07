@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { DriverController } from '../controllers/driver.controller';
-import { authenticate, requireRole } from '@send/shared/src/security/auth';
+import { authenticate, requireRole } from '@send/shared/security/auth';
 import {
   validateCreateDriver,
   validateUpdateDriver

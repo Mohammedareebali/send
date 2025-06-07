@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { TrackingController } from '../controllers/tracking.controller';
-import { authenticate } from '@send/shared/src/security/auth';
+import { authenticate } from '@send/shared/security/auth';
 import { validateLocation } from '../middleware/validation.middleware';
 
 export function createTrackingRoutes(controller: TrackingController): Router {

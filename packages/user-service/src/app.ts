@@ -3,8 +3,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
-import { MonitoringService } from '@send/shared';
-import { LoggingService } from 'shared/src/services/logging.service';
+
+import promBundle from 'express-prom-bundle';
+import { MonitoringService } from './infra/monitoring/monitoring.service';
+import { LoggingService } from '@shared/services/logging.service';
+
+
 import userRoutes from './api/routes/user.routes';
 import { errorHandler } from '@shared/errors';
 

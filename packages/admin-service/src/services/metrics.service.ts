@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { RabbitMQService } from 'shared/src/messaging/rabbitmq.service';
-import { LoggingService } from 'shared/src/services/logging.service';
+import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
+import { LoggingService } from '@shared/services/logging.service';
 
 interface Metrics {
   totalRunsToday: number;
