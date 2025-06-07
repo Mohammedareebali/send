@@ -5,3 +5,4 @@ export * from './testing/setup';
 export * from './messaging';
 export { PrismaClient } from '@prisma/client';
 export { authenticate, requireRole } from './security/auth';
+export { SecurityConfigService } from './security/config';

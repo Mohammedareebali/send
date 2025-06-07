@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { getServiceConfig } from '../config';
 import { User } from '@shared/types/user';
 
 declare global {
@@ -21,7 +22,7 @@ export const authMiddleware = (
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as User & { roles: string[] };
+    const decoded = jwt.verify(token, getServiceConfig().security.jwtSecret) as User & { roles: string[] };
     req.user = decoded;
     next();
   } catch (error) {

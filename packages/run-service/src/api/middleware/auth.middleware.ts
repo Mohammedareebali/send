@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { getServiceConfig } from '../../config';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -19,7 +20,7 @@ export const authMiddleware = async (
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+    const decoded = jwt.verify(token, getServiceConfig().security.jwtSecret) as {
       id: string;
       role: string;
     };

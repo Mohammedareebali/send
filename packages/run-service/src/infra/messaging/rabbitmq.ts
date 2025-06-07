@@ -1,9 +1,10 @@
 import { Run, RunNotification } from '@shared/types/run';
 import { RabbitMQService as BaseRabbitMQService, RabbitMQConfig } from '@shared/messaging';
 import { logger } from '@shared/logger';
+import { getServiceConfig } from '../../config';
 
 export class RabbitMQService extends BaseRabbitMQService {
-  constructor(url: string = process.env.RABBITMQ_URL || 'amqp://localhost') {
+  constructor(url: string = getServiceConfig().rabbitMQUrl) {
     const config: RabbitMQConfig = {
       url,
       exchange: 'run-events',

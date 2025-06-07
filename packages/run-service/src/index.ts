@@ -1,10 +1,11 @@
 import app from './app';
 import { PrismaClient } from '@prisma/client';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
+import { getServiceConfig } from './config';
 
 const prisma = new PrismaClient();
-const rabbitMQ = new RabbitMQService();
-const port = process.env.PORT || 3002;
+const { rabbitMQUrl, port } = getServiceConfig();
+const rabbitMQ = new RabbitMQService(rabbitMQUrl);
 
 // Connect to RabbitMQ
 rabbitMQ.connect().catch(console.error);

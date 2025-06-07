@@ -71,6 +71,7 @@ pnpm test
 - `RABBITMQ_URL` - RabbitMQ connection URL
 - `RABBITMQ_EXCHANGE` - RabbitMQ exchange name
 - `RABBITMQ_QUEUE` - RabbitMQ queue name
+- `MAPS_API_KEY` - Google Maps API key
 
 ## Architecture
 

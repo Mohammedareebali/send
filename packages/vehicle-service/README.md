@@ -177,12 +177,14 @@ docker run -p 3000:3000 vehicle-service
 ```
 
 Environment variables:
+- `PORT`: Service port (default: 3005)
 - `REDIS_HOST`: Redis server host
 - `REDIS_PORT`: Redis server port
 - `REDIS_PASSWORD`: Redis server password
 - `CACHE_TTL`: Vehicle cache TTL in seconds (default: 300)
 - `DATABASE_URL`: Database connection string
 - `JWT_SECRET`: JWT signing secret
+- `RABBITMQ_URL`: RabbitMQ connection URL
 - `API_KEY`: API key for service authentication
 
 ## Contributing
