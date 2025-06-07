@@ -2,6 +2,7 @@ import express, { ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { PrismaClient } from '@prisma/client';
 import { RunModel } from './data/models/run.model';
 import { RunController } from './api/controllers/run.controller';
@@ -22,10 +23,12 @@ const scheduleService = new ScheduleService();
 rabbitMQ.connect().catch(console.error);
 
 // Middleware
-app.use(helmet());
+app.use(securityHeaders);
 app.use(cors());
+app.use(helmet());
 app.use(compression());
 app.use(express.json());
+app.use(rateLimit('run-service'));
 
 // Initialize controller with all services
 const runController = new RunController(

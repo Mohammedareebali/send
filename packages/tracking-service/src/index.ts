@@ -2,6 +2,10 @@ import 'dotenv/config';
 import express from 'express';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { logger } from '@shared/logger';
 import { PrismaClient } from '@prisma/client';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
@@ -51,8 +55,15 @@ const geofences: Geofence[] = [
 const trackingService = new TrackingService(prisma, rabbitMQ, geofences);
 const trackingController = new TrackingController(trackingService);
 
-// Set up routes
+// Middleware
+app.use(securityHeaders);
+app.use(cors());
+app.use(helmet());
+app.use(compression());
 app.use(express.json());
+app.use(rateLimit('tracking-service'));
+
+// Set up routes
 app.use('/api', createTrackingRoutes(trackingController));
 
 // Set up WebSocket connections

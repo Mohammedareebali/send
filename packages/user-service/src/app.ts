@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import promBundle from 'express-prom-bundle';
 import { MonitoringService } from './infra/monitoring/monitoring.service';
 import { LoggingService } from 'shared/src/services/logging.service';
@@ -21,10 +22,12 @@ const metricsMiddleware = promBundle({
 });
 
 // Middleware
-app.use(helmet());
+app.use(securityHeaders);
 app.use(cors());
+app.use(helmet());
 app.use(compression() as unknown as express.RequestHandler);
 app.use(express.json());
+app.use(rateLimit('user-service'));
 app.use((req, res, next) => {
   logger.info('Incoming request', { method: req.method, url: req.url, ip: req.ip });
   next();

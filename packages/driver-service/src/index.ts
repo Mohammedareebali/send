@@ -1,6 +1,10 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { logger } from '@shared/logger';
+import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
 import { DriverService } from './infra/services/driver.service';
 import { DriverController } from './api/controllers/driver.controller';
@@ -13,8 +17,15 @@ const rabbitMQ = new RabbitMQService();
 const driverService = new DriverService(prisma, rabbitMQ);
 const driverController = new DriverController(driverService);
 
-// Set up routes
+// Middleware
+app.use(securityHeaders);
+app.use(cors());
+app.use(helmet());
+app.use(compression());
 app.use(express.json());
+app.use(rateLimit('driver-service'));
+
+// Set up routes
 app.use('/api', createDriverRoutes(driverController));
 
 // Connect to RabbitMQ and start listening for events
