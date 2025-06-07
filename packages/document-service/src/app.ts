@@ -12,6 +12,7 @@ import { LoggerService } from '@shared/logging/logger.service';
 import { createDocumentRoutes } from './api/routes/document.routes';
 import { errorHandler, AppError } from '@shared/errors';
 import { createErrorResponse } from '@shared/responses';
+import { MonitoringService } from '@send/shared';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -57,6 +58,18 @@ app.get('/health', async (req, res) => {
     res.status(503).json(
       createErrorResponse(new AppError('Health check failed', 503))
     );
+  }
+});
+
+const monitoringService = MonitoringService.getInstance();
+app.get('/metrics', async (_req, res) => {
+  try {
+    const metrics = await monitoringService.getMetrics();
+    res.set('Content-Type', 'text/plain');
+    res.send(metrics);
+  } catch (error) {
+    logger.error('Failed to get metrics', { error });
+    res.status(500).send('Failed to get metrics');
   }
 });
 
