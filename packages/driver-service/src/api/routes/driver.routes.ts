@@ -1,16 +1,19 @@
 import { Router } from 'express';
 import { DriverController } from '../controllers/driver.controller';
 import { authenticate, requireRole } from '@send/shared/src/security/auth';
-import { validateDriver } from '../middleware/validation.middleware';
+import {
+  validateCreateDriver,
+  validateUpdateDriver
+} from '../middleware/validation.middleware';
 
 export function createDriverRoutes(controller: DriverController): Router {
   const router = Router();
 
   // Create a new driver (admin only)
-  router.post('/drivers', 
+  router.post('/drivers',
     authenticate(),
     requireRole(['ADMIN']),
-    validateDriver,
+    validateCreateDriver,
     controller.createDriver.bind(controller)
   );
 
@@ -29,10 +32,10 @@ export function createDriverRoutes(controller: DriverController): Router {
   );
 
   // Update a driver (admin and the driver themselves)
-  router.put('/drivers/:id', 
+  router.put('/drivers/:id',
     authenticate(),
     requireRole(['ADMIN', 'DRIVER']),
-    validateDriver,
+    validateUpdateDriver,
     controller.updateDriver.bind(controller)
   );
 

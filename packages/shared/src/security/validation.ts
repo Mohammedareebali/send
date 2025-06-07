@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { prometheus } from '../prometheus';
 import { Schema } from 'joi';
+import { createValidationErrorResponse } from '../responses/error';
 import { Counter } from 'prom-client';
 
 export interface ValidationError {
@@ -36,18 +37,18 @@ export class ValidationService {
         });
 
         if (error) {
-          const validationErrors: ValidationError[] = error.details.map(detail => ({
-            field: detail.path.join('.'),
-            message: detail.message
-          }));
+          const details: Record<string, string[]> = {};
+          for (const detail of error.details) {
+            const field = detail.path.join('.');
+            if (!details[field]) {
+              details[field] = [];
+            }
+            details[field].push(detail.message);
+          }
 
           this.validationCounter.inc({ valid: 'false' });
 
-          return res.status(400).json({
-            error: 'Validation Error',
-            message: 'Invalid request data',
-            details: validationErrors
-          });
+          return res.status(400).json(createValidationErrorResponse(details));
         }
 
         // Replace request body with validated and sanitized data
@@ -75,18 +76,18 @@ export class ValidationService {
         });
 
         if (error) {
-          const validationErrors: ValidationError[] = error.details.map(detail => ({
-            field: detail.path.join('.'),
-            message: detail.message
-          }));
+          const details: Record<string, string[]> = {};
+          for (const detail of error.details) {
+            const field = detail.path.join('.');
+            if (!details[field]) {
+              details[field] = [];
+            }
+            details[field].push(detail.message);
+          }
 
           this.validationCounter.inc({ valid: 'false' });
 
-          return res.status(400).json({
-            error: 'Validation Error',
-            message: 'Invalid query parameters',
-            details: validationErrors
-          });
+          return res.status(400).json(createValidationErrorResponse(details));
         }
 
         // Replace query parameters with validated and sanitized data
@@ -114,18 +115,18 @@ export class ValidationService {
         });
 
         if (error) {
-          const validationErrors: ValidationError[] = error.details.map(detail => ({
-            field: detail.path.join('.'),
-            message: detail.message
-          }));
+          const details: Record<string, string[]> = {};
+          for (const detail of error.details) {
+            const field = detail.path.join('.');
+            if (!details[field]) {
+              details[field] = [];
+            }
+            details[field].push(detail.message);
+          }
 
           this.validationCounter.inc({ valid: 'false' });
 
-          return res.status(400).json({
-            error: 'Validation Error',
-            message: 'Invalid URL parameters',
-            details: validationErrors
-          });
+          return res.status(400).json(createValidationErrorResponse(details));
         }
 
         // Replace URL parameters with validated and sanitized data
