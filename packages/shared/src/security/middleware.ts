@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { RateLimiter } from './rate-limiter';
 import { prometheus } from '../config/metrics';
+import { createErrorResponse } from '../responses';
+import { AppError } from '../errors';
 
 // Security headers middleware
 export const securityHeaders = (req: Request, res: Response, next: NextFunction) => {
@@ -92,21 +94,16 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
   console.error('Unhandled error:', err);
 
   if (err.name === 'ValidationError') {
-    return res.status(400).json({
-      error: 'Validation Error',
-      message: err.message
-    });
+    return res.status(400).json(
+      createErrorResponse(new AppError(err.message, 400))
+    );
   }
 
   if (err.name === 'UnauthorizedError') {
-    return res.status(401).json({
-      error: 'Unauthorized',
-      message: 'Invalid or missing authentication token'
-    });
+    return res.status(401).json(
+      createErrorResponse(new AppError('Invalid or missing authentication token', 401))
+    );
   }
 
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: 'An unexpected error occurred'
-  });
-}; 
+  res.status(500).json(createErrorResponse(err));
+};

@@ -6,7 +6,7 @@ import promBundle from 'express-prom-bundle';
 import { MonitoringService } from './infra/monitoring/monitoring.service';
 import { LoggingService } from 'shared/src/services/logging.service';
 import userRoutes from './api/routes/user.routes';
-import { errorHandler } from './api/middleware/error.middleware';
+import { errorHandler } from '@shared/errors';
 
 const app: express.Application = express();
 const logger = new LoggingService('user-service');

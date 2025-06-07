@@ -1,7 +1,8 @@
 import app from './app';
+import { logger } from '@shared/logger';
 
 const port = process.env.PORT || 3012;
 
 app.listen(port, () => {
-  console.log(`Admin service running on port ${port}`);
+  logger.info(`Admin service running on port ${port}`);
 });

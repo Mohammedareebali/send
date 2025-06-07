@@ -1,19 +1,16 @@
+const base = require('../../jest.config.base');
+
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
+  ...base,
   testMatch: ['**/?(*.)+(test).ts'],
-  transform: {
-    '^.+\\.ts$': 'ts-jest'
-  },
   moduleNameMapper: {
     '^@send/shared$': '<rootDir>/src',
     '^@send/shared/(.*)$': '<rootDir>/src/$1',
-    '^@shared/(.*)$': '<rootDir>/src/$1'
+    '^@shared/(.*)$': '<rootDir>/src/$1',
   },
   globals: {
     'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.json'
-    }
-  }
+      tsconfig: '<rootDir>/tsconfig.json',
+    },
+  },
 };

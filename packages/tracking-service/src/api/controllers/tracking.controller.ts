@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { TrackingService } from '../../infra/services/tracking.service';
 import { Run } from '@shared/types/run';
 import { Location } from '@shared/types/tracking';
+import { logger } from '@shared/logger';
 
 export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
@@ -12,7 +13,7 @@ export class TrackingController {
       await this.trackingService.startTracking(run);
       res.status(200).json({ message: 'Tracking started' });
     } catch (error) {
-      console.error('Failed to start tracking:', error);
+      logger.error('Failed to start tracking:', error);
       res.status(500).json({ error: 'Failed to start tracking' });
     }
   }
@@ -24,7 +25,7 @@ export class TrackingController {
       await this.trackingService.updateLocation(runId, location);
       res.status(200).json({ message: 'Location updated' });
     } catch (error) {
-      console.error('Failed to update location:', error);
+      logger.error('Failed to update location:', error);
       res.status(500).json({ error: 'Failed to update location' });
     }
   }
@@ -35,7 +36,7 @@ export class TrackingController {
       await this.trackingService.stopTracking(runId);
       res.status(200).json({ message: 'Tracking stopped' });
     } catch (error) {
-      console.error('Failed to stop tracking:', error);
+      logger.error('Failed to stop tracking:', error);
       res.status(500).json({ error: 'Failed to stop tracking' });
     }
   }
@@ -50,7 +51,7 @@ export class TrackingController {
       }
       res.status(200).json({ status });
     } catch (error) {
-      console.error('Failed to get tracking status:', error);
+      logger.error('Failed to get tracking status:', error);
       res.status(500).json({ error: 'Failed to get tracking status' });
     }
   }
@@ -69,7 +70,7 @@ export class TrackingController {
         timestamp: location.timestamp,
       });
     } catch (error) {
-      console.error('Failed to get latest location:', error);
+      logger.error('Failed to get latest location:', error);
       res.status(500).json({ error: 'Failed to get latest location' });
     }
   }

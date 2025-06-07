@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { Location } from '@shared/types/run';
+import { getServiceConfig } from '../../config';
 
 export class RouteService {
   private readonly apiKey: string;
   private readonly baseUrl: string;
 
   constructor() {
-    this.apiKey = process.env.MAPS_API_KEY || '';
+    this.apiKey = getServiceConfig().mapsApiKey;
     this.baseUrl = 'https://maps.googleapis.com/maps/api';
   }
 
