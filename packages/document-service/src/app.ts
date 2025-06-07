@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { PrismaClient } from '@prisma/client';
 import { DocumentController } from './api/controllers/document.controller';
 import { DocumentService } from './services/document.service';
@@ -34,10 +35,12 @@ const documentController = new DocumentController(documentService);
 const healthCheckService = new HealthCheckService(prisma, rabbitMQ.getChannel(), logger.getLogger(), 'document-service');
 
 // Middleware
-app.use(express.json());
+app.use(securityHeaders);
 app.use(cors());
 app.use(helmet());
 app.use(compression());
+app.use(express.json());
+app.use(rateLimit('document-service'));
 
 // Routes
 app.use('/api/documents', createDocumentRoutes(documentController));
