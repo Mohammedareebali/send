@@ -1,4 +1,5 @@
 import { app, prisma } from './app';
+import { logger } from '@shared/logger';
 
 const port = process.env.PORT || 3011;
 
@@ -13,5 +14,5 @@ process.on('SIGINT', async () => {
 });
 
 app.listen(port, () => {
-  console.log(`Invoicing service running on port ${port}`);
+  logger.info(`Invoicing service running on port ${port}`);
 });
