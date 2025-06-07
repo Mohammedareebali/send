@@ -1,6 +1,6 @@
 import express from 'express';
 import { Server } from 'http';
-import { PrismaClient } from '@prisma/client';
+import { databaseService, LoggerService, HealthCheckService } from '@send/shared';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -11,14 +11,15 @@ import { VehicleController } from './api/controllers/vehicle.controller';
 import { createVehicleRoutes } from './api/routes/vehicle.routes';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
 
-import { logger } from '@shared/logger';
 import { MonitoringService } from '@send/shared';
 
 const app = express();
 const server = new Server(app);
-const prisma = new PrismaClient();
+const prisma = databaseService.getPrismaClient();
 const { rabbitMQUrl, port } = getServiceConfig();
 const rabbitMQService = new RabbitMQService(rabbitMQUrl);
+const logger = new LoggerService({ serviceName: 'vehicle-service' });
+const healthCheck = new HealthCheckService(prisma, rabbitMQService.getChannel(), logger.getLogger(), 'vehicle-service');
 
 // Create services and controllers
 const vehicleService = new VehicleService(rabbitMQService);
@@ -33,6 +34,11 @@ app.use(compression());
 app.use(express.json());
 app.use(rateLimit('vehicle-service'));
 app.use('/api', createVehicleRoutes(vehicleController));
+
+app.get('/health', async (_req, res) => {
+  const health = await healthCheck.checkHealth();
+  res.status(health.status === 'UP' ? 200 : 503).json(health);
+});
 
 const monitoringService = MonitoringService.getInstance();
 app.get('/metrics', async (_req, res) => {
@@ -61,10 +67,12 @@ async function start() {
 
 start();
 
-// Handle graceful shutdown
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received. Shutting down gracefully...');
+async function shutdown() {
+  logger.info('Shutting down gracefully...');
   await rabbitMQService.close();
   await prisma.$disconnect();
   process.exit(0);
-});
+}
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
-import { PrismaClient } from '@prisma/client';
+import { databaseService } from '@send/shared';
 import { DocumentController } from './api/controllers/document.controller';
 import { DocumentService } from './services/document.service';
 import { HealthCheckService } from '@shared/health/health.check';
@@ -16,7 +16,7 @@ import { createErrorResponse } from '@shared/responses';
 import { MonitoringService } from '@send/shared';
 
 const app = express();
-const prisma = new PrismaClient();
+const prisma = databaseService.getPrismaClient();
 
 // Initialize services
 const logger = new LoggerService({

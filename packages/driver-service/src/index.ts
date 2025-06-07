@@ -1,6 +1,5 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import { logger } from '@shared/logger';
+import { databaseService, LoggerService, HealthCheckService } from '@send/shared';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import cors from 'cors';
@@ -13,8 +12,10 @@ import { createDriverRoutes } from './api/routes/driver.routes';
 import { MonitoringService } from '@send/shared';
 
 const app = express();
-const prisma = new PrismaClient();
+const prisma = databaseService.getPrismaClient();
 const rabbitMQ = new RabbitMQService();
+const logger = new LoggerService({ serviceName: 'driver-service' });
+const healthCheck = new HealthCheckService(prisma, rabbitMQ.getChannel(), logger.getLogger(), 'driver-service');
 
 const driverService = new DriverService(prisma, rabbitMQ);
 const driverController = new DriverController(driverService);
@@ -30,6 +31,11 @@ app.use(rateLimit('driver-service'));
 
 // Set up routes
 app.use('/api', createDriverRoutes(driverController));
+
+app.get('/health', async (_req, res) => {
+  const health = await healthCheck.checkHealth();
+  res.status(health.status === 'UP' ? 200 : 503).json(health);
+});
 
 const monitoringService = MonitoringService.getInstance();
 app.get('/metrics', async (_req, res) => {
@@ -64,10 +70,12 @@ async function start() {
 
 start();
 
-// Handle graceful shutdown
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received. Shutting down gracefully...');
+async function shutdown() {
+  logger.info('Shutting down gracefully...');
   await rabbitMQ.close();
   await prisma.$disconnect();
   process.exit(0);
-});
+}
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

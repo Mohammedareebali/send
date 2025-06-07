@@ -8,14 +8,14 @@ import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 
 import promBundle from 'express-prom-bundle';
 import { MonitoringService } from './infra/monitoring/monitoring.service';
-import { LoggingService } from '@shared/services/logging.service';
+import { LoggerService } from '@send/shared';
 
 
 import userRoutes from './api/routes/user.routes';
 import { errorHandler } from '@shared/errors';
 
 const app: express.Application = express();
-const logger = new LoggingService('user-service');
+const logger = new LoggerService({ serviceName: 'user-service' });
 
 // Initialize monitoring
 const monitoringService = MonitoringService.getInstance();

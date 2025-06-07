@@ -1,31 +1,27 @@
 import app from './app';
-import { PrismaClient } from '@prisma/client';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
 
-import { logger } from '@shared/logger';
+import { databaseService, LoggerService, HealthCheckService } from '@send/shared';
 import { getServiceConfig } from './config';
 
-const prisma = new PrismaClient();
+const prisma = databaseService.getPrismaClient();
 const { rabbitMQUrl, port } = getServiceConfig();
 const rabbitMQ = new RabbitMQService(rabbitMQUrl);
+const logger = new LoggerService({ serviceName: 'run-service' });
+const healthCheck = new HealthCheckService(prisma, rabbitMQ.getChannel(), logger.getLogger(), 'run-service');
 
 // Connect to RabbitMQ
 rabbitMQ.connect().catch(logger.error);
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received. Shutting down gracefully...');
+async function shutdown() {
+  logger.info('Shutting down gracefully...');
   await rabbitMQ.close();
   await prisma.$disconnect();
   process.exit(0);
-});
+}
 
-process.on('SIGINT', async () => {
-  logger.info('SIGINT received. Shutting down gracefully...');
-  await rabbitMQ.close();
-  await prisma.$disconnect();
-  process.exit(0);
-});
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
 
 app.listen(port, () => {
   logger.info(`Run Service running on port ${port}`);
