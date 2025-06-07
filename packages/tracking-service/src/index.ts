@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import { logger } from '@shared/logger';
 import { PrismaClient } from '@prisma/client';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
@@ -57,6 +58,7 @@ const trackingController = new TrackingController(trackingService);
 
 // Middleware
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression());

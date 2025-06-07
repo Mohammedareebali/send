@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import { PrismaClient } from '@prisma/client';
 import { DocumentController } from './api/controllers/document.controller';
 import { DocumentService } from './services/document.service';
@@ -36,6 +37,7 @@ const healthCheckService = new HealthCheckService(prisma, rabbitMQ.getChannel(),
 
 // Middleware
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression());

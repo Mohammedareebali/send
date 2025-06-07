@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import studentRoutes from './api/routes/student.routes';
 import { errorHandler } from '@shared/errors';
 
@@ -10,6 +11,7 @@ const app = express();
 
 // Middleware
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression());

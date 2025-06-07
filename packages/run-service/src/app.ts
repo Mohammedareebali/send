@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import { PrismaClient } from '@prisma/client';
 import { RunModel } from './data/models/run.model';
 import { RunController } from './api/controllers/run.controller';
@@ -24,6 +25,7 @@ rabbitMQ.connect().catch(console.error);
 
 // Middleware
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression());
