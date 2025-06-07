@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { DocumentService } from '../../services/document.service';
 import { Document } from '@shared/types/document';
 import { logger } from '@shared/logger';
+import { AppError } from '@shared/errors';
+import { createErrorResponse } from '@shared/responses';
 
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
@@ -11,7 +13,9 @@ export class DocumentController {
       const { userId, type, metadata } = req.body;
       const file = req.file as Express.Multer.File;
       if (!file) {
-        res.status(400).json({ error: 'File is required' });
+        res
+          .status(400)
+          .json(createErrorResponse(new AppError('File is required', 400)));
         return;
       }
       const document = await this.documentService.uploadDocument(userId, {
@@ -23,7 +27,7 @@ export class DocumentController {
       res.status(201).json(document);
     } catch (error) {
       logger.error('Failed to upload document:', error);
-      res.status(500).json({ error: 'Failed to upload document' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -32,13 +36,15 @@ export class DocumentController {
       const { id } = req.params;
       const doc = await this.documentService.getDocumentById(id);
       if (!doc) {
-        res.status(404).json({ error: 'Document not found' });
+        res
+          .status(404)
+          .json(createErrorResponse(new AppError('Document not found', 404)));
         return;
       }
       res.json(doc);
     } catch (error) {
       logger.error('Failed to get document:', error);
-      res.status(500).json({ error: 'Failed to get document' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -52,7 +58,7 @@ export class DocumentController {
       res.json(docs);
     } catch (error) {
       logger.error('Failed to list documents:', error);
-      res.status(500).json({ error: 'Failed to list documents' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -63,7 +69,7 @@ export class DocumentController {
       res.status(204).send();
     } catch (error) {
       logger.error('Failed to delete document:', error);
-      res.status(500).json({ error: 'Failed to delete document' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -81,7 +87,7 @@ export class DocumentController {
       res.json(access);
     } catch (error) {
       logger.error('Failed to update document access:', error);
-      res.status(500).json({ error: 'Failed to update document access' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 
@@ -93,7 +99,7 @@ export class DocumentController {
       res.json(doc);
     } catch (error) {
       logger.error('Failed to update document metadata:', error);
-      res.status(500).json({ error: 'Failed to update document metadata' });
+      res.status(500).json(createErrorResponse(error as Error));
     }
   }
 }

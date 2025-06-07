@@ -10,6 +10,8 @@ import { HealthCheckService } from '@shared/health/health.check';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
 import { LoggerService } from '@shared/logging/logger.service';
 import { createDocumentRoutes } from './api/routes/document.routes';
+import { errorHandler, AppError } from '@shared/errors';
+import { createErrorResponse } from '@shared/responses';
 import { MonitoringService } from '@send/shared';
 
 const app = express();
@@ -53,10 +55,9 @@ app.get('/health', async (req, res) => {
     res.status(health.status === 'UP' ? 200 : 503).json(health);
   } catch (error) {
     logger.error('Health check failed', { error });
-    res.status(503).json({
-      status: 'DOWN',
-      error: 'Health check failed'
-    });
+    res.status(503).json(
+      createErrorResponse(new AppError('Health check failed', 503))
+    );
   }
 });
 
@@ -73,12 +74,6 @@ app.get('/metrics', async (_req, res) => {
 });
 
 // Error handling
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error('Unhandled error', { error: err });
-  res.status(500).json({
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+app.use(errorHandler);
 
 export { app, prisma, rabbitMQ, logger, documentService };
