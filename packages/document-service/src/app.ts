@@ -10,6 +10,7 @@ import { HealthCheckService } from '@shared/health/health.check';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
 import { LoggerService } from '@shared/logging/logger.service';
 import { createDocumentRoutes } from './api/routes/document.routes';
+import { MonitoringService } from '@send/shared';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -56,6 +57,18 @@ app.get('/health', async (req, res) => {
       status: 'DOWN',
       error: 'Health check failed'
     });
+  }
+});
+
+const monitoringService = MonitoringService.getInstance();
+app.get('/metrics', async (_req, res) => {
+  try {
+    const metrics = await monitoringService.getMetrics();
+    res.set('Content-Type', 'text/plain');
+    res.send(metrics);
+  } catch (error) {
+    logger.error('Failed to get metrics', { error });
+    res.status(500).send('Failed to get metrics');
   }
 });
 

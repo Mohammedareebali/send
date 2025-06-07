@@ -11,6 +11,7 @@ import { createVehicleRoutes } from './api/routes/vehicle.routes';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
 
 import { logger } from '@shared/logger';
+import { MonitoringService } from '@send/shared';
 
 const app = express();
 const server = new Server(app);
@@ -30,6 +31,18 @@ app.use(compression());
 app.use(express.json());
 app.use(rateLimit('vehicle-service'));
 app.use('/api', createVehicleRoutes(vehicleController));
+
+const monitoringService = MonitoringService.getInstance();
+app.get('/metrics', async (_req, res) => {
+  try {
+    const metrics = await monitoringService.getMetrics();
+    res.set('Content-Type', 'text/plain');
+    res.send(metrics);
+  } catch (error) {
+    logger.error('Failed to get metrics:', error);
+    res.status(500).send('Failed to get metrics');
+  }
+});
 
 // Start the service
 async function start() {
