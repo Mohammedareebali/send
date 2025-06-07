@@ -13,6 +13,7 @@ import { TrackingService } from './infra/services/tracking.service';
 import { TrackingController } from './api/controllers/tracking.controller';
 import { createTrackingRoutes } from './api/routes/tracking.routes';
 import { Geofence } from '@shared/types/tracking';
+import { MonitoringService } from '@send/shared';
 
 const app = express();
 const httpServer = createServer(app);
@@ -65,6 +66,18 @@ app.use(rateLimit('tracking-service'));
 
 // Set up routes
 app.use('/api', createTrackingRoutes(trackingController));
+
+const monitoringService = MonitoringService.getInstance();
+app.get('/metrics', async (_req, res) => {
+  try {
+    const metrics = await monitoringService.getMetrics();
+    res.set('Content-Type', 'text/plain');
+    res.send(metrics);
+  } catch (error) {
+    logger.error('Failed to get metrics:', error);
+    res.status(500).send('Failed to get metrics');
+  }
+});
 
 // Set up WebSocket connections
 io.on('connection', (socket) => {

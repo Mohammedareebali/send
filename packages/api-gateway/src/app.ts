@@ -5,6 +5,7 @@ import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { serviceConfig } from './config';
 import { LoggerService } from '@shared/logging/logger.service';
 import { CircuitBreakerService } from '@shared/circuit-breaker';
+import { MonitoringService } from '@send/shared';
 
 const logger = new LoggerService({
   serviceName: 'api-gateway',
@@ -115,6 +116,18 @@ app.get('/health', async (_req, res) => {
   );
 
   res.status(200).json(results);
+});
+
+const monitoringService = MonitoringService.getInstance();
+app.get('/metrics', async (_req, res) => {
+  try {
+    const metrics = await monitoringService.getMetrics();
+    res.set('Content-Type', 'text/plain');
+    res.send(metrics);
+  } catch (error) {
+    logger.error('Failed to get metrics:', error);
+    res.status(500).send('Failed to get metrics');
+  }
 });
 
 export default app;
