@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { StudentModel } from '../../data/models/student.model';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { Student, StudentEvent, StudentNotification, StudentCreateInput, StudentUpdateInput } from '@send/shared';
 import { AppError } from '@shared/errors';
