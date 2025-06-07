@@ -7,6 +7,7 @@ import { prometheus } from '@shared/prometheus';
 import { logger } from '@shared/logger';
 import Redis from 'ioredis';
 import { z } from 'zod';
+import { getServiceConfig } from '../config';
 
 interface PrismaVehicle {
   id: string;
@@ -207,11 +208,11 @@ export class VehicleService {
   constructor(rabbitMQ?: RabbitMQService) {
     this.prisma = new PrismaClient();
     this.redis = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+      host: getServiceConfig().redis.host,
+      port: getServiceConfig().redis.port,
+      password: getServiceConfig().redis.password,
     });
-    this.cacheTTL = parseInt(process.env.CACHE_TTL || '300');
+    this.cacheTTL = getServiceConfig().redis.cacheTTL;
     this.rabbitMQ = rabbitMQ;
   }
 

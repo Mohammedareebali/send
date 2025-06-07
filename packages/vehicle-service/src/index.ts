@@ -5,12 +5,14 @@ import { VehicleService } from './services/vehicle.service';
 import { VehicleController } from './api/controllers/vehicle.controller';
 import { createVehicleRoutes } from './api/routes/vehicle.routes';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
+
 import { logger } from '@shared/logger';
 
 const app = express();
 const server = new Server(app);
 const prisma = new PrismaClient();
-const rabbitMQService = new RabbitMQService();
+const { rabbitMQUrl, port } = getServiceConfig();
+const rabbitMQService = new RabbitMQService(rabbitMQUrl);
 
 // Create services and controllers
 const vehicleService = new VehicleService(rabbitMQService);
@@ -24,7 +26,6 @@ app.use('/api', createVehicleRoutes(vehicleController));
 async function start() {
   try {
     await rabbitMQService.connect();
-    const port = process.env.PORT || 3005;
     server.listen(port, () => {
       logger.info(`Vehicle service listening on port ${port}`);
     });
