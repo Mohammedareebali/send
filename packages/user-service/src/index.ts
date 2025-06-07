@@ -6,11 +6,11 @@ import { errorHandler } from '@shared/errors';
 import { authRoutes } from './api/routes/auth.routes';
 import userRoutes from './api/routes/user.routes';
 import { setupEventBus } from './infra/eventBus';
-import { LoggingService } from '@shared/services/logging.service';
+import { LoggerService } from '@send/shared';
 import { createConnection } from 'mongoose';
 
 const app = express();
-const logger = new LoggingService('user-service');
+const logger = new LoggerService({ serviceName: 'user-service' });
 
 // Middleware
 app.use(helmet());

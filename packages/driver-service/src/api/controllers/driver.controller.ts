@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import { DriverService } from '../../infra/services/driver.service';
 import { Driver, DriverStatus } from '@shared/types/driver';
-import { logger } from '@shared/logger';
+import { LoggerService } from '@send/shared';
+import { createErrorResponse, AppError } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'driver-service' });
 
 export class DriverController {
   constructor(private readonly driverService: DriverService) {}
@@ -13,7 +16,7 @@ export class DriverController {
       res.status(201).json(createdDriver);
     } catch (error) {
       logger.error('Failed to create driver:', error);
-      res.status(500).json({ error: 'Failed to create driver' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to create driver', 500)));
     }
   }
 
@@ -25,7 +28,7 @@ export class DriverController {
       res.status(200).json(updatedDriver);
     } catch (error) {
       logger.error('Failed to update driver:', error);
-      res.status(500).json({ error: 'Failed to update driver' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to update driver', 500)));
     }
   }
 
@@ -34,13 +37,13 @@ export class DriverController {
       const { id } = req.params;
       const driver = await this.driverService.getDriver(id);
       if (!driver) {
-        res.status(404).json({ error: 'Driver not found' });
+        res.status(404).json(createErrorResponse(new AppError('Driver not found', 404)));
         return;
       }
       res.status(200).json(driver);
     } catch (error) {
       logger.error('Failed to get driver:', error);
-      res.status(500).json({ error: 'Failed to get driver' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to get driver', 500)));
     }
   }
 
@@ -50,7 +53,7 @@ export class DriverController {
       res.status(200).json(drivers);
     } catch (error) {
       logger.error('Failed to get drivers:', error);
-      res.status(500).json({ error: 'Failed to get drivers' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to get drivers', 500)));
     }
   }
 
@@ -61,7 +64,7 @@ export class DriverController {
       res.status(204).send();
     } catch (error) {
       logger.error('Failed to delete driver:', error);
-      res.status(500).json({ error: 'Failed to delete driver' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to delete driver', 500)));
     }
   }
 
@@ -73,7 +76,7 @@ export class DriverController {
       res.status(200).json(updatedDriver);
     } catch (error) {
       logger.error('Failed to update driver status:', error);
-      res.status(500).json({ error: 'Failed to update driver status' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to update driver status', 500)));
     }
   }
 
@@ -85,7 +88,7 @@ export class DriverController {
       res.status(200).json(updatedDriver);
     } catch (error) {
       logger.error('Failed to assign driver to run:', error);
-      res.status(500).json({ error: 'Failed to assign driver to run' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to assign driver to run', 500)));
     }
   }
 
@@ -96,7 +99,7 @@ export class DriverController {
       res.status(200).json(updatedDriver);
     } catch (error) {
       logger.error('Failed to unassign driver from run:', error);
-      res.status(500).json({ error: 'Failed to unassign driver from run' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to unassign driver from run', 500)));
     }
   }
 
@@ -107,7 +110,7 @@ export class DriverController {
       res.status(200).json(availability);
     } catch (error) {
       logger.error('Failed to get driver availability:', error);
-      res.status(500).json({ error: 'Failed to get driver availability' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to get driver availability', 500)));
     }
   }
 
@@ -119,7 +122,7 @@ export class DriverController {
       res.status(200).json(availability);
     } catch (error) {
       logger.error('Failed to update driver availability:', error);
-      res.status(500).json({ error: 'Failed to update driver availability' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to update driver availability', 500)));
     }
   }
 
@@ -129,7 +132,7 @@ export class DriverController {
       res.status(200).json(drivers);
     } catch (error) {
       logger.error('Failed to get available drivers:', error);
-      res.status(500).json({ error: 'Failed to get available drivers' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to get available drivers', 500)));
     }
   }
 
@@ -140,7 +143,7 @@ export class DriverController {
       res.status(200).json(performance);
     } catch (error) {
       logger.error('Failed to get driver performance:', error);
-      res.status(500).json({ error: 'Failed to get driver performance' });
+      res.status(500).json(createErrorResponse(new AppError('Failed to get driver performance', 500)));
     }
   }
 }

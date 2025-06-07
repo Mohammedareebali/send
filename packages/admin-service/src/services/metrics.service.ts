@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
-import { LoggingService } from '@shared/services/logging.service';
+import { databaseService, LoggerService } from '@send/shared';
 
 interface Metrics {
   totalRunsToday: number;
@@ -14,15 +14,11 @@ export class MetricsService {
   private documentDb: PrismaClient;
   private openIncidents = 0;
   private rabbit: RabbitMQService;
-  private logger = new LoggingService('admin-service');
+  private logger = new LoggerService({ serviceName: 'admin-service' });
 
   constructor() {
-    this.runDb = new PrismaClient({
-      datasources: { db: { url: process.env.RUN_DATABASE_URL! } }
-    });
-    this.documentDb = new PrismaClient({
-      datasources: { db: { url: process.env.DOCUMENT_DATABASE_URL! } }
-    });
+    this.runDb = databaseService.getPrismaClient();
+    this.documentDb = databaseService.getPrismaClient();
 
     this.rabbit = new RabbitMQService(
       {

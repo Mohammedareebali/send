@@ -4,14 +4,15 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
-import { PrismaClient } from '@prisma/client';
+import { databaseService, LoggerService, HealthCheckService } from '@send/shared';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceController } from './api/controllers/invoice.controller';
 import { createInvoiceRoutes } from './api/routes/invoice.routes';
 import { MonitoringService } from '@send/shared';
-import { logger } from '@shared/logger';
+const logger = new LoggerService({ serviceName: 'invoicing-service' });
 
-const prisma = new PrismaClient();
+const prisma = databaseService.getPrismaClient();
+const healthCheck = new HealthCheckService(prisma, null, logger.getLogger(), 'invoicing-service');
 export const invoiceService = new InvoiceService(prisma);
 const invoiceController = new InvoiceController(invoiceService);
 
@@ -26,6 +27,11 @@ app.use(rateLimit('invoicing-service'));
 
 app.use('/api/invoices', createInvoiceRoutes(invoiceController));
 
+app.get('/health', async (_req, res) => {
+  const health = await healthCheck.checkHealth();
+  res.status(health.status === 'UP' ? 200 : 503).json(health);
+});
+
 const monitoringService = MonitoringService.getInstance();
 app.get('/metrics', async (_req, res) => {
   try {
@@ -38,5 +44,5 @@ app.get('/metrics', async (_req, res) => {
   }
 });
 
-export { app, prisma };
+export { app, prisma, logger };
 export default app;
