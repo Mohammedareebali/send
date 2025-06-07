@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
 
 import { logger } from '@shared/logger';
+import { getServiceConfig } from './config';
 
 const prisma = new PrismaClient();
 const { rabbitMQUrl, port } = getServiceConfig();

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -9,11 +9,7 @@ import { RabbitMQService } from './infra/messaging/rabbitmq';
 import { RouteService } from './infra/services/route.service';
 import { ScheduleService } from './infra/services/schedule.service';
 import { createRunRoutes } from './api/routes/run.routes';
-<<<<<<< HEAD
-import { createErrorResponse } from '@shared/responses';
-=======
 import { errorHandler } from '@shared/errors';
->>>>>>> main
 
 const app = express();
 const prisma = new PrismaClient();
@@ -43,13 +39,6 @@ const runController = new RunController(
 app.use('/api/runs', createRunRoutes(runController));
 
 // Error handling middleware
-<<<<<<< HEAD
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json(createErrorResponse(err));
-});
-=======
-app.use(errorHandler);
->>>>>>> main
+app.use(errorHandler as ErrorRequestHandler);
 
 export default app; 
