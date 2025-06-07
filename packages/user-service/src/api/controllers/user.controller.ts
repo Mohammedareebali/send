@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { UserModel } from '../../data/models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { UserRole, DriverData, PAData, GuardianData } from '@shared/types';
@@ -10,6 +10,7 @@ import { PasswordResetTokenModel } from '../../data/models/passwordResetToken.mo
 import { NotificationService } from '../../../../system-notification-service/src/services/notification.service';
 import { NotificationChannel, NotificationPriority } from '../../../../system-notification-service/src/types/notification.types';
 import { publishEvent } from '../../infra/eventBus';
+import { AppError } from '@shared/errors';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -18,7 +19,7 @@ export enum UserStatus {
 }
 
 export const UserController = {
-  async register(req: Request, res: Response) {
+  async register(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password, firstName, lastName, role, ...roleData } = req.body;
       
@@ -45,20 +46,20 @@ export const UserController = {
 
       res.status(201).json(user);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async login(req: Request, res: Response) {
+  async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
       const user = await UserModel.findByEmail(email);
       if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        throw new AppError('Invalid credentials', 401);
       }
       const isValid = await bcrypt.compare(password, user.password);
       if (!isValid) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        throw new AppError('Invalid credentials', 401);
       }
 
       await UserModel.update(user.id, {
@@ -76,23 +77,23 @@ export const UserController = {
 
       res.json({ token });
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async getProfile(req: AuthRequest, res: Response) {
+  async getProfile(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const user = await UserModel.findById(req.user!.id);
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        throw new AppError('User not found', 404);
       }
       res.json(user);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async updateProfile(req: AuthRequest, res: Response) {
+  async updateProfile(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.user!;
       const { firstName, lastName, ...roleData } = req.body;
@@ -100,7 +101,7 @@ export const UserController = {
       // Get current user to check role
       const currentUser = await UserModel.findById(id);
       if (!currentUser) {
-        return res.status(404).json({ error: 'User not found' });
+        throw new AppError('User not found', 404);
       }
 
       // Update user data
@@ -123,39 +124,39 @@ export const UserController = {
 
       res.json(user);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async changePassword(req: AuthRequest, res: Response) {
+  async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.user!;
       const { currentPassword, newPassword } = req.body;
       const user = await UserModel.findById(id);
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        throw new AppError('User not found', 404);
       }
       const isValid = await bcrypt.compare(currentPassword, user.password);
       if (!isValid) {
-        return res.status(401).json({ error: 'Invalid current password' });
+        throw new AppError('Invalid current password', 401);
       }
       const updatedUser = await UserModel.update(id, { password: newPassword });
       res.json(updatedUser);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async requestPasswordReset(req: Request, res: Response) {
+  async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
     try {
       const { email } = req.body;
       if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
+        throw new AppError('Email is required', 400);
       }
 
       const user = await UserModel.findByEmail(email);
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        throw new AppError('User not found', 404);
       }
 
       const token = crypto.randomBytes(32).toString('hex');
@@ -180,20 +181,20 @@ export const UserController = {
 
       res.json({ message: 'Password reset email sent' });
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async resetPassword(req: Request, res: Response) {
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { token, newPassword } = req.body;
       if (!token || !newPassword) {
-        return res.status(400).json({ error: 'Token and newPassword are required' });
+        throw new AppError('Token and newPassword are required', 400);
       }
 
       const record = await PasswordResetTokenModel.findByToken(token);
       if (!record) {
-        return res.status(400).json({ error: 'Invalid or expired token' });
+        throw new AppError('Invalid or expired token', 400);
       }
 
       await UserModel.update(record.userId, { password: newPassword });
@@ -201,33 +202,33 @@ export const UserController = {
 
       res.json({ message: 'Password reset successful' });
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async getAllUsers(req: AuthRequest, res: Response) {
+  async getAllUsers(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const users = await UserModel.getAllUsers();
       res.json(users);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async getUserById(req: AuthRequest, res: Response) {
+  async getUserById(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const user = await UserModel.findById(id);
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        throw new AppError('User not found', 404);
       }
       res.json(user);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async updateUser(req: AuthRequest, res: Response) {
+  async updateUser(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { role, ...data } = req.body;
@@ -240,11 +241,11 @@ export const UserController = {
 
       res.json(user);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 
-  async deleteUser(req: AuthRequest, res: Response) {
+  async deleteUser(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       await UserModel.delete(id);
@@ -252,7 +253,7 @@ export const UserController = {
 
       res.status(204).send();
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   }
-}; 
+};
