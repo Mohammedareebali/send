@@ -1,7 +1,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { StudentModel } from '../../data/models/student.model';
 import { StudentCreateInput, StudentUpdateInput } from '@send/shared';
-import { authenticate } from '@send/shared/src/security/auth';
+import { authenticate } from '@send/shared/security/auth';
 
 const router = Router();
 const studentModel = StudentModel.getInstance();

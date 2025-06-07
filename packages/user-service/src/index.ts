@@ -6,7 +6,7 @@ import { errorHandler } from '@shared/errors';
 import { authRoutes } from './api/routes/auth.routes';
 import userRoutes from './api/routes/user.routes';
 import { setupEventBus } from './infra/eventBus';
-import { LoggingService } from 'shared/src/services/logging.service';
+import { LoggingService } from '@shared/services/logging.service';
 import { createConnection } from 'mongoose';
 
 const app = express();
