@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { RunController } from '../controllers/run.controller';
-import { authMiddleware } from '../../middleware/auth.middleware';
-import { roleMiddleware } from '../../middleware/role.middleware';
+import { authMiddleware } from '../middleware/auth.middleware';
+import { roleMiddleware } from '../middleware/role.middleware';
 import { UserRole } from '@shared/types/user';
 
 export function createRunRoutes(controller: RunController): Router {
