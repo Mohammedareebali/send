@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import { PrismaClient } from '@prisma/client';
 import { InvoiceService } from './services/invoice.service';
 import { InvoiceController } from './api/controllers/invoice.controller';
@@ -16,6 +17,7 @@ const invoiceController = new InvoiceController(invoiceService);
 
 const app = express();
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression());

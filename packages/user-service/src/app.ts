@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
+
 import promBundle from 'express-prom-bundle';
 import { MonitoringService } from './infra/monitoring/monitoring.service';
 import { LoggingService } from '@shared/services/logging.service';
@@ -20,6 +22,7 @@ const monitoringService = MonitoringService.getInstance();
 
 // Middleware
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression() as unknown as express.RequestHandler);

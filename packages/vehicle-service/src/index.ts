@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import { VehicleService } from './services/vehicle.service';
 import { VehicleController } from './api/controllers/vehicle.controller';
 import { createVehicleRoutes } from './api/routes/vehicle.routes';
@@ -25,6 +26,7 @@ const vehicleController = new VehicleController(vehicleService);
 
 // Middleware
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression());

@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import { PrismaClient } from '@prisma/client';
 import { IncidentService } from './services/incident.service';
 import { IncidentController } from './api/controllers/incident.controller';
@@ -31,6 +32,7 @@ const incidentController = new IncidentController(incidentService);
 
 const app = express();
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression());

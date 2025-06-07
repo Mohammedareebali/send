@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import { AdminController } from './api/controllers/admin.controller';
 import { createAdminRoutes } from './api/routes/admin.routes';
 import { MetricsService } from './services/metrics.service';
@@ -18,6 +19,7 @@ const controller = new AdminController(metricsService, configService, reportServ
 
 const app = express();
 app.use(securityHeaders);
+app.use(ipRateLimitMiddleware());
 app.use(cors());
 app.use(helmet());
 app.use(compression());
