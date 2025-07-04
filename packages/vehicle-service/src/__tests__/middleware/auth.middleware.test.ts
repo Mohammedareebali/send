@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
-import { authMiddleware } from '../../middleware/auth.middleware';
+import { authenticate } from '@send/shared/security/auth';
 
 const app = express();
-app.get('/test', authMiddleware, (_: Request, res: Response) => {
+app.get('/test', authenticate(), (_: Request, res: Response) => {
   res.status(200).json({ ok: true });
 });
 

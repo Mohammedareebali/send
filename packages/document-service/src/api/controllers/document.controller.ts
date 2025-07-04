@@ -5,7 +5,7 @@ import { LoggerService } from '@send/shared';
 
 const logger = new LoggerService({ serviceName: 'document-service' });
 import { AppError } from '@shared/errors';
-import { createErrorResponse } from '@shared/responses';
+import { createErrorResponse, createSuccessResponse } from '@shared/responses';
 
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
@@ -20,13 +20,18 @@ export class DocumentController {
           .json(createErrorResponse(new AppError('File is required', 400)));
         return;
       }
-      const document = await this.documentService.uploadDocument(userId, {
-        originalname: file.originalname,
-        mimetype: file.mimetype,
-        size: file.size,
-        buffer: file.buffer,
-      }, type, metadata || {});
-      res.status(201).json(document);
+      const document = await this.documentService.uploadDocument(
+        userId,
+        {
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          buffer: file.buffer
+        },
+        type,
+        metadata || {}
+      );
+      res.status(201).json(createSuccessResponse(document));
     } catch (error) {
       logger.error('Failed to upload document:', error);
       res.status(500).json(createErrorResponse(error as Error));
@@ -43,7 +48,7 @@ export class DocumentController {
           .json(createErrorResponse(new AppError('Document not found', 404)));
         return;
       }
-      res.json(doc);
+      res.json(createSuccessResponse(doc));
     } catch (error) {
       logger.error('Failed to get document:', error);
       res.status(500).json(createErrorResponse(error as Error));
@@ -57,7 +62,7 @@ export class DocumentController {
         userId: userId as string | undefined,
         type: type as string | undefined,
       });
-      res.json(docs);
+      res.json(createSuccessResponse(docs));
     } catch (error) {
       logger.error('Failed to list documents:', error);
       res.status(500).json(createErrorResponse(error as Error));
@@ -86,7 +91,7 @@ export class DocumentController {
         grantedBy,
         expiresAt ? new Date(expiresAt) : undefined
       );
-      res.json(access);
+      res.json(createSuccessResponse(access));
     } catch (error) {
       logger.error('Failed to update document access:', error);
       res.status(500).json(createErrorResponse(error as Error));
@@ -98,7 +103,7 @@ export class DocumentController {
       const { id } = req.params;
       const metadata = req.body.metadata;
       const doc = await this.documentService.updateDocumentMetadata(id, metadata);
-      res.json(doc);
+      res.json(createSuccessResponse(doc));
     } catch (error) {
       logger.error('Failed to update document metadata:', error);
       res.status(500).json(createErrorResponse(error as Error));

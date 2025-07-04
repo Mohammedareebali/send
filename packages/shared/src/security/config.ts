@@ -1,5 +1,6 @@
 import { prometheus } from '../prometheus';
 import { RedisCache } from '../cache/redis';
+import { EnvLoader } from '../config/env';
 
 export interface SecurityConfig {
   jwtSecret: string;
@@ -28,6 +29,7 @@ export class SecurityConfigService {
   private config: SecurityConfig;
 
   private constructor() {
+    EnvLoader.load();
     this.cache = RedisCache.getInstance();
     this.config = this.loadConfig();
   }
