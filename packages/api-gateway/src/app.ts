@@ -1,5 +1,7 @@
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import cors from 'cors';
+import compression from 'compression';
 import { authenticate } from '@send/shared';
 import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
@@ -55,9 +57,11 @@ function createResilientProxy(target: string, serviceName: string) {
 
 const app = express();
 
-app.use(express.json());
 app.use(securityHeaders);
 app.use(ipRateLimitMiddleware());
+app.use(cors());
+app.use(compression());
+app.use(express.json());
 app.use(rateLimit('api-gateway'));
 
 // Request/response logging
