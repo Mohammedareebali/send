@@ -9,8 +9,9 @@ import { createAdminRoutes } from './api/routes/admin.routes';
 import { MetricsService } from './services/metrics.service';
 import { ConfigService } from './services/config.service';
 import { ReportService } from './services/report.service';
-import { MonitoringService } from '@send/shared';
-import { logger } from '@shared/logger';
+import { MonitoringService, LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'admin-service' });
 
 const metricsService = new MetricsService();
 const configService = new ConfigService();

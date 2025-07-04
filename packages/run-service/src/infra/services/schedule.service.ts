@@ -1,6 +1,9 @@
 import { ScheduleType, Run } from '@shared/types/run';
 import { addDays, addWeeks, isBefore, parseISO } from 'date-fns';
 import { RRule } from 'rrule';
+import { LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'run-service' });
 
 export class ScheduleService {
   async calculateNextOccurrence(run: Run): Promise<Date | null> {
@@ -49,7 +52,7 @@ export class ScheduleService {
       const nextDate = rule.after(now);
       return nextDate;
     } catch (error) {
-      console.error('Failed to parse recurrence rule:', error);
+      logger.error('Failed to parse recurrence rule:', error);
       return null;
     }
   }

@@ -6,8 +6,9 @@ import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import studentRoutes from './api/routes/student.routes';
 import { errorHandler } from '@shared/errors';
-import { MonitoringService } from '@send/shared';
-import { logger } from '@shared/logger';
+import { MonitoringService, LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'student-service' });
 
 const app = express();
 

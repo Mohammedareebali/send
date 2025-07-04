@@ -1,4 +1,7 @@
 import Redis from 'redis';
+import { LoggerService } from '../logging/logger.service';
+
+const logger = new LoggerService({ serviceName: 'cache' });
 
 export interface CacheConfig {
   host: string;
@@ -22,10 +25,10 @@ export class RedisCache {
     });
 
     this.client.on('error', (err) => {
-      console.error('Redis Client Error:', err);
+      logger.error('Redis Client Error:', err);
     });
 
-    this.client.connect().catch(console.error);
+    this.client.connect().catch(err => logger.error('Redis connect error:', err));
   }
 
   public static getInstance(config?: CacheConfig): RedisCache {

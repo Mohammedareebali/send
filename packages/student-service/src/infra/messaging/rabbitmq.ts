@@ -1,6 +1,8 @@
 import { StudentEvent, StudentNotification } from '@send/shared';
 import { RabbitMQService as BaseRabbitMQService, RabbitMQConfig } from '@shared/messaging';
-import { logger } from '@shared/logger';
+import { LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'student-service' });
 
 export class RabbitMQService extends BaseRabbitMQService {
   

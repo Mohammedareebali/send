@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { DocumentService } from '../../services/document.service';
 import { Document } from '@shared/types/document';
-import { logger } from '@shared/logger';
+import { LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'document-service' });
 import { AppError } from '@shared/errors';
 import { createErrorResponse } from '@shared/responses';
 

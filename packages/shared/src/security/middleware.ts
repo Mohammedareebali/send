@@ -3,6 +3,9 @@ import { RateLimiter } from './rate-limiter';
 import { prometheus } from '../config/metrics';
 import { createErrorResponse } from '../responses';
 import { AppError } from '../errors';
+import { LoggerService } from '../logging/logger.service';
+
+const logger = new LoggerService({ serviceName: 'security' });
 
 // Security headers middleware
 export const securityHeaders = (req: Request, res: Response, next: NextFunction) => {
@@ -61,7 +64,7 @@ export const rateLimit = (service: string) => {
 
       next();
     } catch (error) {
-      console.error('Rate limit middleware error:', error);
+      logger.error('Rate limit middleware error:', error);
       next();
     }
   };
@@ -80,7 +83,7 @@ export const validateRequest = (schema: any) => {
       }
       next();
     } catch (error) {
-      console.error('Request validation error:', error);
+      logger.error('Request validation error:', error);
       res.status(500).json({
         error: 'Internal Server Error',
         message: 'Failed to validate request'
@@ -91,7 +94,7 @@ export const validateRequest = (schema: any) => {
 
 // Error handling middleware
 export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Unhandled error:', err);
+  logger.error('Unhandled error:', err);
 
   if (err.name === 'ValidationError') {
     return res.status(400).json(

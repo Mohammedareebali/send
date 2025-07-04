@@ -1,5 +1,5 @@
 import { EmailNotification } from '../types/notification.types';
-import { Logger } from 'winston';
+import { LoggerService } from '@send/shared';
 import nodemailer from 'nodemailer';
 
 interface SMTPConfig {
@@ -13,7 +13,7 @@ interface SMTPConfig {
 export class EmailProvider {
   private transporter: any;
 
-  constructor(private readonly logger: Logger) {
+  constructor(private readonly logger: LoggerService) {
     const config: SMTPConfig = {
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,

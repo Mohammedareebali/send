@@ -1,9 +1,9 @@
 import { PushNotification } from '../types/notification.types';
-import { Logger } from 'winston';
+import { LoggerService } from '@send/shared';
 import admin from 'firebase-admin';
 
 export class PushProvider {
-  constructor(private readonly logger: Logger) {
+  constructor(private readonly logger: LoggerService) {
     if (!admin.apps.length) {
       const serviceAccount = process.env.FCM_SERVICE_ACCOUNT;
       if (serviceAccount) {
