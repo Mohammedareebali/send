@@ -1,6 +1,12 @@
 import { Request, Response } from 'express';
 import { StudentModel } from '../data/models/student.model';
-import { Student, StudentCreateInput, StudentUpdateInput, StudentWhereInput } from '@shared/types/student';
+import {
+  Student,
+  StudentCreateInput,
+  StudentUpdateInput,
+  StudentWhereInput
+} from '@shared/types/student';
+import { createSuccessResponse } from '@send/shared';
 
 export class StudentController {
   private model: StudentModel;
@@ -13,7 +19,7 @@ export class StudentController {
     try {
       const studentData = req.body as StudentCreateInput;
       const student = await this.model.create(studentData);
-      res.status(201).json(student);
+      res.status(201).json(createSuccessResponse(student));
     } catch (error) {
       res.status(500).json({ error: 'Failed to create student' });
     }
@@ -27,7 +33,7 @@ export class StudentController {
       if (!student) {
         return res.status(404).json({ error: 'Student not found' });
       }
-      res.json(student);
+      res.json(createSuccessResponse(student));
     } catch (error) {
       res.status(500).json({ error: 'Failed to update student' });
     }
@@ -40,7 +46,7 @@ export class StudentController {
       if (!student) {
         return res.status(404).json({ error: 'Student not found' });
       }
-      res.json(student);
+      res.json(createSuccessResponse(student));
     } catch (error) {
       res.status(500).json({ error: 'Failed to get student' });
     }
@@ -51,7 +57,7 @@ export class StudentController {
       const { parentId } = req.params;
       const where: StudentWhereInput = { parentId };
       const students = await this.model.findAll(where);
-      res.json(students);
+      res.json(createSuccessResponse(students));
     } catch (error) {
       res.status(500).json({ error: 'Failed to get students' });
     }
@@ -60,7 +66,7 @@ export class StudentController {
   async getAllStudents(req: Request, res: Response) {
     try {
       const students = await this.model.findAll();
-      res.json(students);
+      res.json(createSuccessResponse(students));
     } catch (error) {
       res.status(500).json({ error: 'Failed to get students' });
     }

@@ -1,15 +1,29 @@
 import { Request, Response } from 'express';
 import { VehicleService } from '../../services/vehicle.service';
-import { CreateVehicleDto, UpdateVehicleDto, TelemetryRecordDto } from '../dto/vehicle.dto';
+import {
+  CreateVehicleDto,
+  UpdateVehicleDto,
+  TelemetryRecordDto
+} from '../dto/vehicle.dto';
 import { VehicleStatus } from '@shared/types/vehicle';
+import {
+  createSuccessResponse,
+  createPaginatedResponse
+} from '@send/shared';
+import {
+  createSuccessResponse,
+  createPaginatedResponse
+} from '@send/shared';
 
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
   async createVehicle(req: Request, res: Response): Promise<void> {
     try {
-      const vehicle = await this.vehicleService.createVehicle(req.body as CreateVehicleDto);
-      res.status(201).json(vehicle);
+      const vehicle = await this.vehicleService.createVehicle(
+        req.body as CreateVehicleDto
+      );
+      res.status(201).json(createSuccessResponse(vehicle));
     } catch (error) {
       res.status(500).json({ message: 'Error creating vehicle', error });
     }
@@ -17,12 +31,15 @@ export class VehicleController {
 
   async updateVehicle(req: Request, res: Response): Promise<void> {
     try {
-      const vehicle = await this.vehicleService.updateVehicle(req.params.id, req.body as UpdateVehicleDto);
+      const vehicle = await this.vehicleService.updateVehicle(
+        req.params.id,
+        req.body as UpdateVehicleDto
+      );
       if (!vehicle) {
         res.status(404).json({ message: 'Vehicle not found' });
         return;
       }
-      res.json(vehicle);
+      res.json(createSuccessResponse(vehicle));
     } catch (error) {
       res.status(500).json({ message: 'Error updating vehicle', error });
     }
@@ -35,7 +52,7 @@ export class VehicleController {
         res.status(404).json({ message: 'Vehicle not found' });
         return;
       }
-      res.json(vehicle);
+      res.json(createSuccessResponse(vehicle));
     } catch (error) {
       res.status(500).json({ message: 'Error getting vehicle', error });
     }
@@ -44,7 +61,9 @@ export class VehicleController {
   async getVehicles(req: Request, res: Response): Promise<void> {
     try {
       const { vehicles, total } = await this.vehicleService.getAllVehicles(req.query);
-      res.json({ vehicles, total });
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 10;
+      res.json(createPaginatedResponse(vehicles, total, page, limit));
     } catch (error) {
       res.status(500).json({ message: 'Error getting vehicles', error });
     }
@@ -65,8 +84,10 @@ export class VehicleController {
 
   async updateVehicleStatus(req: Request, res: Response): Promise<void> {
     try {
-      const vehicle = await this.vehicleService.updateVehicle(req.params.id, { status: req.body.status });
-      res.json(vehicle);
+      const vehicle = await this.vehicleService.updateVehicle(req.params.id, {
+        status: req.body.status
+      });
+      res.json(createSuccessResponse(vehicle));
     } catch (error) {
       res.status(500).json({ message: 'Error updating vehicle status', error });
     }
@@ -74,8 +95,11 @@ export class VehicleController {
 
   async assignVehicleToRun(req: Request, res: Response): Promise<void> {
     try {
-      const vehicle = await this.vehicleService.assignVehicleToRun(req.params.id, req.body.runId);
-      res.json(vehicle);
+      const vehicle = await this.vehicleService.assignVehicleToRun(
+        req.params.id,
+        req.body.runId
+      );
+      res.json(createSuccessResponse(vehicle));
     } catch (error) {
       res.status(500).json({ message: 'Error assigning vehicle to run', error });
     }
@@ -84,7 +108,7 @@ export class VehicleController {
   async unassignVehicleFromRun(req: Request, res: Response): Promise<void> {
     try {
       const vehicle = await this.vehicleService.unassignVehicleFromRun(req.params.id);
-      res.json(vehicle);
+      res.json(createSuccessResponse(vehicle));
     } catch (error) {
       res.status(500).json({ message: 'Error unassigning vehicle from run', error });
     }
@@ -93,7 +117,7 @@ export class VehicleController {
   async getAvailableVehicles(req: Request, res: Response): Promise<void> {
     try {
       const vehicles = await this.vehicleService.getAvailableVehicles();
-      res.json(vehicles);
+      res.json(createSuccessResponse(vehicles));
     } catch (error) {
       res.status(500).json({ message: 'Error getting available vehicles', error });
     }
@@ -111,7 +135,7 @@ export class VehicleController {
   async getMaintenanceHistory(req: Request, res: Response): Promise<void> {
     try {
       const history = await this.vehicleService.getMaintenanceHistory(req.params.id);
-      res.json(history);
+      res.json(createSuccessResponse(history));
     } catch (error) {
       res.status(500).json({ message: 'Error getting maintenance history', error });
     }
@@ -123,7 +147,7 @@ export class VehicleController {
         req.params.id,
         req.body as TelemetryRecordDto
       );
-      res.status(201).json(record);
+      res.status(201).json(createSuccessResponse(record));
     } catch (error) {
       res.status(500).json({ message: 'Error adding telemetry record', error });
     }
@@ -136,7 +160,7 @@ export class VehicleController {
         res.status(404).json({ message: 'Telemetry not found' });
         return;
       }
-      res.json(record);
+      res.json(createSuccessResponse(record));
     } catch (error) {
       res.status(500).json({ message: 'Error getting latest telemetry', error });
     }
