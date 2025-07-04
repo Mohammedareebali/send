@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { Login } from './components/Login'
 import { CommunicationPanel } from './components/CommunicationPanel'
+// @ts-ignore
 import './index.css'
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('token'))
+  const [loggedIn, setLoggedIn] = useState<boolean>(!!localStorage.getItem('token'))
 
   if (!loggedIn) {
     return <Login onLogin={() => setLoggedIn(true)} />
