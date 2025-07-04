@@ -91,7 +91,10 @@ describe('StudentController', () => {
       await studentController.createStudent(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to create student' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to create student' }
+      });
     });
   });
 
@@ -125,7 +128,10 @@ describe('StudentController', () => {
       await studentController.getStudent(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Student not found' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: { code: 'AppError', message: 'Student not found' }
+      });
     });
 
     it('should return 500 on error', async () => {
@@ -135,7 +141,10 @@ describe('StudentController', () => {
       await studentController.getStudent(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to get student' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to get student' }
+      });
     });
   });
 
@@ -193,7 +202,10 @@ describe('StudentController', () => {
       await studentController.getStudents(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to get students' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to get students' }
+      });
     });
   });
 
@@ -226,7 +238,10 @@ describe('StudentController', () => {
       await studentController.addGuardian(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to add guardian' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to add guardian' }
+      });
     });
   });
 
@@ -250,7 +265,10 @@ describe('StudentController', () => {
       await studentController.removeGuardian(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to remove guardian' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to remove guardian' }
+      });
     });
   });
 
@@ -283,7 +301,10 @@ describe('StudentController', () => {
       await studentController.recordAttendance(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to record attendance' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to record attendance' }
+      });
     });
   });
 }); 
