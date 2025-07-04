@@ -20,6 +20,7 @@ import { errorHandler } from "@shared/errors";
 import { MonitoringService } from "@send/shared";
 const logger = new LoggerService({ serviceName: "run-service" });
 
+
 const app = express();
 const prisma = databaseService.getPrismaClient();
 const runModel = new RunModel(prisma);
@@ -40,7 +41,6 @@ rabbitMQ.connect().catch(console.error);
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(cors());
-app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(rateLimit("run-service"));

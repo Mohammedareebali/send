@@ -10,13 +10,13 @@ import { errorHandler } from "@shared/errors";
 import { MonitoringService } from "@send/shared";
 import { logger } from "@shared/logger";
 
+
 const app = express();
 
 // Middleware
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(cors());
-app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(rateLimit("student-service"));

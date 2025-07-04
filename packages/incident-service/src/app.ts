@@ -17,6 +17,7 @@ import { RabbitMQService } from "@shared/messaging/rabbitmq.service";
 import { startEscalationJob } from "./jobs/escalation.job";
 import { MonitoringService } from "@send/shared";
 
+
 export const prisma = databaseService.getPrismaClient();
 export const logger = new LoggerService({
   serviceName: "incident-service",
@@ -45,7 +46,6 @@ const app = express();
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(cors());
-app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(rateLimit("incident-service"));

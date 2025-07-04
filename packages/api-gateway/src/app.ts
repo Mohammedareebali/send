@@ -1,3 +1,4 @@
+
 import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { authenticate } from "@send/shared";
@@ -8,6 +9,7 @@ import { serviceConfig } from "./config";
 import { LoggerService } from "@shared/logging/logger.service";
 import { CircuitBreakerService } from "@shared/circuit-breaker";
 import { MonitoringService } from "@send/shared";
+
 
 const logger = new LoggerService({
   serviceName: "api-gateway",
@@ -56,10 +58,12 @@ function createResilientProxy(target: string, serviceName: string) {
 
 const app = express();
 
+
 app.use(express.json());
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(rateLimit("api-gateway"));
+
 
 // Request/response logging
 app.use((req, res, next) => {

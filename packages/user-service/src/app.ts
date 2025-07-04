@@ -5,6 +5,7 @@ import compression from "compression";
 import { rateLimit } from "@send/shared/security/middleware";
 import { securityHeadersMiddleware } from "@send/shared/security/headers";
 
+
 import { ipRateLimitMiddleware } from "@send/shared/security/ip-rate-limiter";
 
 import promBundle from "express-prom-bundle";
@@ -24,7 +25,6 @@ const monitoringService = MonitoringService.getInstance();
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(cors());
-app.use(helmet());
 app.use(compression() as unknown as express.RequestHandler);
 app.use(express.json());
 app.use(rateLimit("user-service"));

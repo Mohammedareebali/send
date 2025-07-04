@@ -1,3 +1,4 @@
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -13,6 +14,7 @@ import { ReportService } from "./services/report.service";
 import { MonitoringService } from "@send/shared";
 import { logger } from "@shared/logger";
 
+
 const metricsService = new MetricsService();
 const configService = new ConfigService();
 const reportService = new ReportService(metricsService);
@@ -26,7 +28,6 @@ const app = express();
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(cors());
-app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(rateLimit("admin-service"));

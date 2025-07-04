@@ -16,6 +16,7 @@ import { createInvoiceRoutes } from "./api/routes/invoice.routes";
 import { MonitoringService } from "@send/shared";
 const logger = new LoggerService({ serviceName: "invoicing-service" });
 
+
 const prisma = databaseService.getPrismaClient();
 const healthCheck = new HealthCheckService(
   prisma,
@@ -30,7 +31,6 @@ const app = express();
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(cors());
-app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(rateLimit("invoicing-service"));

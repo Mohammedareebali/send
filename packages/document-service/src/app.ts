@@ -16,6 +16,7 @@ import { errorHandler, AppError } from "@shared/errors";
 import { createErrorResponse } from "@shared/responses";
 import { MonitoringService } from "@send/shared";
 
+
 const app = express();
 const prisma = databaseService.getPrismaClient();
 
@@ -48,7 +49,6 @@ const healthCheckService = new HealthCheckService(
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(cors());
-app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(rateLimit("document-service"));
