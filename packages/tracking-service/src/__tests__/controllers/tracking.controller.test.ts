@@ -37,7 +37,9 @@ describe('TrackingController - getTrackingStatus', () => {
 
     expect(service.getTrackingStatus).toHaveBeenCalledWith('run1');
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ status: 'IN_PROGRESS' });
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, data: { status: 'IN_PROGRESS' } })
+    );
   });
 
   it('returns 404 when run not found', async () => {

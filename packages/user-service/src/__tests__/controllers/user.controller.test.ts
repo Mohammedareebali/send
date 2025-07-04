@@ -48,7 +48,9 @@ describe('UserController', () => {
       expect(mockedUserModel.create).toHaveBeenCalled();
       expect(publishEvent).toHaveBeenCalledWith('user.created', created);
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(created);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, data: created })
+      );
     });
   });
 
@@ -70,7 +72,9 @@ describe('UserController', () => {
       expect(mockedUserModel.findByEmail).toHaveBeenCalledWith('t@example.com');
       expect(mockedBcrypt.compare).toHaveBeenCalledWith('pw', 'hashed');
       expect(publishEvent).toHaveBeenCalledWith('user.login', { id: user.id, email: user.email });
-      expect(res.json).toHaveBeenCalledWith({ token: 'token' });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, data: { token: 'token' } })
+      );
     });
 
     it('returns 401 for invalid credentials', async () => {

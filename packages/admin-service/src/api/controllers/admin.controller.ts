@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { MetricsService } from '../../services/metrics.service';
 import { ConfigService } from '../../services/config.service';
 import { ReportService } from '../../services/report.service';
+import { createSuccessResponse } from '@send/shared';
 
 export class AdminController {
   constructor(
@@ -12,21 +13,21 @@ export class AdminController {
 
   async metrics(req: Request, res: Response): Promise<void> {
     const metrics = await this.metricsService.getMetrics();
-    res.json(metrics);
+    res.json(createSuccessResponse(metrics));
   }
 
   async reports(req: Request, res: Response): Promise<void> {
     const reports = await this.reportService.getReports();
-    res.json(reports);
+    res.json(createSuccessResponse(reports));
   }
 
   async getConfig(req: Request, res: Response): Promise<void> {
     const config = await this.configService.getConfig();
-    res.json(config);
+    res.json(createSuccessResponse(config));
   }
 
   async updateConfig(req: Request, res: Response): Promise<void> {
     const config = await this.configService.updateConfig(req.body);
-    res.json(config);
+    res.json(createSuccessResponse(config));
   }
 }
