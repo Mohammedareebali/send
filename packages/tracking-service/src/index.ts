@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import { EnvLoader } from '@send/shared';
 import express from 'express';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
@@ -14,6 +14,8 @@ import { TrackingController } from './api/controllers/tracking.controller';
 import { createTrackingRoutes } from './api/routes/tracking.routes';
 import { Geofence } from '@shared/types/tracking';
 import { MonitoringService } from '@send/shared';
+
+EnvLoader.load();
 
 const app = express();
 const httpServer = createServer(app);
