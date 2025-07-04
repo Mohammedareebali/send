@@ -11,6 +11,9 @@ import { createIncidentRoutes } from './api/routes/incident.routes';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
 import { startEscalationJob } from './jobs/escalation.job';
 import { MonitoringService } from '@send/shared';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 export const prisma = databaseService.getPrismaClient();
 export const logger = new LoggerService({
@@ -41,6 +44,9 @@ app.use(express.json());
 app.use(rateLimit('incident-service'));
 
 app.use('/api/incidents', createIncidentRoutes(incidentController));
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/health', async (_req, res) => {
   const health = await healthCheck.checkHealth();

@@ -7,6 +7,9 @@ import { serviceConfig } from './config';
 import { LoggerService } from '@shared/logging/logger.service';
 import { CircuitBreakerService } from '@shared/circuit-breaker';
 import { MonitoringService } from '@send/shared';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 const logger = new LoggerService({
   serviceName: 'api-gateway',
@@ -75,6 +78,9 @@ app.use((req, res, next) => {
 
 // Apply authentication to all API routes
 app.use('/api', authenticate());
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Proxy rules
 

@@ -62,6 +62,7 @@ pnpm test
 - `GET /api/runs/:id` - Get a specific run
 - `GET /api/runs/my-runs` - Get runs assigned to the current user (Driver/PA only)
 - `PUT /api/runs/:id/complete` - Mark a run as completed (Driver only)
+- `GET /docs` - API documentation
 
 ## Environment Variables
 

@@ -9,6 +9,9 @@ import { InvoiceService } from './services/invoice.service';
 import { InvoiceController } from './api/controllers/invoice.controller';
 import { createInvoiceRoutes } from './api/routes/invoice.routes';
 import { MonitoringService } from '@send/shared';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 const logger = new LoggerService({ serviceName: 'invoicing-service' });
 
 const prisma = databaseService.getPrismaClient();
@@ -26,6 +29,9 @@ app.use(express.json());
 app.use(rateLimit('invoicing-service'));
 
 app.use('/api/invoices', createInvoiceRoutes(invoiceController));
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/health', async (_req, res) => {
   const health = await healthCheck.checkHealth();

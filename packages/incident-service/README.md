@@ -17,6 +17,7 @@ The Incident Service handles reporting and management of service disruptions or 
 - `GET /api/incidents/:id` - Retrieve a single incident
 - `PUT /api/incidents/:id` - Update an incident
 - `DELETE /api/incidents/:id` - Delete an incident
+- `GET /docs` - API documentation
 
 ## Installation
 

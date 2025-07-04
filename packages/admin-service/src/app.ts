@@ -11,6 +11,9 @@ import { ConfigService } from './services/config.service';
 import { ReportService } from './services/report.service';
 import { MonitoringService } from '@send/shared';
 import { logger } from '@shared/logger';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 const metricsService = new MetricsService();
 const configService = new ConfigService();
@@ -27,6 +30,9 @@ app.use(express.json());
 app.use(rateLimit('admin-service'));
 
 app.use('/api', createAdminRoutes(controller));
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const monitoringService = MonitoringService.getInstance();
 app.get('/metrics', async (_req, res) => {

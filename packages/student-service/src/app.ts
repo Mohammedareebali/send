@@ -8,6 +8,9 @@ import studentRoutes from './api/routes/student.routes';
 import { errorHandler } from '@shared/errors';
 import { MonitoringService } from '@send/shared';
 import { logger } from '@shared/logger';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 const app = express();
 
@@ -22,6 +25,9 @@ app.use(rateLimit('student-service'));
 
 // Routes
 app.use('/api/students', studentRoutes);
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const monitoringService = MonitoringService.getInstance();
 app.get('/metrics', async (_req, res) => {

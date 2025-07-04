@@ -12,6 +12,9 @@ import { createVehicleRoutes } from './api/routes/vehicle.routes';
 import { RabbitMQService } from './infra/messaging/rabbitmq';
 
 import { MonitoringService } from '@send/shared';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 const app = express();
 const server = new Server(app);
@@ -34,6 +37,9 @@ app.use(compression());
 app.use(express.json());
 app.use(rateLimit('vehicle-service'));
 app.use('/api', createVehicleRoutes(vehicleController));
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/health', async (_req, res) => {
   const health = await healthCheck.checkHealth();

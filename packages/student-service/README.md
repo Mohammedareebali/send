@@ -43,4 +43,5 @@ The Student Service manages student profiles, guardians and attendance within th
 - `POST /api/students/:id/add-guardian` – Add a guardian to a student
 - `DELETE /api/students/:id/remove-guardian` – Remove a guardian from a student
 - `POST /api/students/:id/attendance` – Record attendance for a student
+- `GET /docs` – API documentation
 

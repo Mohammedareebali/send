@@ -27,6 +27,7 @@ The User Service is a microservice responsible for user management in the SEND T
 - `PUT /api/users/{id}/status` - Update user status
 - `GET /api/users/drivers/available` - Get available drivers
 - `PUT /api/users/drivers/{id}/availability` - Update driver availability
+- `GET /docs` - API documentation
 
 ## Prerequisites
 
