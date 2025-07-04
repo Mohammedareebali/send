@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { prometheus } from '../prometheus';
 import { RedisCache } from '../cache/redis';
-import winston from 'winston';
-import 'winston-daily-rotate-file';
+import { LoggerService } from '../logging/logger.service';
 import { PrismaClient } from '@prisma/client';
 
 export interface AuditLog {
@@ -22,27 +21,16 @@ export interface AuditLog {
 
 export class AuditService {
   private static instance: AuditService;
-  private logger: winston.Logger;
+  private logger: LoggerService;
   private cache: RedisCache;
   private prisma: PrismaClient;
 
   private constructor() {
     this.cache = RedisCache.getInstance();
     this.prisma = new PrismaClient();
-    this.logger = winston.createLogger({
-      level: 'info',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
-      ),
-      transports: [
-        new (require('winston-daily-rotate-file'))({
-          filename: 'logs/audit-%DATE%.log',
-          datePattern: 'YYYY-MM-DD',
-          maxSize: '20m',
-          maxFiles: '14d'
-        })
-      ]
+    this.logger = new LoggerService({
+      serviceName: 'audit-service',
+      logFile: 'logs/audit.log'
     });
   }
 
@@ -91,11 +79,11 @@ export class AuditService {
           responseTime: auditLog.responseTime
         }
       }).catch(error => {
-        console.error('Failed to store audit log:', error);
-        prometheus.httpRequestsTotal.inc({ 
-          method: req.method, 
-          route: req.path, 
-          status_code: '500' 
+        this.logger.error('Failed to store audit log:', { error });
+        prometheus.httpRequestsTotal.inc({
+          method: req.method,
+          route: req.path,
+          status_code: '500'
         });
       });
 
@@ -137,7 +125,7 @@ export class AuditService {
         }
       });
     } catch (error) {
-      console.error('Failed to get audit logs:', error);
+      this.logger.error('Failed to get audit logs:', { error });
       prometheus.httpRequestsTotal.inc({ 
         method: 'GET', 
         route: '/audit/logs', 
@@ -164,7 +152,7 @@ export class AuditService {
         }
       });
     } catch (error) {
-      console.error('Failed to search audit logs:', error);
+      this.logger.error('Failed to search audit logs:', { error });
       prometheus.httpRequestsTotal.inc({ 
         method: 'GET', 
         route: '/audit/search', 
@@ -187,7 +175,7 @@ export class AuditService {
         }
       });
     } catch (error) {
-      console.error('Failed to cleanup old audit logs:', error);
+      this.logger.error('Failed to cleanup old audit logs:', { error });
       prometheus.httpRequestsTotal.inc({ 
         method: 'DELETE', 
         route: '/audit/cleanup', 

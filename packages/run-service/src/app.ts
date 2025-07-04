@@ -35,7 +35,7 @@ const routeService = new RouteService();
 const scheduleService = new ScheduleService();
 
 // Initialize RabbitMQ connection
-rabbitMQ.connect().catch(console.error);
+rabbitMQ.connect().catch(error => logger.error('RabbitMQ connection error', error));
 
 // Middleware
 app.use(securityHeadersMiddleware());

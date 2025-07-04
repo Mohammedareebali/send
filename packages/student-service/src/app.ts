@@ -1,14 +1,14 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import compression from "compression";
-import { rateLimit } from "@send/shared/security/middleware";
-import { securityHeadersMiddleware } from "@send/shared/security/headers";
-import { ipRateLimitMiddleware } from "@send/shared/security/ip-rate-limiter";
-import studentRoutes from "./api/routes/student.routes";
-import { errorHandler } from "@shared/errors";
-import { MonitoringService } from "@send/shared";
-import { logger } from "@shared/logger";
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
+import studentRoutes from './api/routes/student.routes';
+import { errorHandler } from '@shared/errors';
+import { MonitoringService, LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'student-service' });
 
 
 const app = express();

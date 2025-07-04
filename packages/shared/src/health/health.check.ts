@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Channel } from 'amqplib';
-import { Logger } from 'winston';
+import { LoggerService } from '../logging/logger.service';
 
 export interface HealthCheckResult {
   status: 'UP' | 'DOWN';
@@ -24,7 +24,7 @@ export class HealthCheckService {
   constructor(
     private readonly prisma: PrismaClient,
     private readonly rabbitMQChannel: Channel | null,
-    private readonly logger: Logger,
+    private readonly logger: LoggerService,
     private readonly serviceName: string
   ) {}
 

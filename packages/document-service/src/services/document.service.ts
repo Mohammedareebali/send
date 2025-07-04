@@ -3,7 +3,7 @@ import { PrismaClient} from '@prisma/client';
 import { S3 } from 'aws-sdk';
 import { createWorker, Worker } from 'tesseract.js';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
-import { Logger } from 'winston';
+import { LoggerService } from '@send/shared';
 import { Document, DocumentVersion, DocumentAccess, OCRResult } from '@shared/types/document';
 
 interface MulterFile {
@@ -34,7 +34,7 @@ export class DocumentService {
   constructor(
     private readonly prisma: PrismaClient,
     private readonly rabbitMQ: RabbitMQService,
-    private readonly logger: Logger,
+    private readonly logger: LoggerService,
     private readonly s3: S3 = new S3({
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,

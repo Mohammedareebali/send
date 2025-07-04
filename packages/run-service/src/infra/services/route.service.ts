@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { Location } from '@shared/types/run';
 import { getServiceConfig } from '../../config';
+import { LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'run-service' });
 
 export class RouteService {
   private readonly apiKey: string;
@@ -52,7 +55,7 @@ export class RouteService {
         }
       };
     } catch (error) {
-      console.error('Route optimization failed:', error);
+      logger.error('Route optimization failed:', error);
       throw new Error('Failed to optimize route');
     }
   }
@@ -68,7 +71,7 @@ export class RouteService {
 
       return response.data;
     } catch (error) {
-      console.error('Failed to get traffic conditions:', error);
+      logger.error('Failed to get traffic conditions:', error);
       throw new Error('Failed to get traffic conditions');
     }
   }

@@ -1,18 +1,17 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
+import { AdminController } from './api/controllers/admin.controller';
+import { createAdminRoutes } from './api/routes/admin.routes';
+import { MetricsService } from './services/metrics.service';
+import { ConfigService } from './services/config.service';
+import { ReportService } from './services/report.service';
+import { MonitoringService, LoggerService } from '@send/shared';
 
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import compression from "compression";
-import { rateLimit } from "@send/shared/security/middleware";
-import { securityHeadersMiddleware } from "@send/shared/security/headers";
-import { ipRateLimitMiddleware } from "@send/shared/security/ip-rate-limiter";
-import { AdminController } from "./api/controllers/admin.controller";
-import { createAdminRoutes } from "./api/routes/admin.routes";
-import { MetricsService } from "./services/metrics.service";
-import { ConfigService } from "./services/config.service";
-import { ReportService } from "./services/report.service";
-import { MonitoringService } from "@send/shared";
-import { logger } from "@shared/logger";
+const logger = new LoggerService({ serviceName: 'admin-service' });
 
 
 const metricsService = new MetricsService();

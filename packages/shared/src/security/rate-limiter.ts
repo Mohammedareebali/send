@@ -1,5 +1,8 @@
 import Redis from 'ioredis';
 import { prometheus } from '../config/metrics';
+import { LoggerService } from '../logging/logger.service';
+
+const logger = new LoggerService({ serviceName: 'security' });
 
 export class RateLimiter {
   private static instance: RateLimiter;
@@ -79,7 +82,7 @@ export class RateLimiter {
         resetTime,
       };
     } catch (error) {
-      console.error('Rate limit check failed:', error);
+      logger.error('Rate limit check failed:', error);
       // Fail open in case of Redis errors
       return {
         isAllowed: true,

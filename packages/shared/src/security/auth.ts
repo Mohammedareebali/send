@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { prometheus } from '../prometheus';
 import { RedisCache } from '../cache/redis';
+import { LoggerService } from '../logging/logger.service';
 
 export interface AuthConfig {
   jwtSecret: string;
@@ -25,6 +26,7 @@ export class AuthService {
   private static instance: AuthService;
   private cache: RedisCache;
   public config: AuthConfig;
+  private logger = new LoggerService({ serviceName: 'security' });
 
   private constructor() {
     this.cache = RedisCache.getInstance();
@@ -139,7 +141,7 @@ export const authenticate = (options: { requireApiKey?: boolean } = {}) => {
         });
       }
     } catch (error) {
-      console.error('Authentication error:', error);
+      this.logger.error('Authentication error:', error);
       return res.status(500).json({
         error: 'Internal Server Error',
         message: 'Authentication failed'

@@ -1,13 +1,13 @@
 import { TrackingService } from './tracking.service';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
-import { Logger } from 'winston';
+import { LoggerService } from '@send/shared';
 import { Location } from '@shared/types/tracking';
 
 describe('TrackingService', () => {
   let trackingService: TrackingService;
   let mockPrisma: any;
   let mockRabbitMQ: jest.Mocked<RabbitMQService>;
-  let mockLogger: jest.Mocked<Logger>;
+  let mockLogger: jest.Mocked<LoggerService>;
 
   beforeEach(() => {
     mockPrisma = {

@@ -1,6 +1,8 @@
 import { DriverEvent, DriverNotification } from '../../types/driver.types';
 import { RabbitMQService as BaseRabbitMQService, RabbitMQConfig } from '@shared/messaging';
-import { logger } from '@shared/logger';
+import { LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'driver-service' });
 
 export class RabbitMQService extends BaseRabbitMQService {
   constructor(url: string = process.env.RABBITMQ_URL || 'amqp://localhost') {

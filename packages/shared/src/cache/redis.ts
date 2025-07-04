@@ -1,5 +1,8 @@
 import { createClient } from 'redis';
 import { prometheus } from '../prometheus';
+import { LoggerService } from '../logging/logger.service';
+
+const logger = new LoggerService({ serviceName: 'cache' });
 
 export class RedisCache {
   private static instance: RedisCache;
@@ -39,7 +42,7 @@ export class RedisCache {
     });
 
     this.client.on('error', (err) => {
-      console.error('Redis Client Error', err);
+      logger.error('Redis Client Error', err);
       this.cacheErrors.inc({ operation: 'connection' });
     });
 
@@ -78,7 +81,7 @@ export class RedisCache {
       return value;
     } catch (error) {
       this.cacheErrors.inc({ operation: 'get' });
-      console.error('Redis get error:', error);
+      logger.error('Redis get error:', error);
       return null;
     }
   }
@@ -93,7 +96,7 @@ export class RedisCache {
       this.cacheHits.inc({ operation: 'set' });
     } catch (error) {
       this.cacheErrors.inc({ operation: 'set' });
-      console.error('Redis set error:', error);
+      logger.error('Redis set error:', error);
     }
   }
 
@@ -103,7 +106,7 @@ export class RedisCache {
       this.cacheHits.inc({ operation: 'del' });
     } catch (error) {
       this.cacheErrors.inc({ operation: 'del' });
-      console.error('Redis del error:', error);
+      logger.error('Redis del error:', error);
     }
   }
 
@@ -114,7 +117,7 @@ export class RedisCache {
       return exists === 1;
     } catch (error) {
       this.cacheErrors.inc({ operation: 'exists' });
-      console.error('Redis exists error:', error);
+      logger.error('Redis exists error:', error);
       return false;
     }
   }
@@ -126,7 +129,7 @@ export class RedisCache {
       return ttl;
     } catch (error) {
       this.cacheErrors.inc({ operation: 'ttl' });
-      console.error('Redis ttl error:', error);
+      logger.error('Redis ttl error:', error);
       return -2; // Key doesn't exist
     }
   }

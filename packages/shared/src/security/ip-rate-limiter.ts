@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { prometheus } from '../prometheus';
 import { RedisCache } from '../cache/redis.cache';
+import { LoggerService } from '../logging/logger.service';
+
+const logger = new LoggerService({ serviceName: 'security' });
 
 export interface RateLimitConfig {
   windowMs: number;
@@ -90,8 +93,8 @@ export const ipRateLimitMiddleware = (config?: RateLimitConfig) => {
 
       next();
     } catch (error) {
-      console.error('Rate limit error:', error);
+      logger.error('Rate limit error:', error);
       next();
     }
   };
-}; 
+};

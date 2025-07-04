@@ -1,6 +1,8 @@
 import * as amqp from 'amqplib';
 import { config } from '../config';
-import { logger } from '@shared/logger';
+import { LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'user-service' });
 
 let channel: amqp.Channel | null = null;
 let connection: amqp.Connection | null = null;

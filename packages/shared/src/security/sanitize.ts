@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { prometheus } from '../prometheus';
+import { LoggerService } from '../logging/logger.service';
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 
 const window = new JSDOM('').window;
 const purify = DOMPurify(window);
+const logger = new LoggerService({ serviceName: 'security' });
 
 export const sanitizeRequest = () => {
   const sanitizationCounter = new prometheus.Counter({
@@ -49,7 +51,7 @@ export const sanitizeRequest = () => {
 
       next();
     } catch (error) {
-      console.error('Sanitization error:', error);
+      logger.error('Sanitization error:', error);
       res.status(400).json({
         error: 'Bad Request',
         message: 'Failed to sanitize request data'
@@ -115,7 +117,7 @@ export const preventSqlInjection = () => {
 
       next();
     } catch (error) {
-      console.error('SQL injection prevention error:', error);
+      logger.error('SQL injection prevention error:', error);
       res.status(400).json({
         error: 'Bad Request',
         message: 'Potential SQL injection attempt detected'

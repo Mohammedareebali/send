@@ -3,6 +3,9 @@ import { prometheus } from '../prometheus';
 import { Schema } from 'joi';
 import { createValidationErrorResponse } from '../responses/error';
 import { Counter } from 'prom-client';
+import { LoggerService } from '../logging/logger.service';
+
+const logger = new LoggerService({ serviceName: 'security' });
 
 export interface ValidationError {
   field: string;
@@ -57,7 +60,7 @@ export class ValidationService {
         this.validationCounter.inc({ valid: 'true' });
         next();
       } catch (error) {
-        console.error('Validation error:', error);
+        logger.error('Validation error:', error);
         this.validationCounter.inc({ valid: 'false' });
         return res.status(500).json({
           error: 'Internal Server Error',
@@ -96,7 +99,7 @@ export class ValidationService {
         this.validationCounter.inc({ valid: 'true' });
         next();
       } catch (error) {
-        console.error('Validation error:', error);
+        logger.error('Validation error:', error);
         this.validationCounter.inc({ valid: 'false' });
         return res.status(500).json({
           error: 'Internal Server Error',
@@ -135,7 +138,7 @@ export class ValidationService {
         this.validationCounter.inc({ valid: 'true' });
         next();
       } catch (error) {
-        console.error('Validation error:', error);
+        logger.error('Validation error:', error);
         this.validationCounter.inc({ valid: 'false' });
         return res.status(500).json({
           error: 'Internal Server Error',
