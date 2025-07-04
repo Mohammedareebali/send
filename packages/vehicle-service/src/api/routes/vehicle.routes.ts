@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { VehicleController } from '../controllers/vehicle.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { authenticate } from '@send/shared/security/auth';
 import { validateCreateVehicle, validateUpdateVehicle } from '../middleware/validation.middleware';
 
 export function createVehicleRoutes(controller: VehicleController): Router {
   const router = Router();
 
   // Apply authentication middleware to all routes
-  router.use(authMiddleware);
+  router.use(authenticate());
 
   // Vehicle CRUD routes
   router.post('/', validateCreateVehicle, controller.createVehicle.bind(controller));

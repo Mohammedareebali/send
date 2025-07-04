@@ -15,7 +15,9 @@ export class TrackingController {
       res.status(200).json(createSuccessResponse({ message: 'Tracking started' }));
     } catch (error) {
       logger.error('Failed to start tracking:', error);
-      res.status(500).json({ error: 'Failed to start tracking' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to start tracking', 500)));
     }
   }
 
@@ -27,7 +29,9 @@ export class TrackingController {
       res.status(200).json(createSuccessResponse({ message: 'Location updated' }));
     } catch (error) {
       logger.error('Failed to update location:', error);
-      res.status(500).json({ error: 'Failed to update location' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to update location', 500)));
     }
   }
 
@@ -38,7 +42,9 @@ export class TrackingController {
       res.status(200).json(createSuccessResponse({ message: 'Tracking stopped' }));
     } catch (error) {
       logger.error('Failed to stop tracking:', error);
-      res.status(500).json({ error: 'Failed to stop tracking' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to stop tracking', 500)));
     }
   }
 
@@ -47,13 +53,17 @@ export class TrackingController {
       const { runId } = req.params;
       const status = this.trackingService.getTrackingStatus(runId);
       if (!status) {
-        res.status(404).json({ error: 'Run not found' });
+        res
+          .status(404)
+          .json(createErrorResponse(new AppError('Run not found', 404)));
         return;
       }
       res.status(200).json(createSuccessResponse({ status }));
     } catch (error) {
       logger.error('Failed to get tracking status:', error);
-      res.status(500).json({ error: 'Failed to get tracking status' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to get tracking status', 500)));
     }
   }
 
@@ -62,7 +72,9 @@ export class TrackingController {
       const { routeId } = req.params;
       const location = this.trackingService.getLatestLocation(routeId);
       if (!location) {
-        res.status(404).json({ error: 'Location not found' });
+        res
+          .status(404)
+          .json(createErrorResponse(new AppError('Location not found', 404)));
         return;
       }
       res.status(200).json(
@@ -74,7 +86,9 @@ export class TrackingController {
       );
     } catch (error) {
       logger.error('Failed to get latest location:', error);
-      res.status(500).json({ error: 'Failed to get latest location' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to get latest location', 500)));
     }
   }
 }

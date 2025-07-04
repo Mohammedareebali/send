@@ -8,6 +8,7 @@ import {
 } from '@shared/types/student';
 import { createSuccessResponse } from '@send/shared';
 
+
 export class StudentController {
   private model: StudentModel;
 
@@ -21,7 +22,9 @@ export class StudentController {
       const student = await this.model.create(studentData);
       res.status(201).json(createSuccessResponse(student));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create student' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to create student', 500)));
     }
   }
 
@@ -31,11 +34,15 @@ export class StudentController {
       const studentData = req.body as StudentUpdateInput;
       const student = await this.model.update(id, studentData);
       if (!student) {
-        return res.status(404).json({ error: 'Student not found' });
+        return res
+          .status(404)
+          .json(createErrorResponse(new AppError('Student not found', 404)));
       }
       res.json(createSuccessResponse(student));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to update student' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to update student', 500)));
     }
   }
 
@@ -44,11 +51,15 @@ export class StudentController {
       const { id } = req.params;
       const student = await this.model.findById(id);
       if (!student) {
-        return res.status(404).json({ error: 'Student not found' });
+        return res
+          .status(404)
+          .json(createErrorResponse(new AppError('Student not found', 404)));
       }
       res.json(createSuccessResponse(student));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to get student' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to get student', 500)));
     }
   }
 
@@ -59,7 +70,9 @@ export class StudentController {
       const students = await this.model.findAll(where);
       res.json(createSuccessResponse(students));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to get students' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to get students', 500)));
     }
   }
 
@@ -68,7 +81,9 @@ export class StudentController {
       const students = await this.model.findAll();
       res.json(createSuccessResponse(students));
     } catch (error) {
-      res.status(500).json({ error: 'Failed to get students' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to get students', 500)));
     }
   }
 
@@ -78,7 +93,9 @@ export class StudentController {
       await this.model.delete(id);
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ error: 'Failed to delete student' });
+      res
+        .status(500)
+        .json(createErrorResponse(new AppError('Failed to delete student', 500)));
     }
   }
 } 
