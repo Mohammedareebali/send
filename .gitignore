@@ -58,3 +58,4 @@ packages/shared/src/types/vehicle.js
 packages/shared/tsconfig.tsbuildinfo
 
 /packages/user-service/prisma/generated/
+packages/*/dist/
