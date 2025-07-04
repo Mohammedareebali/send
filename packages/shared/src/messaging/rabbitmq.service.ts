@@ -1,5 +1,5 @@
 import { connect, Channel, Connection } from 'amqplib';
-import { Logger } from 'winston';
+import { LoggerService } from '../logging/logger.service';
 
 export interface RabbitMQConfig {
   url: string;
@@ -15,9 +15,9 @@ export class RabbitMQService {
   private isConnecting: boolean = false;
   private reconnectAttempts: number = 0;
   private readonly config: Required<RabbitMQConfig>;
-  private readonly logger: Logger;
+  private readonly logger: LoggerService;
 
-  constructor(config: RabbitMQConfig, logger: Logger) {
+  constructor(config: RabbitMQConfig, logger: LoggerService) {
     this.config = {
       retryAttempts: 5,
       retryDelay: 5000,

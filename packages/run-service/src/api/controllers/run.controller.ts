@@ -5,6 +5,7 @@ import { RabbitMQService } from '../../infra/messaging/rabbitmq';
 import { RouteService } from '../../infra/services/route.service';
 import { ScheduleService } from '../../infra/services/schedule.service';
 import { AppError } from '@shared/errors';
+import { createSuccessResponse } from '@send/shared';
 
 declare global {
   namespace Express {
@@ -119,7 +120,7 @@ export class RunController {
         await this.rabbitMQ.publishNotification(notification);
       }
 
-      res.json({ run });
+      res.json(createSuccessResponse({ run }));
     } catch (error) {
       next(error);
     }
@@ -145,7 +146,7 @@ export class RunController {
         await this.rabbitMQ.publishNotification(notification);
       }
 
-      res.json({ run });
+      res.json(createSuccessResponse({ run }));
     } catch (error) {
       next(error);
     }
@@ -162,7 +163,7 @@ export class RunController {
       // Publish run completed event
       await this.rabbitMQ.publishRunEvent('RUN_COMPLETED', run);
 
-      res.json({ run });
+      res.json(createSuccessResponse({ run }));
     } catch (error) {
       next(error);
     }
@@ -175,7 +176,7 @@ export class RunController {
       if (!run) {
         throw new AppError('Run not found', 404);
       }
-      res.json({ run });
+      res.json(createSuccessResponse({ run }));
     } catch (error) {
       next(error);
     }
@@ -189,7 +190,7 @@ export class RunController {
         type: type as RunType,
         driverId: driverId as string
       });
-      res.json({ runs });
+      res.json(createSuccessResponse({ runs }));
     } catch (error) {
       next(error);
     }

@@ -4,7 +4,7 @@ import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
 import { PrismaClient } from '@prisma/client';
 import { getDistance, isPointInPolygon } from 'geolib';
 import { Socket } from 'socket.io';
-import { Logger } from 'winston';
+import { LoggerService } from '@send/shared';
 import { Location as SharedLocation } from '@shared/types/tracking';
 
 interface GeolibCoordinates {
@@ -36,7 +36,7 @@ export class TrackingService {
   constructor(
     private readonly prisma: PrismaClient,
     private readonly rabbitMQ: RabbitMQService,
-    private readonly logger: Logger
+    private readonly logger: LoggerService
   ) {}
 
   async startTracking(run: Run): Promise<void> {

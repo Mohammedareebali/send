@@ -1,5 +1,7 @@
 import app from './app';
-import { logger } from '@shared/logger';
+import { LoggerService } from '@send/shared';
+
+const logger = new LoggerService({ serviceName: 'api-gateway' });
 
 const port = process.env.PORT || 8080;
 

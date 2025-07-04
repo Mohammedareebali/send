@@ -1,7 +1,8 @@
-import { config as dotenvConfig } from 'dotenv';
 import { ConnectionOptions } from 'typeorm';
+import { EnvLoader } from '@send/shared';
+import { SecurityConfigService } from '@send/shared/security/config';
 
-dotenvConfig();
+EnvLoader.load();
 
 interface Config {
   port: number;
@@ -30,8 +31,8 @@ export const config: Config = {
     synchronize: process.env.NODE_ENV !== 'production',
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-secret-key',
-    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+    secret: SecurityConfigService.getInstance().getConfig().jwtSecret,
+    expiresIn: SecurityConfigService.getInstance().getConfig().jwtExpiresIn,
   },
   rabbitMQ: {
     url: process.env.RABBITMQ_URL || 'amqp://localhost',

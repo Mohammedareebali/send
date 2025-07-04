@@ -6,42 +6,42 @@ import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import studentRoutes from './api/routes/student.routes';
 import { errorHandler } from '@shared/errors';
-import { MonitoringService } from '@send/shared';
-import { logger } from '@shared/logger';
+
+import { MonitoringService, LoggerService } from '@send/shared';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerConfig } from '@send/shared/swagger';
+const logger = new LoggerService({ serviceName: 'student-service' });
 
 const app = express();
 
 // Middleware
-app.use(securityHeaders);
+app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
 app.use(cors());
-app.use(helmet());
 app.use(compression());
 app.use(express.json());
-app.use(rateLimit('student-service'));
+app.use(rateLimit("student-service"));
 
 // Routes
-app.use('/api/students', studentRoutes);
+app.use("/api/students", studentRoutes);
 
 const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const monitoringService = MonitoringService.getInstance();
-app.get('/metrics', async (_req, res) => {
+app.get("/metrics", async (_req, res) => {
   try {
     const metrics = await monitoringService.getMetrics();
-    res.set('Content-Type', 'text/plain');
+    res.set("Content-Type", "text/plain");
     res.send(metrics);
   } catch (error) {
-    logger.error('Failed to get metrics:', error);
-    res.status(500).send('Failed to get metrics');
+    logger.error("Failed to get metrics:", error);
+    res.status(500).send("Failed to get metrics");
   }
 });
 
 // Error handling middleware
 app.use(errorHandler);
 
-export default app; 
+export default app;

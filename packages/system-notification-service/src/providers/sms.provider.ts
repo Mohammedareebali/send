@@ -1,5 +1,5 @@
 import { SMSNotification } from '../types/notification.types';
-import { Logger } from 'winston';
+import { LoggerService } from '@send/shared';
 import twilio from 'twilio';
 
 interface TwilioConfig {
@@ -12,7 +12,7 @@ export class SMSProvider {
   private client: twilio.Twilio;
   private from?: string;
 
-  constructor(private readonly logger: Logger) {
+  constructor(private readonly logger: LoggerService) {
     const config: TwilioConfig = {
       accountSid: process.env.TWILIO_ACCOUNT_SID,
       authToken: process.env.TWILIO_AUTH_TOKEN,

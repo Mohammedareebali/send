@@ -1,6 +1,6 @@
 import { TrackingService } from '../../infra/services/tracking.service';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
-import { Logger } from 'winston';
+import { LoggerService } from '@send/shared';
 import { Run, RunStatus, RunType, ScheduleType } from '@shared/types/run';
 import { Location } from '@shared/types/tracking';
 
@@ -8,7 +8,7 @@ describe('TrackingService', () => {
   let trackingService: TrackingService;
   let mockRabbitMQ: jest.Mocked<RabbitMQService>;
   let mockPrisma: any;
-  let mockLogger: jest.Mocked<Logger>;
+  let mockLogger: jest.Mocked<LoggerService>;
   let mockRun: Run;
   let mockGeofences: any[];
 

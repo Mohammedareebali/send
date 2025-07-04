@@ -1,7 +1,9 @@
 import { Run, RunNotification } from '@shared/types/run';
 import { RabbitMQService as BaseRabbitMQService, RabbitMQConfig } from '@shared/messaging';
-import { logger } from '@shared/logger';
+import { LoggerService } from '@send/shared';
 import { getServiceConfig } from '../../config';
+
+const logger = new LoggerService({ serviceName: 'run-service' });
 
 export class RabbitMQService extends BaseRabbitMQService {
   constructor(url: string = getServiceConfig().rabbitMQUrl) {

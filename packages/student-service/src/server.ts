@@ -1,6 +1,8 @@
-import 'dotenv/config';
+import { EnvLoader } from '@send/shared';
 import app from './app';
 import { databaseService, LoggerService } from '@send/shared';
+
+EnvLoader.load();
 
 const prisma = databaseService.getPrismaClient();
 const logger = new LoggerService({ serviceName: 'student-service' });

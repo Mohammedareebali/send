@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { prometheus } from '../prometheus';
+import { LoggerService } from '../logging/logger.service';
+
+const logger = new LoggerService({ serviceName: 'security' });
 
 export const securityHeadersMiddleware = () => {
   const securityHeadersCounter = new prometheus.Counter({
@@ -58,8 +61,8 @@ export const securityHeadersMiddleware = () => {
 
       next();
     } catch (error) {
-      console.error('Security headers error:', error);
+      logger.error('Security headers error:', error);
       next();
     }
   };
-}; 
+};

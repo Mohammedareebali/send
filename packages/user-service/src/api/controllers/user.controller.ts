@@ -1,16 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserModel } from '../../data/models/user.model';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { UserRole, DriverData, PAData, GuardianData } from '@shared/types';
 import { mapPrismaRoleToShared, mapSharedRoleToPrisma } from '../../data/mappers/user.mapper';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { SecurityConfigService } from '@send/shared/security/config';
 import crypto from 'crypto';
 import { PasswordResetTokenModel } from '../../data/models/passwordResetToken.model';
 import { NotificationService } from '../../../../system-notification-service/src/services/notification.service';
 import { NotificationChannel, NotificationPriority } from '../../../../system-notification-service/src/types/notification.types';
 import { publishEvent } from '../../infra/eventBus';
 import { AppError } from '@shared/errors';
+import { createSuccessResponse } from '@send/shared';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -44,7 +45,7 @@ export const UserController = {
 
       await publishEvent('user.created', user);
 
-      res.status(201).json(user);
+      res.status(201).json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
@@ -71,29 +72,29 @@ export const UserController = {
 
       const token = jwt.sign(
         { id: user.id, email: user.email, role: mapPrismaRoleToShared(user.role) },
-        process.env.JWT_SECRET || 'your-secret-key',
+        SecurityConfigService.getInstance().getConfig().jwtSecret,
         { expiresIn: '1d' }
       );
 
-      res.json({ token });
+      res.json(createSuccessResponse({ token }));
     } catch (error: any) {
       next(error);
     }
   },
 
-  async getProfile(req: AuthRequest, res: Response, next: NextFunction) {
+  async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
       const user = await UserModel.findById(req.user!.id);
       if (!user) {
         throw new AppError('User not found', 404);
       }
-      res.json(user);
+      res.json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
   },
 
-  async updateProfile(req: AuthRequest, res: Response, next: NextFunction) {
+  async updateProfile(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.user!;
       const { firstName, lastName, ...roleData } = req.body;
@@ -122,13 +123,13 @@ export const UserController = {
 
       await publishEvent('user.updated', user);
 
-      res.json(user);
+      res.json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
   },
 
-  async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
+  async changePassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.user!;
       const { currentPassword, newPassword } = req.body;
@@ -141,7 +142,7 @@ export const UserController = {
         throw new AppError('Invalid current password', 401);
       }
       const updatedUser = await UserModel.update(id, { password: newPassword });
-      res.json(updatedUser);
+      res.json(createSuccessResponse(updatedUser));
     } catch (error: any) {
       next(error);
     }
@@ -179,7 +180,7 @@ export const UserController = {
         htmlContent: `<p>Your password reset token is: <strong>${token}</strong></p>`
       });
 
-      res.json({ message: 'Password reset email sent' });
+      res.json(createSuccessResponse({ message: 'Password reset email sent' }));
     } catch (error: any) {
       next(error);
     }
@@ -200,35 +201,35 @@ export const UserController = {
       await UserModel.update(record.userId, { password: newPassword });
       await PasswordResetTokenModel.delete(record.id);
 
-      res.json({ message: 'Password reset successful' });
+      res.json(createSuccessResponse({ message: 'Password reset successful' }));
     } catch (error: any) {
       next(error);
     }
   },
 
-  async getAllUsers(req: AuthRequest, res: Response, next: NextFunction) {
+  async getAllUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await UserModel.getAllUsers();
-      res.json(users);
+      res.json(createSuccessResponse(users));
     } catch (error: any) {
       next(error);
     }
   },
 
-  async getUserById(req: AuthRequest, res: Response, next: NextFunction) {
+  async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const user = await UserModel.findById(id);
       if (!user) {
         throw new AppError('User not found', 404);
       }
-      res.json(user);
+      res.json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
   },
 
-  async updateUser(req: AuthRequest, res: Response, next: NextFunction) {
+  async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { role, ...data } = req.body;
@@ -239,13 +240,13 @@ export const UserController = {
 
       await publishEvent('user.updated', user);
 
-      res.json(user);
+      res.json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
   },
 
-  async deleteUser(req: AuthRequest, res: Response, next: NextFunction) {
+  async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       await UserModel.delete(id);

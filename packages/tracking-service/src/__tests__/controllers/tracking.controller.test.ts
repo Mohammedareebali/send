@@ -37,7 +37,9 @@ describe('TrackingController - getTrackingStatus', () => {
 
     expect(service.getTrackingStatus).toHaveBeenCalledWith('run1');
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ status: 'IN_PROGRESS' });
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, data: { status: 'IN_PROGRESS' } })
+    );
   });
 
   it('returns 404 when run not found', async () => {
@@ -47,7 +49,10 @@ describe('TrackingController - getTrackingStatus', () => {
     await controller.getTrackingStatus(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Run not found' });
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      error: { code: 'AppError', message: 'Run not found' }
+    });
   });
 
   it('handles errors from service', async () => {
@@ -59,6 +64,9 @@ describe('TrackingController - getTrackingStatus', () => {
     await controller.getTrackingStatus(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to get tracking status' });
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      error: { code: 'AppError', message: 'Failed to get tracking status' }
+    });
   });
 });

@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { S3 } from 'aws-sdk';
 import { createWorker } from 'tesseract.js';
 import { RabbitMQService } from '@shared/messaging/rabbitmq.service';
-import { Logger } from 'winston';
+import { LoggerService } from '@send/shared';
 
 // Mock Prisma client
 jest.mock('@prisma/client', () => {
@@ -62,14 +62,17 @@ jest.mock('@shared/messaging/rabbitmq.service', () => ({
   }))
 }));
 
-// Mock Logger
-jest.mock('winston', () => ({
-  Logger: jest.fn().mockImplementation(() => ({
+// Mock LoggerService
+jest.mock('@send/shared', () => ({
+  LoggerService: jest.fn().mockImplementation(() => ({
     info: jest.fn(),
     error: jest.fn(),
     debug: jest.fn(),
-    warn: jest.fn()
-  }))
+    warn: jest.fn(),
+    getLogger: jest.fn()
+  })),
+  RabbitMQService: jest.requireActual('@shared/messaging').RabbitMQService,
+  databaseService: jest.requireActual('@send/shared').databaseService
 }));
 
 describe('DocumentService', () => {
@@ -83,8 +86,8 @@ describe('DocumentService', () => {
   beforeEach(() => {
     mockPrisma = new PrismaClient();
     mockS3 = new S3();
-    mockRabbitMQ = new RabbitMQService({ url: 'amqp://localhost', exchange: 'test', queue: 'test' }, new Logger());
-    mockLogger = new Logger();
+    mockRabbitMQ = new RabbitMQService({ url: 'amqp://localhost', exchange: 'test', queue: 'test' }, new LoggerService({ serviceName: 'test' }));
+    mockLogger = new LoggerService({ serviceName: 'test' });
     mockOcrWorker = {
       load: jest.fn().mockResolvedValue(undefined),
       loadLanguage: jest.fn().mockResolvedValue(undefined),
