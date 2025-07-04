@@ -1,3 +1,16 @@
+import express from 'express';
+import { databaseService, LoggerService, HealthCheckService } from '@send/shared';
+import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
+import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import { RabbitMQService } from './infra/messaging/rabbitmq';
+import { DriverService } from './infra/services/driver.service';
+import { DriverController } from './api/controllers/driver.controller';
+import { createDriverRoutes } from './api/routes/driver.routes';
+import { MonitoringService } from '@send/shared';
+
 import express from "express";
 import {
   databaseService,
@@ -15,6 +28,9 @@ import { DriverService } from "./infra/services/driver.service";
 import { DriverController } from "./api/controllers/driver.controller";
 import { createDriverRoutes } from "./api/routes/driver.routes";
 import { MonitoringService } from "@send/shared";
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 const app = express();
 const prisma = databaseService.getPrismaClient();
@@ -42,7 +58,12 @@ app.use(rateLimit("driver-service"));
 // Set up routes
 app.use("/api", createDriverRoutes(driverController));
 
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
 app.get("/health", async (_req, res) => {
+
   const health = await healthCheck.checkHealth();
   res.status(health.status === "UP" ? 200 : 503).json(health);
 });

@@ -14,6 +14,9 @@ import { TrackingController } from './api/controllers/tracking.controller';
 import { createTrackingRoutes } from './api/routes/tracking.routes';
 import { Geofence } from '@shared/types/tracking';
 import { MonitoringService } from '@send/shared';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 
 EnvLoader.load();
@@ -77,6 +80,10 @@ app.use(rateLimit("tracking-service"));
 
 // Set up routes
 app.use("/api", createTrackingRoutes(trackingController));
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 app.get("/health", async (_req, res) => {
   const health = await healthCheck.checkHealth();

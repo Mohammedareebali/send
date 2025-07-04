@@ -8,6 +8,9 @@ import userRoutes from './api/routes/user.routes';
 import { setupEventBus } from './infra/eventBus';
 import { LoggerService } from '@send/shared';
 import { createConnection } from 'mongoose';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 const app = express();
 const logger = new LoggerService({ serviceName: 'user-service' });
@@ -24,6 +27,9 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Error handling
 app.use(errorHandler);

@@ -9,6 +9,9 @@ import { createAdminRoutes } from './api/routes/admin.routes';
 import { MetricsService } from './services/metrics.service';
 import { ConfigService } from './services/config.service';
 import { ReportService } from './services/report.service';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 import { MonitoringService, LoggerService } from '@send/shared';
 
 const logger = new LoggerService({ serviceName: 'admin-service' });
@@ -32,6 +35,9 @@ app.use(express.json());
 app.use(rateLimit("admin-service"));
 
 app.use("/api", createAdminRoutes(controller));
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const monitoringService = MonitoringService.getInstance();
 app.get("/metrics", async (_req, res) => {

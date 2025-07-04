@@ -28,3 +28,4 @@ This service manages driver data and publishes driver events.
     { "startTime": "2024-05-02T13:00:00Z", "endTime": "2024-05-02T17:00:00Z" }
   ]
   ```
+- `/docs` - API documentation

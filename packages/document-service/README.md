@@ -57,6 +57,7 @@ pnpm test
 ### Health Check
 
 - `GET /health` – Service health status
+- `GET /docs` – API documentation
 
 Example upload using `curl`:
 

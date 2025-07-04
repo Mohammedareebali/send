@@ -72,6 +72,7 @@ POST /vehicles/:id/telemetry
 ```http
 GET /vehicles/:id/telemetry/latest
 ```
+- `GET /docs` - API documentation
 
 ## Performance Considerations
 

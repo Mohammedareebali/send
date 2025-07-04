@@ -6,10 +6,12 @@ import { securityHeaders, rateLimit } from '@send/shared/security/middleware';
 import { ipRateLimitMiddleware } from '@send/shared/security/ip-rate-limiter';
 import studentRoutes from './api/routes/student.routes';
 import { errorHandler } from '@shared/errors';
+
 import { MonitoringService, LoggerService } from '@send/shared';
-
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 const logger = new LoggerService({ serviceName: 'student-service' });
-
 
 const app = express();
 
@@ -23,6 +25,9 @@ app.use(rateLimit("student-service"));
 
 // Routes
 app.use("/api/students", studentRoutes);
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const monitoringService = MonitoringService.getInstance();
 app.get("/metrics", async (_req, res) => {

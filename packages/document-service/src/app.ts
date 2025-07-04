@@ -1,3 +1,4 @@
+
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -15,7 +16,9 @@ import { createDocumentRoutes } from "./api/routes/document.routes";
 import { errorHandler, AppError } from "@shared/errors";
 import { createErrorResponse } from "@shared/responses";
 import { MonitoringService } from "@send/shared";
-
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 
 const app = express();
 const prisma = databaseService.getPrismaClient();
@@ -55,6 +58,9 @@ app.use(rateLimit("document-service"));
 
 // Routes
 app.use("/api/documents", createDocumentRoutes(documentController));
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check
 app.get("/health", async (req, res) => {

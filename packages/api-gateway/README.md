@@ -37,3 +37,7 @@ pnpm --filter api-gateway build
 ```bash
 pnpm --filter api-gateway start
 ```
+
+## Documentation
+
+Swagger UI is available at `/docs`.

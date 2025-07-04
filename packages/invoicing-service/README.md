@@ -15,6 +15,7 @@ The Invoicing Service generates and tracks invoices for completed routes within 
 - `GET /api/invoices` - List invoices
 - `GET /api/invoices/:id` - Retrieve a single invoice
 - `PUT /api/invoices/:id/status` - Update invoice status
+- `GET /docs` - API documentation
 
 ## Installation
 

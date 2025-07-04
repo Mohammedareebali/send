@@ -18,6 +18,9 @@ import { ScheduleService } from "./infra/services/schedule.service";
 import { createRunRoutes } from "./api/routes/run.routes";
 import { errorHandler } from "@shared/errors";
 import { MonitoringService } from "@send/shared";
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from '@send/shared/swagger';
 const logger = new LoggerService({ serviceName: "run-service" });
 
 
@@ -55,6 +58,10 @@ const runController = new RunController(
 
 // Routes
 app.use("/api/runs", createRunRoutes(runController));
+
+const swaggerSpec = swaggerJsdoc({ definition: swaggerConfig, apis: [] });
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 app.get("/health", async (_req, res) => {
   const health = await healthCheck.checkHealth();

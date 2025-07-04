@@ -15,6 +15,7 @@ The Admin Service powers the administrative dashboard for SEND Dispatch, aggrega
 - `GET /api/admin/reports` - Retrieve generated reports
 - `GET /api/admin/config` - Retrieve tenant configuration
 - `PUT /api/admin/config` - Update tenant configuration
+- `GET /docs` - API documentation
 
 ## Installation
 
