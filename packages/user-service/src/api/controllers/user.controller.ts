@@ -71,7 +71,7 @@ export const UserController = {
       await publishEvent('user.login', { id: user.id, email: user.email });
 
       const token = jwt.sign(
-        { id: user.id, email: user.email, role: mapPrismaRoleToShared(user.role) },
+        { id: user.id, email: user.email, roles: [mapPrismaRoleToShared(user.role)] },
         SecurityConfigService.getInstance().getConfig().jwtSecret,
         { expiresIn: '1d' }
       );
