@@ -1,8 +1,8 @@
-import { config as dotenvConfig } from 'dotenv';
 import { ConnectionOptions } from 'typeorm';
+import { EnvLoader } from '@send/shared';
 import { SecurityConfigService } from '@send/shared/security/config';
 
-dotenvConfig();
+EnvLoader.load();
 
 interface Config {
   port: number;
