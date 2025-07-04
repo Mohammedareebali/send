@@ -43,6 +43,9 @@ describe('InvoiceController', () => {
     const res = await request(app).get('/invoices/1');
 
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({ error: 'Invoice not found' });
+    expect(res.body).toEqual({
+      success: false,
+      error: { code: 'AppError', message: 'Invoice not found' }
+    });
   });
 });
