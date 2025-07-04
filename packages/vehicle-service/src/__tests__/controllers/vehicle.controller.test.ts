@@ -75,7 +75,10 @@ describe('VehicleController', () => {
         .send({});
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to create vehicle' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to create vehicle' }
+      });
     });
   });
 
@@ -109,7 +112,10 @@ describe('VehicleController', () => {
       const response = await request(app).get('/vehicles/1');
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'Vehicle not found' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Vehicle not found' }
+      });
     });
 
     it('should handle errors', async () => {
@@ -118,7 +124,10 @@ describe('VehicleController', () => {
       const response = await request(app).get('/vehicles/1');
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to get vehicle' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to get vehicle' }
+      });
     });
   });
 
@@ -160,7 +169,10 @@ describe('VehicleController', () => {
         .send({});
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'Vehicle not found' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Vehicle not found' }
+      });
     });
 
     it('should handle errors', async () => {
@@ -171,7 +183,10 @@ describe('VehicleController', () => {
         .send({});
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to update vehicle' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to update vehicle' }
+      });
     });
   });
 
@@ -191,7 +206,10 @@ describe('VehicleController', () => {
       const response = await request(app).delete('/vehicles/1');
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to delete vehicle' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to delete vehicle' }
+      });
     });
   });
 
@@ -226,7 +244,10 @@ describe('VehicleController', () => {
       const response = await request(app).get('/vehicles');
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to list vehicles' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to list vehicles' }
+      });
     });
   });
 
@@ -268,7 +289,10 @@ describe('VehicleController', () => {
         .send({});
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'Vehicle not found' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Vehicle not found' }
+      });
     });
 
     it('should handle errors', async () => {
@@ -279,7 +303,10 @@ describe('VehicleController', () => {
         .send({});
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to add maintenance record' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to add maintenance record' }
+      });
     });
   });
 
@@ -318,7 +345,10 @@ describe('VehicleController', () => {
         .send({ status: VehicleStatus.MAINTENANCE });
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'Vehicle not found' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Vehicle not found' }
+      });
     });
 
     it('should handle errors', async () => {
@@ -329,7 +359,10 @@ describe('VehicleController', () => {
         .send({ status: VehicleStatus.MAINTENANCE });
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to update vehicle status' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to update vehicle status' }
+      });
     });
   });
 
@@ -370,7 +403,10 @@ describe('VehicleController', () => {
         .send({ runId: 'run1' });
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'Vehicle not found' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Vehicle not found' }
+      });
     });
 
     it('should handle errors', async () => {
@@ -381,7 +417,10 @@ describe('VehicleController', () => {
         .send({ runId: 'run1' });
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to assign vehicle to run' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to assign vehicle to run' }
+      });
     });
   });
 
@@ -416,7 +455,10 @@ describe('VehicleController', () => {
       const response = await request(app).post('/vehicles/1/release');
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: 'Vehicle not found' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Vehicle not found' }
+      });
     });
 
     it('should handle errors', async () => {
@@ -425,7 +467,10 @@ describe('VehicleController', () => {
       const response = await request(app).post('/vehicles/1/release');
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: 'Failed to release vehicle from run' });
+      expect(response.body).toEqual({
+        success: false,
+        error: { code: 'AppError', message: 'Failed to release vehicle from run' }
+      });
     });
   });
 }); 

@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserModel } from '../../data/models/user.model';
-import { AuthRequest } from '../middleware/auth.middleware';
 import { UserRole, DriverData, PAData, GuardianData } from '@shared/types';
 import { mapPrismaRoleToShared, mapSharedRoleToPrisma } from '../../data/mappers/user.mapper';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { SecurityConfigService } from '@send/shared/security/config';
 import crypto from 'crypto';
 import { PasswordResetTokenModel } from '../../data/models/passwordResetToken.model';
 import { NotificationService } from '../../../../system-notification-service/src/services/notification.service';
@@ -72,7 +72,7 @@ export const UserController = {
 
       const token = jwt.sign(
         { id: user.id, email: user.email, role: mapPrismaRoleToShared(user.role) },
-        process.env.JWT_SECRET || 'your-secret-key',
+        SecurityConfigService.getInstance().getConfig().jwtSecret,
         { expiresIn: '1d' }
       );
 
@@ -82,7 +82,7 @@ export const UserController = {
     }
   },
 
-  async getProfile(req: AuthRequest, res: Response, next: NextFunction) {
+  async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
       const user = await UserModel.findById(req.user!.id);
       if (!user) {
@@ -94,7 +94,7 @@ export const UserController = {
     }
   },
 
-  async updateProfile(req: AuthRequest, res: Response, next: NextFunction) {
+  async updateProfile(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.user!;
       const { firstName, lastName, ...roleData } = req.body;
@@ -129,7 +129,7 @@ export const UserController = {
     }
   },
 
-  async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
+  async changePassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.user!;
       const { currentPassword, newPassword } = req.body;
@@ -207,7 +207,7 @@ export const UserController = {
     }
   },
 
-  async getAllUsers(req: AuthRequest, res: Response, next: NextFunction) {
+  async getAllUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await UserModel.getAllUsers();
       res.json(createSuccessResponse(users));
@@ -216,7 +216,7 @@ export const UserController = {
     }
   },
 
-  async getUserById(req: AuthRequest, res: Response, next: NextFunction) {
+  async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const user = await UserModel.findById(id);
@@ -229,7 +229,7 @@ export const UserController = {
     }
   },
 
-  async updateUser(req: AuthRequest, res: Response, next: NextFunction) {
+  async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { role, ...data } = req.body;
@@ -246,7 +246,7 @@ export const UserController = {
     }
   },
 
-  async deleteUser(req: AuthRequest, res: Response, next: NextFunction) {
+  async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       await UserModel.delete(id);
