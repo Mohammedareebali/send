@@ -81,7 +81,9 @@ describe('StudentController', () => {
         data: mockStudent,
       });
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({ student: mockStudent });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, data: { student: mockStudent } })
+      );
     });
 
     it('should return 500 on error', async () => {
@@ -115,7 +117,9 @@ describe('StudentController', () => {
       await studentController.getStudent(req as Request, res as Response);
 
       expect(studentModel.findById).toHaveBeenCalledWith('student-123');
-      expect(res.json).toHaveBeenCalledWith({ student: mockStudent });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, data: { student: mockStudent } })
+      );
     });
 
     it('should return 404 if student not found', async () => {
@@ -160,7 +164,9 @@ describe('StudentController', () => {
       await studentController.getStudents(req as Request, res as Response);
 
       expect(studentModel.findAll).toHaveBeenCalledWith(undefined);
-      expect(res.json).toHaveBeenCalledWith({ students: mockStudents });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, data: { students: mockStudents } })
+      );
     });
 
     it('should filter students by parentId', async () => {
@@ -184,7 +190,9 @@ describe('StudentController', () => {
       await studentController.getStudents(req as Request, res as Response);
 
       expect(studentModel.findAll).toHaveBeenCalledWith({ parentId: 'parent-123' });
-      expect(res.json).toHaveBeenCalledWith({ students: mockStudents });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, data: { students: mockStudents } })
+      );
     });
 
     it('should return 500 on error', async () => {
@@ -216,7 +224,9 @@ describe('StudentController', () => {
         data: mockGuardian,
       });
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({ guardian: mockGuardian });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, data: { guardian: mockGuardian } })
+      );
     });
 
     it('should handle errors', async () => {
@@ -273,7 +283,9 @@ describe('StudentController', () => {
         data: mockAttendance,
       });
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({ attendance: mockAttendance });
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true, data: { attendance: mockAttendance } })
+      );
     });
 
     it('should handle errors', async () => {
