@@ -51,7 +51,7 @@ const healthCheckService = new HealthCheckService(
 // Middleware
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(compression());
 app.use(express.json());
 app.use(rateLimit("document-service"));
