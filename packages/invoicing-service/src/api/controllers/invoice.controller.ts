@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { InvoiceService } from '../../services/invoice.service';
 import { InvoiceStatus } from '@shared/types/invoice';
-import { createErrorResponse, AppError } from '@send/shared';
+import { createSuccessResponse } from '@send/shared';
+
 
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
@@ -9,7 +10,7 @@ export class InvoiceController {
   async create(req: Request, res: Response): Promise<void> {
     try {
       const invoice = await this.invoiceService.createInvoice(req.body);
-      res.status(201).json(invoice);
+      res.status(201).json(createSuccessResponse(invoice));
     } catch (err) {
       res
         .status(500)
@@ -18,7 +19,7 @@ export class InvoiceController {
   }
 
   async list(req: Request, res: Response): Promise<void> {
-    res.json(await this.invoiceService.listInvoices());
+    res.json(createSuccessResponse(await this.invoiceService.listInvoices()));
   }
 
   async getById(req: Request, res: Response): Promise<void> {
@@ -29,7 +30,7 @@ export class InvoiceController {
         .json(createErrorResponse(new AppError('Invoice not found', 404)));
       return;
     }
-    res.json(invoice);
+    res.json(createSuccessResponse(invoice));
   }
 
   async updateStatus(req: Request, res: Response): Promise<void> {
@@ -43,7 +44,7 @@ export class InvoiceController {
         .json(createErrorResponse(new AppError('Invoice not found', 404)));
       return;
     }
-    res.json(invoice);
+    res.json(createSuccessResponse(invoice));
   }
 
   async send(req: Request, res: Response): Promise<void> {
@@ -54,6 +55,6 @@ export class InvoiceController {
         .json(createErrorResponse(new AppError('Invoice not found', 404)));
       return;
     }
-    res.json(invoice);
+    res.json(createSuccessResponse(invoice));
   }
 }

@@ -1,7 +1,13 @@
 import { Request, Response } from 'express';
 import { StudentModel } from '../data/models/student.model';
-import { Student, StudentCreateInput, StudentUpdateInput, StudentWhereInput } from '@shared/types/student';
-import { createErrorResponse, AppError } from '@send/shared';
+import {
+  Student,
+  StudentCreateInput,
+  StudentUpdateInput,
+  StudentWhereInput
+} from '@shared/types/student';
+import { createSuccessResponse } from '@send/shared';
+
 
 export class StudentController {
   private model: StudentModel;
@@ -14,7 +20,7 @@ export class StudentController {
     try {
       const studentData = req.body as StudentCreateInput;
       const student = await this.model.create(studentData);
-      res.status(201).json(student);
+      res.status(201).json(createSuccessResponse(student));
     } catch (error) {
       res
         .status(500)
@@ -32,7 +38,7 @@ export class StudentController {
           .status(404)
           .json(createErrorResponse(new AppError('Student not found', 404)));
       }
-      res.json(student);
+      res.json(createSuccessResponse(student));
     } catch (error) {
       res
         .status(500)
@@ -49,7 +55,7 @@ export class StudentController {
           .status(404)
           .json(createErrorResponse(new AppError('Student not found', 404)));
       }
-      res.json(student);
+      res.json(createSuccessResponse(student));
     } catch (error) {
       res
         .status(500)
@@ -62,7 +68,7 @@ export class StudentController {
       const { parentId } = req.params;
       const where: StudentWhereInput = { parentId };
       const students = await this.model.findAll(where);
-      res.json(students);
+      res.json(createSuccessResponse(students));
     } catch (error) {
       res
         .status(500)
@@ -73,7 +79,7 @@ export class StudentController {
   async getAllStudents(req: Request, res: Response) {
     try {
       const students = await this.model.findAll();
-      res.json(students);
+      res.json(createSuccessResponse(students));
     } catch (error) {
       res
         .status(500)

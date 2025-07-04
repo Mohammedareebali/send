@@ -11,6 +11,7 @@ import { NotificationService } from '../../../../system-notification-service/src
 import { NotificationChannel, NotificationPriority } from '../../../../system-notification-service/src/types/notification.types';
 import { publishEvent } from '../../infra/eventBus';
 import { AppError } from '@shared/errors';
+import { createSuccessResponse } from '@send/shared';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -44,7 +45,7 @@ export const UserController = {
 
       await publishEvent('user.created', user);
 
-      res.status(201).json(user);
+      res.status(201).json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
@@ -75,7 +76,7 @@ export const UserController = {
         { expiresIn: '1d' }
       );
 
-      res.json({ token });
+      res.json(createSuccessResponse({ token }));
     } catch (error: any) {
       next(error);
     }
@@ -87,7 +88,7 @@ export const UserController = {
       if (!user) {
         throw new AppError('User not found', 404);
       }
-      res.json(user);
+      res.json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
@@ -122,7 +123,7 @@ export const UserController = {
 
       await publishEvent('user.updated', user);
 
-      res.json(user);
+      res.json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
@@ -141,7 +142,7 @@ export const UserController = {
         throw new AppError('Invalid current password', 401);
       }
       const updatedUser = await UserModel.update(id, { password: newPassword });
-      res.json(updatedUser);
+      res.json(createSuccessResponse(updatedUser));
     } catch (error: any) {
       next(error);
     }
@@ -179,7 +180,7 @@ export const UserController = {
         htmlContent: `<p>Your password reset token is: <strong>${token}</strong></p>`
       });
 
-      res.json({ message: 'Password reset email sent' });
+      res.json(createSuccessResponse({ message: 'Password reset email sent' }));
     } catch (error: any) {
       next(error);
     }
@@ -200,7 +201,7 @@ export const UserController = {
       await UserModel.update(record.userId, { password: newPassword });
       await PasswordResetTokenModel.delete(record.id);
 
-      res.json({ message: 'Password reset successful' });
+      res.json(createSuccessResponse({ message: 'Password reset successful' }));
     } catch (error: any) {
       next(error);
     }
@@ -209,7 +210,7 @@ export const UserController = {
   async getAllUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await UserModel.getAllUsers();
-      res.json(users);
+      res.json(createSuccessResponse(users));
     } catch (error: any) {
       next(error);
     }
@@ -222,7 +223,7 @@ export const UserController = {
       if (!user) {
         throw new AppError('User not found', 404);
       }
-      res.json(user);
+      res.json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }
@@ -239,7 +240,7 @@ export const UserController = {
 
       await publishEvent('user.updated', user);
 
-      res.json(user);
+      res.json(createSuccessResponse(user));
     } catch (error: any) {
       next(error);
     }

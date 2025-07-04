@@ -3,7 +3,7 @@ import { TrackingService } from '../../infra/services/tracking.service';
 import { Run } from '@shared/types/run';
 import { Location } from '@shared/types/tracking';
 import { logger } from '@shared/logger';
-import { createErrorResponse, AppError } from '@send/shared';
+import { createSuccessResponse } from '@send/shared';
 
 export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
@@ -12,7 +12,7 @@ export class TrackingController {
     try {
       const run = req.body as Run;
       await this.trackingService.startTracking(run);
-      res.status(200).json({ message: 'Tracking started' });
+      res.status(200).json(createSuccessResponse({ message: 'Tracking started' }));
     } catch (error) {
       logger.error('Failed to start tracking:', error);
       res
@@ -26,7 +26,7 @@ export class TrackingController {
       const { runId } = req.params;
       const location = req.body as Location;
       await this.trackingService.updateLocation(runId, location);
-      res.status(200).json({ message: 'Location updated' });
+      res.status(200).json(createSuccessResponse({ message: 'Location updated' }));
     } catch (error) {
       logger.error('Failed to update location:', error);
       res
@@ -39,7 +39,7 @@ export class TrackingController {
     try {
       const { runId } = req.params;
       await this.trackingService.stopTracking(runId);
-      res.status(200).json({ message: 'Tracking stopped' });
+      res.status(200).json(createSuccessResponse({ message: 'Tracking stopped' }));
     } catch (error) {
       logger.error('Failed to stop tracking:', error);
       res
@@ -58,7 +58,7 @@ export class TrackingController {
           .json(createErrorResponse(new AppError('Run not found', 404)));
         return;
       }
-      res.status(200).json({ status });
+      res.status(200).json(createSuccessResponse({ status }));
     } catch (error) {
       logger.error('Failed to get tracking status:', error);
       res
@@ -77,11 +77,13 @@ export class TrackingController {
           .json(createErrorResponse(new AppError('Location not found', 404)));
         return;
       }
-      res.status(200).json({
-        lat: location.latitude,
-        lng: location.longitude,
-        timestamp: location.timestamp,
-      });
+      res.status(200).json(
+        createSuccessResponse({
+          lat: location.latitude,
+          lng: location.longitude,
+          timestamp: location.timestamp
+        })
+      );
     } catch (error) {
       logger.error('Failed to get latest location:', error);
       res

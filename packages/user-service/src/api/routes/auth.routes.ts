@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { AuthService } from '../../core/services/AuthService';
 import { UserRepository } from '../../data/repositories/UserRepository';
 import { AppError } from '@shared/errors';
+import { createSuccessResponse } from '@send/shared';
 import { validateRequest } from '../middleware/validateRequest';
 import { loginSchema, registerSchema } from '../validators/auth.validator';
 import { getRepository } from 'typeorm';
@@ -19,7 +20,7 @@ router.post(
     try {
       const { email, password } = req.body;
       const result = await authService.login(email, password);
-      res.json(result);
+      res.json(createSuccessResponse(result));
     } catch (error) {
       next(error);
     }
@@ -32,7 +33,7 @@ router.post(
   async (req, res, next) => {
     try {
       const user = await authService.register(req.body);
-      res.status(201).json(user);
+      res.status(201).json(createSuccessResponse(user));
     } catch (error) {
       next(error);
     }
@@ -48,7 +49,7 @@ router.post('/refresh-token', async (req, res, next) => {
 
     const user = await authService.validateToken(token);
     const newToken = authService.generateToken(user);
-    res.json({ user, token: newToken });
+    res.json(createSuccessResponse({ user, token: newToken }));
   } catch (error) {
     next(error);
   }

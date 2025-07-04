@@ -1,6 +1,6 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { StudentModel } from '../../data/models/student.model';
-import { StudentCreateInput, StudentUpdateInput } from '@send/shared';
+import { StudentCreateInput, StudentUpdateInput, createSuccessResponse } from '@send/shared';
 import { authenticate } from '@send/shared/security/auth';
 
 const router = Router();
@@ -14,7 +14,7 @@ router.post('/', authenticate(), (async (req: Request, res: Response) => {
       parentId: req.user?.id || ''
     };
     const student = await studentModel.create(studentData);
-    res.status(201).json(student);
+    res.status(201).json(createSuccessResponse(student));
   } catch (error) {
     res.status(500).json({ error: 'Failed to create student' });
   }
@@ -24,7 +24,7 @@ router.post('/', authenticate(), (async (req: Request, res: Response) => {
 router.get('/', authenticate(), (async (req: Request, res: Response) => {
   try {
     const students = await studentModel.findAll({ parentId: req.user?.id });
-    res.json(students);
+    res.json(createSuccessResponse(students));
   } catch (error) {
     res.status(500).json({ error: 'Failed to get students' });
   }
@@ -37,7 +37,7 @@ router.get('/:id', authenticate(), (async (req: Request, res: Response) => {
     if (!student) {
       return res.status(404).json({ error: 'Student not found' });
     }
-    res.json(student);
+    res.json(createSuccessResponse(student));
   } catch (error) {
     res.status(500).json({ error: 'Failed to get student' });
   }
@@ -53,8 +53,11 @@ router.put('/:id', authenticate(), (async (req: Request, res: Response) => {
     if (student.parentId !== req.user?.id) {
       return res.status(403).json({ error: 'Not authorized to update this student' });
     }
-    const updatedStudent = await studentModel.update(req.params.id, req.body as StudentUpdateInput);
-    res.json(updatedStudent);
+    const updatedStudent = await studentModel.update(
+      req.params.id,
+      req.body as StudentUpdateInput
+    );
+    res.json(createSuccessResponse(updatedStudent));
   } catch (error) {
     res.status(500).json({ error: 'Failed to update student' });
   }
@@ -81,7 +84,7 @@ router.delete('/:id', authenticate(), (async (req: Request, res: Response) => {
 router.post('/:id/add-guardian', authenticate(), (async (req: Request, res: Response) => {
   try {
     const guardian = await studentModel.addGuardian(req.params.id, req.body);
-    res.status(201).json(guardian);
+    res.status(201).json(createSuccessResponse(guardian));
   } catch (error) {
     res.status(500).json({ error: 'Failed to add guardian' });
   }
@@ -101,7 +104,7 @@ router.delete('/:id/remove-guardian', authenticate(), (async (req: Request, res:
 router.post('/:id/attendance', authenticate(), (async (req: Request, res: Response) => {
   try {
     const attendance = await studentModel.recordAttendance(req.params.id, req.body);
-    res.status(201).json(attendance);
+    res.status(201).json(createSuccessResponse(attendance));
   } catch (error) {
     res.status(500).json({ error: 'Failed to record attendance' });
   }
