@@ -1,7 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { StudentModel } from '../../data/models/student.model';
 import { RabbitMQService } from '../../infra/messaging/rabbitmq';
-import { Student, StudentEvent, StudentNotification, StudentCreateInput, StudentUpdateInput } from '@send/shared';
+import {
+  Student,
+  StudentEvent,
+  StudentNotification,
+  StudentCreateInput,
+  StudentUpdateInput,
+  createSuccessResponse
+} from '@send/shared';
 import { AppError } from '@shared/errors';
 
 const rabbitMQ = new RabbitMQService();
@@ -24,7 +31,7 @@ export class StudentController {
         data: student
       });
 
-      res.status(201).json({ student });
+      res.status(201).json(createSuccessResponse({ student }));
     } catch (error) {
       next(error);
     }
@@ -43,7 +50,7 @@ export class StudentController {
         data: student
       });
 
-      res.json({ student });
+      res.json(createSuccessResponse({ student }));
     } catch (error) {
       next(error);
     }
@@ -58,7 +65,7 @@ export class StudentController {
         throw new AppError('Student not found', 404);
       }
 
-      res.json({ student });
+      res.json(createSuccessResponse({ student }));
     } catch (error) {
       next(error);
     }
@@ -71,7 +78,7 @@ export class StudentController {
         parentId ? { parentId: parentId as string } : undefined
       );
 
-      res.json({ students });
+      res.json(createSuccessResponse({ students }));
     } catch (error) {
       next(error);
     }
@@ -107,7 +114,7 @@ export class StudentController {
         data: guardian
       });
 
-      res.status(201).json({ guardian });
+      res.status(201).json(createSuccessResponse({ guardian }));
     } catch (error) {
       next(error);
     }
@@ -136,7 +143,7 @@ export class StudentController {
         data: attendance
       });
 
-      res.status(201).json({ attendance });
+      res.status(201).json(createSuccessResponse({ attendance }));
     } catch (error) {
       next(error);
     }
