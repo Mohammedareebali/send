@@ -1,4 +1,3 @@
-
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -36,7 +35,7 @@ const rabbitMQ = new RabbitMQService(
     exchange: "document-events",
     queue: "document-notifications",
   },
-  logger.getLogger(),
+  logger,
 );
 
 const documentService = new DocumentService(prisma, rabbitMQ, logger);
@@ -44,7 +43,7 @@ const documentController = new DocumentController(documentService);
 const healthCheckService = new HealthCheckService(
   prisma,
   rabbitMQ.getChannel(),
-  logger.getLogger(),
+  logger,
   "document-service",
 );
 
