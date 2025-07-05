@@ -9,6 +9,8 @@ export const mapPrismaRoleToShared = (role: PrismaUserRole): SharedUserRole => {
       return SharedUserRole.COORDINATOR;
     case PrismaUserRole.MANAGER:
       return SharedUserRole.MANAGER;
+    case PrismaUserRole.CONTROLLER:
+      return SharedUserRole.CONTROLLER;
     case PrismaUserRole.DRIVER:
       return SharedUserRole.DRIVER;
     case PrismaUserRole.PA:
@@ -30,6 +32,8 @@ export const mapSharedRoleToPrisma = (role: SharedUserRole): PrismaUserRole => {
       return PrismaUserRole.COORDINATOR;
     case SharedUserRole.MANAGER:
       return PrismaUserRole.MANAGER;
+    case SharedUserRole.CONTROLLER:
+      return PrismaUserRole.CONTROLLER;
     case SharedUserRole.DRIVER:
       return PrismaUserRole.DRIVER;
     case SharedUserRole.PA:
