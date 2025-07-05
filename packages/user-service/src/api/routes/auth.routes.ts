@@ -40,16 +40,17 @@ router.post(
   }
 );
 
-router.post('/refresh-token', async (req, res, next) => {
+router.post('/refresh', async (req, res, next) => {
   try {
-    const { token } = req.body;
-    if (!token) {
-      throw new AppError(400, 'Token is required');
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      throw new AppError(400, 'Refresh token is required');
     }
 
-    const user = await authService.validateToken(token);
-    const newToken = authService.generateToken(user);
-    res.json(createSuccessResponse({ user, token: newToken }));
+    const user = await authService.validateRefreshToken(refreshToken);
+    const token = authService.generateToken(user);
+    const newRefresh = await authService.generateRefreshToken(user);
+    res.json(createSuccessResponse({ user, token, refreshToken: newRefresh }));
   } catch (error) {
     next(error);
   }

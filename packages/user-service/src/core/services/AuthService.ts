@@ -3,6 +3,8 @@ import { UserRepository } from '../../data/repositories/UserRepository';
 import { AppError } from '@shared/errors';
 import { config } from '../../config';
 import * as jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { RefreshTokenModel } from '../../data/models/refreshToken.model';
 
 interface UserData {
   email: string;
@@ -13,7 +15,7 @@ interface UserData {
 export class AuthService {
   constructor(private userRepository: UserRepository) {}
 
-  async login(email: string, password: string): Promise<{ user: User; token: string }> {
+  async login(email: string, password: string): Promise<{ user: User; token: string; refreshToken: string }> {
     const user = await this.userRepository.findByEmail(email);
     
     if (!user) {
@@ -30,7 +32,8 @@ export class AuthService {
     }
 
     const token = this.generateToken(user);
-    return { user, token };
+    const refreshToken = await this.generateRefreshToken(user);
+    return { user, token, refreshToken };
   }
 
   async register(userData: UserData): Promise<User> {
@@ -59,6 +62,26 @@ export class AuthService {
     };
 
     return jwt.sign(payload, config.jwt.secret as jwt.Secret, options);
+  }
+
+  public async generateRefreshToken(user: User): Promise<string> {
+    const token = crypto.randomBytes(40).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    await RefreshTokenModel.create({ userId: user.id, token, expiresAt });
+    return token;
+  }
+
+  async validateRefreshToken(token: string): Promise<User> {
+    const record = await RefreshTokenModel.findValid(token);
+    if (!record) {
+      throw new AppError(401, 'Invalid refresh token');
+    }
+    const user = await this.userRepository.findOne({ where: { id: record.userId } });
+    if (!user) {
+      throw new AppError(401, 'User not found');
+    }
+    await RefreshTokenModel.delete(record.id);
+    return user;
   }
 
   async validateToken(token: string): Promise<User> {
