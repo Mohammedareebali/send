@@ -39,6 +39,7 @@ model User {
   pa       Pa?
   guardian Guardian?
   passwordResetTokens PasswordResetToken[]
+  refreshTokens      RefreshToken[]
 
   @@map("users")
 }
@@ -105,4 +106,15 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@map("password_reset_tokens")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
 }
