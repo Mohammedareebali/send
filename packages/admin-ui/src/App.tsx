@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Dashboard } from './components/Dashboard'
 import { Login } from './components/Login'
 import { CommunicationPanel } from './components/CommunicationPanel'
-// @ts-ignore
 import './index.css'
 
 function App() {
