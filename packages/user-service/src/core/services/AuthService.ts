@@ -51,7 +51,7 @@ export class AuthService {
     const payload = {
       id: user.id,
       email: user.email,
-      role: user.role,
+      roles: [user.role],
     };
 
     const options: jwt.SignOptions = {
@@ -66,7 +66,7 @@ export class AuthService {
       const decoded = jwt.verify(token, config.jwt.secret as jwt.Secret) as {
         id: string;
         email: string;
-        role: string;
+        roles: string[];
       };
 
       const user = await this.userRepository.findOne({ where: { id: decoded.id } });

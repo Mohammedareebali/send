@@ -7,7 +7,9 @@ export const roleMiddleware = (allowedRoles: UserRole[]) => {
       return res.status(401).json({ message: 'User not authenticated' });
     }
 
-    if (!allowedRoles.includes(req.user.role as unknown as UserRole)) {
+    const roles = (req.user as any).roles || [ (req.user as any).role ];
+    const hasRole = roles.some((r: any) => allowedRoles.includes(r as UserRole));
+    if (!hasRole) {
       return res.status(403).json({ message: 'Insufficient permissions' });
     }
 
