@@ -107,6 +107,7 @@ pnpm test:coverage
 - `DATABASE_URL` - PostgreSQL connection string
 - `RABBITMQ_URL` - RabbitMQ connection string
 - `JWT_SECRET` - JWT secret for authentication
+- `FRONTEND_URL` - allowed origin for CORS requests
 
 ## Dependencies
 
