@@ -42,6 +42,7 @@ pnpm test
 - `RABBITMQ_URL` – RabbitMQ connection URL
 - `LOG_LEVEL` – Log level (default: info)
 - `LOG_FILE` – Optional log file path
+- `FRONTEND_URL` - allowed origin for CORS requests
 
 ## API Endpoints
 

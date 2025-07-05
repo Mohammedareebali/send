@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { authenticate } from "@send/shared";
 import { rateLimit } from "@send/shared/security/middleware";
@@ -64,6 +65,7 @@ const app = express();
 app.use(express.json());
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
+app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(rateLimit("api-gateway"));
 
 

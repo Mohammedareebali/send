@@ -17,7 +17,7 @@ const logger = new LoggerService({ serviceName: 'user-service' });
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
 app.use((req, res, next) => {
   logger.info('Incoming request', { method: req.method, url: req.url, ip: req.ip });

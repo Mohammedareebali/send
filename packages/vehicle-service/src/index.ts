@@ -41,7 +41,7 @@ const vehicleController = new VehicleController(vehicleService);
 // Middleware
 app.use(securityHeadersMiddleware());
 app.use(ipRateLimitMiddleware());
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(helmet());
 app.use(compression());
 app.use(express.json());

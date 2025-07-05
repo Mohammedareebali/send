@@ -32,6 +32,7 @@ pnpm dev
 ## Environment Variables
 
 - `PORT` - Server port (default: 3011)
+- `FRONTEND_URL` - allowed origin for CORS requests
 
 ## License
 

@@ -186,6 +186,7 @@ Environment variables:
 - `DATABASE_URL`: Database connection string
 - `JWT_SECRET`: JWT signing secret
 - `RABBITMQ_URL`: RabbitMQ connection URL
+- `FRONTEND_URL` - allowed origin for CORS requests
 - `API_KEY`: API key for service authentication
 
 ## Contributing
