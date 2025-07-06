@@ -16,7 +16,7 @@ The User Service is a microservice responsible for user management in the SEND T
 ### Authentication
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - User registration
-- `POST /api/auth/refresh-token` - Refresh JWT token
+- `POST /api/auth/refresh` - Refresh JWT using a refresh token
 - `POST /api/users/password/reset-request` - Request password reset
 - `POST /api/users/password/reset` - Reset password
 
@@ -76,6 +76,14 @@ The User Service is a microservice responsible for user management in the SEND T
 - `JWT_EXPIRES_IN` - JWT token expiration time
 - `RABBITMQ_URL` - RabbitMQ connection URL
 - `RABBITMQ_EXCHANGE` - RabbitMQ exchange name
+
+## Token Lifecycle
+
+After a successful login the service returns both a short-lived JWT and a long lived refresh token.
+The refresh token expires after seven days and should be stored in an HTTP only
+cookie when used from a browser. Clients call `POST /api/auth/refresh` with the
+refresh token to obtain a new JWT and rotated refresh token. The access token is
+sent in the response body and can be used in the `Authorization` header.
 
 ## Event Bus
 
