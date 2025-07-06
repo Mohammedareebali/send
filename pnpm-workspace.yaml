@@ -1,5 +1,4 @@
 packages:
-  - 'packages/admin-ui'
   - 'packages/*'
 
 public-hoist-pattern:
