@@ -29,3 +29,7 @@ This service manages driver data and publishes driver events.
   ]
   ```
 - `/docs` - API documentation
+
+## Environment Variables
+
+- `FRONTEND_URL` - allowed origin for CORS requests

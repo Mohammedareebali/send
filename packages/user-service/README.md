@@ -76,6 +76,7 @@ The User Service is a microservice responsible for user management in the SEND T
 - `JWT_EXPIRES_IN` - JWT token expiration time
 - `RABBITMQ_URL` - RabbitMQ connection URL
 - `RABBITMQ_EXCHANGE` - RabbitMQ exchange name
+- `FRONTEND_URL` - allowed origin for CORS requests
 
 ## Token Lifecycle
 

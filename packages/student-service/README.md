@@ -32,6 +32,7 @@ The Student Service manages student profiles, guardians and attendance within th
 - `DATABASE_URL` – PostgreSQL connection string used by Prisma
 - `JWT_SECRET` – secret key for verifying authentication tokens
 - `RABBITMQ_URL` – RabbitMQ connection URL
+- `FRONTEND_URL` - allowed origin for CORS requests
 
 ## Example API Routes
 

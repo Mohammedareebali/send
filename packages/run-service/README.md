@@ -73,6 +73,7 @@ pnpm test
 - `RABBITMQ_EXCHANGE` - RabbitMQ exchange name
 - `RABBITMQ_QUEUE` - RabbitMQ queue name
 - `MAPS_API_KEY` - Google Maps API key
+- `FRONTEND_URL` - allowed origin for CORS requests
 
 ## Architecture
 

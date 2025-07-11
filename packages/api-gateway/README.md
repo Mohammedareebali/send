@@ -17,6 +17,7 @@ traffic to the underlying services and enforces authentication using the shared
 - `LOG_LEVEL` - Log verbosity (default: `info`)
 - `PROXY_RETRY_ATTEMPTS` - Number of retry attempts for proxied requests (default: `3`)
 - `PROXY_RETRY_DELAY_MS` - Delay between retries in milliseconds (default: `100`)
+- `FRONTEND_URL` - allowed origin for CORS requests
  main
 
 ## Development
