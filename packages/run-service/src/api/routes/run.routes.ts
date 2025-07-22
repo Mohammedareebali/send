@@ -52,5 +52,20 @@ export function createRunRoutes(controller: RunController): Router {
     controller.getAllRuns.bind(controller)
   );
 
+  // Dashboard runs endpoint
+  router.get(
+    '/dashboard-runs',
+    authenticate(),
+    controller.getDashboardRuns.bind(controller)
+  );
+
+  // Bulk run creation endpoint
+  router.post(
+    '/bulk',
+    authenticate(),
+    requireRole([UserRole.ADMIN, UserRole.COORDINATOR]),
+    controller.bulkCreateRuns.bind(controller)
+  );
+
   return router;
 } 

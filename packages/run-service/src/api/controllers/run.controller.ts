@@ -195,4 +195,59 @@ export class RunController {
       next(error);
     }
   }
+
+  /**
+   * GET /dashboard-runs
+   * Returns runs with computed fields and expanded details (mocked for now)
+   */
+  async getDashboardRuns(req: Request, res: Response, next: NextFunction) {
+    try {
+      // For now, fetch all runs (optionally filter by status/type in future)
+      const runs = await this.runModel.findAll();
+      // TODO: Fetch driver/PA/student details from other services
+      // TODO: Fetch progress/eta/currentLocation from tracking-service
+      const dashboardRuns = runs.map(run => ({
+        ...run,
+        isUnassigned: !run.driverId && !run.paId && run.status === 'PENDING',
+        // Mocked tracking fields for now
+        progress: Math.floor(Math.random() * 100),
+        eta: new Date(Date.now() + 30 * 60000).toISOString(),
+        currentLocation: {
+          lat: 51.5074,
+          lng: -0.1278,
+          address: 'Mocked Location'
+        },
+        // Mocked expanded details
+        driver: run.driverId ? { id: run.driverId, name: 'Driver Name' } : null,
+        pa: run.paId ? { id: run.paId, name: 'PA Name' } : null,
+        students: Array.isArray(run.studentIds) ? run.studentIds.map(id => ({ id, name: 'Student Name' })) : []
+      }));
+      res.json(createSuccessResponse({ runs: dashboardRuns }));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /runs/bulk
+   * Accepts an array of run objects and creates them in bulk
+   */
+  async bulkCreateRuns(req: Request, res: Response, next: NextFunction) {
+    try {
+      const runsData = req.body;
+      if (!Array.isArray(runsData)) {
+        return res.status(400).json({ error: 'Request body must be an array of runs' });
+      }
+      // TODO: Validate each run object
+      const createdRuns = [];
+      for (const runData of runsData) {
+        // You may want to add validation and error handling per run
+        const run = await this.runModel.create(runData);
+        createdRuns.push(run);
+      }
+      res.status(201).json(createSuccessResponse({ runs: createdRuns }));
+    } catch (error) {
+      next(error);
+    }
+  }
 }

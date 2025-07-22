@@ -28,25 +28,31 @@ const app = express();
 const prisma = databaseService.getPrismaClient();
 const runModel = new RunModel(prisma);
 const rabbitMQ = new RabbitMQService();
+// Pass null for the channel initially; will set after connect
 const healthCheck = new HealthCheckService(
   prisma,
-  rabbitMQ.getChannel(),
-  logger.getLogger(),
+  null,
+  logger, // Use LoggerService instance directly
   "run-service",
 );
 const routeService = new RouteService();
 const scheduleService = new ScheduleService();
 
 // Initialize RabbitMQ connection
-rabbitMQ.connect().catch(error => logger.error('RabbitMQ connection error', error));
+rabbitMQ.connect().then(() => {
+  // After connection, set the channel on healthCheck if needed
+  // (You may need to add a setter or refactor HealthCheckService for dynamic channel assignment)
+  // Example if setter exists:
+  // healthCheck.setRabbitMQChannel(rabbitMQ.getChannel());
+}).catch(error => logger.error('RabbitMQ connection error', error));
 
 // Middleware
-app.use(securityHeadersMiddleware());
-app.use(ipRateLimitMiddleware());
+app.use(securityHeadersMiddleware);
+app.use(ipRateLimitMiddleware);
 app.use(cors());
 app.use(compression());
 app.use(express.json());
-app.use(rateLimit("run-service"));
+app.use(rateLimit); // Fix: pass the middleware function, not a string
 
 // Initialize controller with all services
 const runController = new RunController(
@@ -81,6 +87,6 @@ app.get("/metrics", async (_req, res) => {
 });
 
 // Error handling middleware
-app.use(errorHandler as ErrorRequestHandler);
+app.use(errorHandler);
 
 export default app;

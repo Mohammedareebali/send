@@ -6,12 +6,12 @@ import { getServiceConfig } from './config';
 
 const prisma = databaseService.getPrismaClient();
 const { rabbitMQUrl, port } = getServiceConfig();
-const rabbitMQ = new RabbitMQService(rabbitMQUrl);
 const logger = new LoggerService({ serviceName: 'run-service' });
-const healthCheck = new HealthCheckService(prisma, rabbitMQ.getChannel(), logger.getLogger(), 'run-service');
+const rabbitMQ = new RabbitMQService(rabbitMQUrl);
+const healthCheck = new HealthCheckService(prisma, rabbitMQ.getChannel(), logger, 'run-service');
 
 // Connect to RabbitMQ
-rabbitMQ.connect().catch(logger.error);
+rabbitMQ.connect().catch((err) => logger.error('RabbitMQ connection error:', err));
 
 async function shutdown() {
   logger.info('Shutting down gracefully...');
