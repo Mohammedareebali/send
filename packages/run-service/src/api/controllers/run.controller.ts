@@ -7,16 +7,6 @@ import { ScheduleService } from '../../infra/services/schedule.service';
 import { AppError } from '@shared/errors';
 import { createSuccessResponse } from '@send/shared';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        role: string;
-      };
-    }
-  }
-}
 
 export class RunController {
   constructor(

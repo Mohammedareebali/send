@@ -1,5 +1,11 @@
 export class PrismaClient {
   [key: string]: any
+  async $connect() {
+    /* no-op for tests */
+  }
+  async $disconnect() {
+    /* no-op for tests */
+  }
 }
 
 // Enum stubs used in tests

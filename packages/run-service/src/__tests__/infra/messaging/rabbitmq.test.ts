@@ -84,7 +84,11 @@ describe('RabbitMQService', () => {
         'run-events',
         'RUN_CREATED',
         expect.any(Buffer),
-        { persistent: true }
+        expect.objectContaining({
+          persistent: true,
+          contentType: 'application/json',
+          timestamp: expect.any(Number)
+        })
       );
     });
 
@@ -128,7 +132,11 @@ describe('RabbitMQService', () => {
         'run-events',
         'notification',
         expect.any(Buffer),
-        { persistent: true }
+        expect.objectContaining({
+          persistent: true,
+          contentType: 'application/json',
+          timestamp: expect.any(Number)
+        })
       );
     });
 
@@ -153,7 +161,11 @@ describe('RabbitMQService', () => {
 
       expect(mockChannel.consume).toHaveBeenCalledWith(
         'run-notifications',
-        expect.any(Function)
+        expect.any(Function),
+        expect.objectContaining({
+          noAck: false,
+          consumerTag: 'run-notifications-consumer'
+        })
       );
     });
 

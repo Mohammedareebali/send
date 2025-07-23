@@ -6,6 +6,7 @@ import { RouteService } from '../../infra/services/route.service';
 import { ScheduleService } from '../../infra/services/schedule.service';
 import { Run, RunStatus, RunType, ScheduleType } from '@shared/types/run';
 import { PrismaClient } from '@prisma/client';
+import { createSuccessResponse } from '@send/shared';
 
 // Event type constants
 const RUN_CREATED = 'RUN_CREATED';
@@ -113,7 +114,7 @@ describe('RunController', () => {
       mockReq.body = runData;
       mockRunModel.create.mockResolvedValue(createdRun);
 
-      await controller.createRun(mockReq as Request, mockRes as Response);
+      await controller.createRun(mockReq as Request, mockRes as Response, jest.fn());
 
       expect(mockRunModel.create).toHaveBeenCalledWith(expect.objectContaining(runData));
       expect(mockPublishRunEvent).toHaveBeenCalledWith(RUN_CREATED, createdRun);
@@ -155,11 +156,13 @@ describe('RunController', () => {
       mockReq.body = updateData;
       mockRunModel.update.mockResolvedValue(updatedRun);
 
-      await controller.updateRun(mockReq as Request, mockRes as Response);
+      await controller.updateRun(mockReq as Request, mockRes as Response, jest.fn());
 
       expect(mockRunModel.update).toHaveBeenCalledWith(runId, updateData);
       expect(mockPublishRunEvent).toHaveBeenCalledWith(RUN_UPDATED, updatedRun);
-      expect(mockRes.json).toHaveBeenCalledWith({ run: updatedRun });
+      expect(mockRes.json).toHaveBeenCalledWith(
+        createSuccessResponse({ run: updatedRun })
+      );
     });
   });
 
@@ -190,11 +193,13 @@ describe('RunController', () => {
       mockReq.params = { id: runId };
       mockRunModel.update.mockResolvedValue(cancelledRun);
 
-      await controller.cancelRun(mockReq as Request, mockRes as Response);
+      await controller.cancelRun(mockReq as Request, mockRes as Response, jest.fn());
 
       expect(mockRunModel.update).toHaveBeenCalledWith(runId, { status: RunStatus.CANCELLED });
       expect(mockPublishRunEvent).toHaveBeenCalledWith(RUN_CANCELLED, cancelledRun);
-      expect(mockRes.json).toHaveBeenCalledWith({ run: cancelledRun });
+      expect(mockRes.json).toHaveBeenCalledWith(
+        createSuccessResponse({ run: cancelledRun })
+      );
     });
   });
 
@@ -226,14 +231,16 @@ describe('RunController', () => {
       mockReq.params = { id: runId };
       mockRunModel.update.mockResolvedValue(completedRun);
 
-      await controller.completeRun(mockReq as Request, mockRes as Response);
+      await controller.completeRun(mockReq as Request, mockRes as Response, jest.fn());
 
       expect(mockRunModel.update).toHaveBeenCalledWith(runId, { 
         status: RunStatus.COMPLETED,
         endTime: expect.any(Date)
       });
       expect(mockPublishRunEvent).toHaveBeenCalledWith(RUN_COMPLETED, completedRun);
-      expect(mockRes.json).toHaveBeenCalledWith({ run: completedRun });
+      expect(mockRes.json).toHaveBeenCalledWith(
+        createSuccessResponse({ run: completedRun })
+      );
     });
   });
 }); 
