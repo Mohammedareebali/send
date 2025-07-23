@@ -1,6 +1,6 @@
-import { PrismaClient } from '@send/shared';
+import { databaseService } from '@send/shared';
 
-const prisma = new PrismaClient();
+const prisma = databaseService.getPrismaClient();
 process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://user:pass@localhost:5432/test';
 
 beforeAll(async () => {

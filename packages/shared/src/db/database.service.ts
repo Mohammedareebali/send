@@ -22,7 +22,7 @@ export class DatabaseService {
     this.prisma.$connect().then(() => {
       incrementConnections();
       logger.info('Database connected successfully');
-    }).catch((error) => {
+    }).catch((error: unknown) => {
       incrementErrors();
       logger.error('Failed to connect to database:', error);
     });
@@ -30,7 +30,7 @@ export class DatabaseService {
     this.prisma.$disconnect().then(() => {
       incrementDisconnections();
       logger.info('Database disconnected successfully');
-    }).catch((error) => {
+    }).catch((error: unknown) => {
       incrementErrors();
       logger.error('Failed to disconnect from database:', error);
     });
